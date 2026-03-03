@@ -5,13 +5,12 @@ import {
   timestamp,
   text,
   check,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
-export const roleTable = pgTable("role", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: varchar("name", { length: 25 }).notNull().unique(),
-});
+
+export const roleEnum  = pgEnum("role", ["user", "admin"]);
 
 export const userTable = pgTable(
   "user",
@@ -20,9 +19,8 @@ export const userTable = pgTable(
     name: varchar("name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     password: text("password").notNull(),
-    roleId: uuid("role_id")
-      .references(() => roleTable.id, { onDelete: "cascade" })
-      .notNull(),
+    role: roleEnum("role").notNull(),
+    refreshToken: text("refresh_token").unique(),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },

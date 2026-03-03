@@ -1,5 +1,6 @@
 CREATE TYPE "public"."event_type" AS ENUM('seed', 'nursery', 'transplant', 'harvest');--> statement-breakpoint
 CREATE TYPE "public"."vote_type" AS ENUM('upvote', 'downvote');--> statement-breakpoint
+CREATE TYPE "public"."role" AS ENUM('user', 'admin');--> statement-breakpoint
 CREATE TABLE "ai_disease_detection" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
@@ -115,21 +116,17 @@ CREATE TABLE "postVote" (
 	"vote" "vote_type" NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "role" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"name" varchar(25) NOT NULL,
-	CONSTRAINT "role_name_unique" UNIQUE("name")
-);
---> statement-breakpoint
 CREATE TABLE "user" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar(255) NOT NULL,
 	"email" varchar(255) NOT NULL,
 	"password" text NOT NULL,
-	"role_id" uuid NOT NULL,
+	"role" "role" NOT NULL,
+	"refresh_token" text,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "user_email_unique" UNIQUE("email"),
+	CONSTRAINT "user_refresh_token_unique" UNIQUE("refresh_token"),
 	CONSTRAINT "email_check" CHECK ("user"."email" ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$')
 );
 --> statement-breakpoint
@@ -153,7 +150,6 @@ ALTER TABLE "postComment" ADD CONSTRAINT "postComment_post_id_posts_id_fk" FOREI
 ALTER TABLE "posts" ADD CONSTRAINT "posts_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "postVote" ADD CONSTRAINT "postVote_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "postVote" ADD CONSTRAINT "postVote_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "user" ADD CONSTRAINT "user_role_id_role_id_fk" FOREIGN KEY ("role_id") REFERENCES "public"."role"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "ai_disease_detection_user_idx" ON "ai_disease_detection" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "crop_category_id_idx" ON "crop" USING btree ("category_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "unique_crop_calendar" ON "crop_calendar" USING btree ("region_id","crop_id","event_type","month");--> statement-breakpoint
