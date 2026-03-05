@@ -8,6 +8,20 @@
       "when": 1772523688960,
       "tag": "0000_fat_nightcrawler",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1772613802639,
+      "tag": "0001_tense_rogue",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772682721790,
+      "tag": "0002_early_centennial",
+      "breakpoints": true
     }
   ]
 }
