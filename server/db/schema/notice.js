@@ -14,6 +14,7 @@ export const noticeTable = pgTable(
     title: varchar("title", { length: 255 }).notNull(),
     content: text("content").notNull(),
     image: text("image"),
+    category:text("category"),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
