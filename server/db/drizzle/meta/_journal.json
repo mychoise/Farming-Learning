@@ -22,6 +22,20 @@
       "when": 1772682721790,
       "tag": "0002_early_centennial",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1772722402700,
+      "tag": "0003_noisy_gladiator",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1772789762140,
+      "tag": "0004_cheerful_hiroim",
+      "breakpoints": true
     }
   ]
 }

@@ -32,11 +32,14 @@ export const aiTextQuery = pgTable("ai_text_query", {
 
 export const aiDiseaseDetection = pgTable("ai_disease_detection", {
   id: uuid("id").primaryKey().defaultRandom(),
-  communicationId: uuid("communication_id")
+  userId: uuid("userId")
     .notNull()
-    .references(() => aiCommunicationSession.id),
+    .references(() => userTable.id),
   image: text("image").notNull(),
   predictedDisease: text("predicted_disease").notNull(),
   confirmatryScore: numeric("confirmatry_score").notNull(),
+  descriptionOfDiseaseByUser: text("description_of_disease_by_user").notNull(),
+  descriptionOfDiseaseByAI: text("description_of_disease_by_ai").notNull(),
+  treatment: text("treatment").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
