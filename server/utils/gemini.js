@@ -18,45 +18,56 @@ export const diseaseDetectionAI = async (descriptionOfDisease, imageUrl) => {
 
   const mimeType = imageResponse.headers.get("content-type") || "image/jpeg";
 
-  const prompt = `You are an expert agricultural plant pathologist specializing in Nepali crops, plant diseases, and farming practices.
+const prompt = `
+You are an expert agricultural plant pathologist specializing in Nepali crops and diseases.
 
-Your task is to analyze:
-1. The farmer's disease description
-2. The plant image (if provided)
+You will analyze:
+1. The farmer's description
+2. The plant image
 
-Use both sources to determine the MOST LIKELY crop disease affecting the plant.
+MANDATORY STEP 1: Identify the crop species from the image before diagnosing disease.
 
-Focus on crops commonly grown in Nepal such as vegetables, fruits, grains, and herbs.
+Common crops in Nepal include:
+Tomato, Potato, Rice, Maize, Wheat, Cabbage, Cauliflower, Chili, Onion, Garlic, Banana, Mango, Mustard, and other vegetables and fruits.
 
-You must prioritize:
-- Symptoms described by the farmer
-- Visual evidence from the image
-- Diseases commonly found in Nepal's Terai, Hill, and Himalayan regions
+STEP 2: Identify visible symptoms such as:
+- Yellowing leaves
+- Spots
+- Wilting
+- Mold
+- Holes
+- Curling
+- Rot
 
-Return EXACTLY this JSON format and nothing else:
+STEP 3: Based on crop + symptoms, determine the MOST LIKELY disease.
+
+STEP 4: Provide treatment suitable for Nepali farmers using:
+- locally available fungicides
+- organic treatments
+- cultural farming practices.
+
+Return EXACTLY this JSON format:
 
 {
-  "predictedDisease": "Most likely disease name",
-  "descriptionByAi": "Clear explanation of the disease, why it matches the symptoms, and what signs confirm it",
-  "treatment": "Practical treatment advice suitable for Nepali farmers including organic or locally available solutions if possible",
+  "plant": "Detected crop name",
+  "predictedDisease": "Most likely disease",
+  "descriptionByAi": "Explanation of why the symptoms match the disease",
+  "treatment": "Practical treatment for Nepali farmers",
   "confirmatoryScore": 0.00
 }
 
 Rules:
-
 1. Output ONLY valid JSON.
-2. Do NOT include markdown, explanations, or extra text.
+2. No markdown or explanations.
 3. confirmatoryScore must be between 0.00 and 1.00.
-4. predictedDisease must contain ONLY one disease name.
-5. If the disease is uncertain, choose the MOST probable disease.
-6. If the image and symptoms do not clearly match a disease, still choose the closest likely disease but reduce the confidence score.
-7. Treatments must be practical for farmers in Nepal (mention common fungicides, organic solutions, or cultural practices).
-8. Avoid scientific jargon when possible — keep it understandable for farmers.
-9. Never invent diseases that do not exist.
-10. Base your reasoning on plant pathology knowledge.
+4. predictedDisease must contain ONLY one disease.
+5. If uncertain, choose the closest likely disease but reduce the confidence.
+6. Use simple language farmers can understand.
+7. Never invent diseases.
 
-Disease description from farmer:
-${descriptionOfDisease}`
+Farmer description:
+${descriptionOfDisease}
+`;
 
   // ✅ OLLAMA (Your llava:7b model - already downloaded!)
   const response = await fetch('http://localhost:11434/api/generate', {
