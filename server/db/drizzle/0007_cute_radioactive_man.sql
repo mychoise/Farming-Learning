@@ -1,0 +1,1 @@
+CREATE INDEX "notice_category" ON "notices" USING btree ("category");

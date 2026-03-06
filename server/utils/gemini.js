@@ -16,8 +16,6 @@ export const diseaseDetectionAI = async (descriptionOfDisease, imageUrl) => {
 
   console.log("Image URL:", imageUrl);
 
-  const mimeType = imageResponse.headers.get("content-type") || "image/jpeg";
-
 const prompt = `
 You are an expert agricultural plant pathologist specializing in Nepali crops and diseases.
 

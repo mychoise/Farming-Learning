@@ -5,7 +5,12 @@ import {
   text,
   timestamp,
   index,
+  pgEnum,
 } from "drizzle-orm/pg-core";
+
+
+export const categoryEnum = pgEnum("category", ["weather", "market", "government","other"]);
+
 
 export const noticeTable = pgTable(
   "notices",
@@ -14,12 +19,13 @@ export const noticeTable = pgTable(
     title: varchar("title", { length: 255 }).notNull(),
     content: text("content").notNull(),
     image: text("image"),
-    category:text("category"),
+    category: categoryEnum("category").notNull(),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
   },
   (table) => [
     index("notice_created_at").on(table.createdAt),
     index("notce_title").on(table.title),
+    index("notice_category").on(table.category),
   ],
 );

@@ -43,6 +43,20 @@
       "when": 1772791889338,
       "tag": "0005_tiresome_midnight",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1772808458255,
+      "tag": "0006_fat_ben_grimm",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1772808503739,
+      "tag": "0007_cute_radioactive_man",
+      "breakpoints": true
     }
   ]
 }
