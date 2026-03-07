@@ -5,64 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1772523688960,
-      "tag": "0000_fat_nightcrawler",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1772613802639,
-      "tag": "0001_tense_rogue",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1772682721790,
-      "tag": "0002_early_centennial",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1772722402700,
-      "tag": "0003_noisy_gladiator",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1772789762140,
-      "tag": "0004_cheerful_hiroim",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1772791889338,
-      "tag": "0005_tiresome_midnight",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1772808458255,
-      "tag": "0006_fat_ben_grimm",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1772808503739,
-      "tag": "0007_cute_radioactive_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1772847240180,
-      "tag": "0008_real_speedball",
+      "when": 1772896001619,
+      "tag": "0000_loud_northstar",
       "breakpoints": true
     }
   ]

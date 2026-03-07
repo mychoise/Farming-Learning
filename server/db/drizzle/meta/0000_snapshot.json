@@ -1,11 +1,11 @@
 {
-  "id": "600095c1-adc7-4444-9147-f9aab2338c8f",
+  "id": "76e15036-4ab2-4121-a9ea-dc7803d6bc60",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.ai_disease_detection": {
-      "name": "ai_disease_detection",
+    "public.ai_communication_session": {
+      "name": "ai_communication_session",
       "schema": "",
       "columns": {
         "id": {
@@ -17,6 +17,59 @@
         },
         "user_id": {
           "name": "user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ai_communication_session_user_id_user_id_fk": {
+          "name": "ai_communication_session_user_id_user_id_fk",
+          "tableFrom": "ai_communication_session",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.ai_disease_detection": {
+      "name": "ai_disease_detection",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "userId": {
+          "name": "userId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -39,45 +92,40 @@
           "primaryKey": false,
           "notNull": true
         },
+        "description_of_disease_by_user": {
+          "name": "description_of_disease_by_user",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description_of_disease_by_ai": {
+          "name": "description_of_disease_by_ai",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "treatment": {
+          "name": "treatment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
         }
       },
-      "indexes": {
-        "ai_disease_detection_user_idx": {
-          "name": "ai_disease_detection_user_idx",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
-        "ai_disease_detection_user_id_user_id_fk": {
-          "name": "ai_disease_detection_user_id_user_id_fk",
+        "ai_disease_detection_userId_user_id_fk": {
+          "name": "ai_disease_detection_userId_user_id_fk",
           "tableFrom": "ai_disease_detection",
           "tableTo": "user",
           "columnsFrom": [
-            "user_id"
+            "userId"
           ],
           "columnsTo": [
             "id"
@@ -103,8 +151,8 @@
           "notNull": true,
           "default": "gen_random_uuid()"
         },
-        "user_id": {
-          "name": "user_id",
+        "communication_id": {
+          "name": "communication_id",
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
@@ -127,23 +175,16 @@
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "ai_text_query_user_id_user_id_fk": {
-          "name": "ai_text_query_user_id_user_id_fk",
+        "ai_text_query_communication_id_ai_communication_session_id_fk": {
+          "name": "ai_text_query_communication_id_ai_communication_session_id_fk",
           "tableFrom": "ai_text_query",
-          "tableTo": "user",
+          "tableTo": "ai_communication_session",
           "columnsFrom": [
-            "user_id"
+            "communication_id"
           ],
           "columnsTo": [
             "id"
@@ -259,29 +300,85 @@
           "primaryKey": false,
           "notNull": true
         },
+        "climate": {
+          "name": "climate",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "soil_type": {
+          "name": "soil_type",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "season": {
+          "name": "season",
+          "type": "season",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
         "nitrogen": {
           "name": "nitrogen",
-          "type": "integer",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true
         },
         "phosphorus": {
           "name": "phosphorus",
-          "type": "integer",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true
         },
         "potassium": {
           "name": "potassium",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "estimated_profit": {
-          "name": "estimated_profit",
           "type": "numeric",
           "primaryKey": false,
           "notNull": true
+        },
+        "growing_guide": {
+          "name": "growing_guide",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "watering_schedule": {
+          "name": "watering_schedule",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "harvesting_tips": {
+          "name": "harvesting_tips",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "difficulty": {
+          "name": "difficulty",
+          "type": "difficulty",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profit_min": {
+          "name": "profit_min",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profit_max": {
+          "name": "profit_max",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -651,6 +748,13 @@
           "primaryKey": false,
           "notNull": false
         },
+        "category": {
+          "name": "category",
+          "type": "category",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -687,6 +791,21 @@
           "columns": [
             {
               "expression": "title",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "notice_category": {
+          "name": "notice_category",
+          "columns": [
+            {
+              "expression": "category",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1153,6 +1272,25 @@
     }
   },
   "enums": {
+    "public.difficulty": {
+      "name": "difficulty",
+      "schema": "public",
+      "values": [
+        "beginner",
+        "intermediate",
+        "advanced"
+      ]
+    },
+    "public.season": {
+      "name": "season",
+      "schema": "public",
+      "values": [
+        "spring",
+        "monsoon",
+        "winter",
+        "all"
+      ]
+    },
     "public.event_type": {
       "name": "event_type",
       "schema": "public",
@@ -1161,6 +1299,16 @@
         "nursery",
         "transplant",
         "harvest"
+      ]
+    },
+    "public.category": {
+      "name": "category",
+      "schema": "public",
+      "values": [
+        "weather",
+        "market",
+        "government",
+        "other"
       ]
     },
     "public.vote_type": {

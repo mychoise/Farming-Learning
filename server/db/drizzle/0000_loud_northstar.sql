@@ -1,23 +1,34 @@
+CREATE TYPE "public"."difficulty" AS ENUM('beginner', 'intermediate', 'advanced');--> statement-breakpoint
+CREATE TYPE "public"."season" AS ENUM('spring', 'monsoon', 'winter', 'all');--> statement-breakpoint
 CREATE TYPE "public"."event_type" AS ENUM('seed', 'nursery', 'transplant', 'harvest');--> statement-breakpoint
+CREATE TYPE "public"."category" AS ENUM('weather', 'market', 'government', 'other');--> statement-breakpoint
 CREATE TYPE "public"."vote_type" AS ENUM('upvote', 'downvote');--> statement-breakpoint
 CREATE TYPE "public"."role" AS ENUM('user', 'admin');--> statement-breakpoint
-CREATE TABLE "ai_disease_detection" (
+CREATE TABLE "ai_communication_session" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" uuid NOT NULL,
+	"title" text,
+	"created_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "ai_disease_detection" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"userId" uuid NOT NULL,
 	"image" text NOT NULL,
 	"predicted_disease" text NOT NULL,
 	"confirmatry_score" numeric NOT NULL,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"description_of_disease_by_user" text NOT NULL,
+	"description_of_disease_by_ai" text NOT NULL,
+	"treatment" text NOT NULL,
+	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "ai_text_query" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"user_id" uuid NOT NULL,
+	"communication_id" uuid NOT NULL,
 	"question" text NOT NULL,
 	"response" text NOT NULL,
-	"created_at" timestamp DEFAULT now(),
-	"updated_at" timestamp DEFAULT now()
+	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "animalCalculate" (
@@ -38,10 +49,19 @@ CREATE TABLE "crop" (
 	"nepali_name" varchar(255),
 	"category_id" uuid NOT NULL,
 	"description" text NOT NULL,
-	"nitrogen" integer NOT NULL,
-	"phosphorus" integer NOT NULL,
-	"potassium" integer NOT NULL,
-	"estimated_profit" numeric NOT NULL,
+	"climate" varchar(255),
+	"soil_type" varchar(255),
+	"season" "season",
+	"nitrogen" numeric NOT NULL,
+	"phosphorus" numeric NOT NULL,
+	"potassium" numeric NOT NULL,
+	"growing_guide" text,
+	"watering_schedule" text,
+	"harvesting_tips" text,
+	"difficulty" "difficulty",
+	"profit_min" numeric,
+	"profit_max" numeric,
+	"image_url" varchar(500),
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "crop_name_unique" UNIQUE("name"),
@@ -89,6 +109,7 @@ CREATE TABLE "notices" (
 	"title" varchar(255) NOT NULL,
 	"content" text NOT NULL,
 	"image" text,
+	"category" "category" NOT NULL,
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );
@@ -140,8 +161,9 @@ CREATE TABLE "video" (
 	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-ALTER TABLE "ai_disease_detection" ADD CONSTRAINT "ai_disease_detection_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "ai_text_query" ADD CONSTRAINT "ai_text_query_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ai_communication_session" ADD CONSTRAINT "ai_communication_session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ai_disease_detection" ADD CONSTRAINT "ai_disease_detection_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "ai_text_query" ADD CONSTRAINT "ai_text_query_communication_id_ai_communication_session_id_fk" FOREIGN KEY ("communication_id") REFERENCES "public"."ai_communication_session"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "crop" ADD CONSTRAINT "crop_category_id_crop_category_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."crop_category"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "crop_calendar" ADD CONSTRAINT "crop_calendar_region_id_regions_id_fk" FOREIGN KEY ("region_id") REFERENCES "public"."regions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "crop_calendar" ADD CONSTRAINT "crop_calendar_crop_id_crop_id_fk" FOREIGN KEY ("crop_id") REFERENCES "public"."crop"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -150,11 +172,11 @@ ALTER TABLE "postComment" ADD CONSTRAINT "postComment_post_id_posts_id_fk" FOREI
 ALTER TABLE "posts" ADD CONSTRAINT "posts_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "postVote" ADD CONSTRAINT "postVote_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "postVote" ADD CONSTRAINT "postVote_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "ai_disease_detection_user_idx" ON "ai_disease_detection" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "crop_category_id_idx" ON "crop" USING btree ("category_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "unique_crop_calendar" ON "crop_calendar" USING btree ("region_id","crop_id","event_type","month");--> statement-breakpoint
 CREATE INDEX "notice_created_at" ON "notices" USING btree ("created_at");--> statement-breakpoint
 CREATE INDEX "notce_title" ON "notices" USING btree ("title");--> statement-breakpoint
+CREATE INDEX "notice_category" ON "notices" USING btree ("category");--> statement-breakpoint
 CREATE INDEX "postComment_userId_postId_idx" ON "postComment" USING btree ("user_id","post_id");--> statement-breakpoint
 CREATE INDEX "post_created_by_idx" ON "posts" USING btree ("created_by");--> statement-breakpoint
 CREATE INDEX "post_created_at_idx" ON "posts" USING btree ("created_at");--> statement-breakpoint
