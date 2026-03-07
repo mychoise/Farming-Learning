@@ -24,11 +24,7 @@ export const getAllcrop = async (req, res) => {
     return res.status(200).json({
       success: true,
       crop,
-      pagination: {
-        page,
-        limit,
-        total: count,
-      },
+      pagination: { page, limit, total: count },
     });
   } catch (error) {
     console.log("error in getting all crops");
@@ -46,14 +42,15 @@ export const getSpecificCrop = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Crop ID is required" });
     }
+
     const uuidRegex =
       /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid crop id",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid crop id" });
     }
+
     const [crop] = await db
       .select()
       .from(cropTable)
@@ -64,11 +61,11 @@ export const getSpecificCrop = async (req, res) => {
       .where(eq(cropTable.id, id));
 
     if (!crop) {
-      return res.status(404).json({
-        success: false,
-        message: "Crop not found",
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "Crop not found" });
     }
+
     return res.status(200).json({ success: true, crop });
   } catch (error) {
     console.log("error in getting specific crop");
@@ -82,93 +79,113 @@ export const addCrop = async (req, res) => {
   try {
     const {
       name,
-      description,
       nepaliName,
+      description,
+      categoryName,
+      // NPK
       nitrogen,
       phosphorus,
       potassium,
-      categoryName,
-      estimatedProfit,
+      // Soil & Climate
+      climate,
+      soilType,
+      season,
+      // Growing info
+      growingGuide,
+      wateringSchedule,
+      harvestingTips,
+      difficulty,
+      // Profit
+      profitMin,
+      profitMax,
     } = req.body;
 
+    // Required fields only
     if (
       !name ||
       !description ||
+      !categoryName ||
       !nitrogen ||
       !phosphorus ||
-      !potassium ||
-      !estimatedProfit ||
-      !categoryName
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
-
-    if (
-      !Number(nitrogen) ||
-      !Number(phosphorus) ||
-      !Number(potassium) ||
-      !Number(estimatedProfit)
+      !potassium
     ) {
       return res.status(400).json({
         success: false,
         message:
-          "Nitrogen, phosphorus, potassium, and estimated profit must be numbers",
+          "name, description, categoryName, nitrogen, phosphorus and potassium are required",
       });
     }
 
-    if (estimatedProfit < 0) {
+    // NPK must be valid positive numbers
+    if (!Number(nitrogen) || !Number(phosphorus) || !Number(potassium)) {
       return res.status(400).json({
         success: false,
-        message: "Estimated profit must be a positive number",
+        message: "Nitrogen, phosphorus and potassium must be valid numbers",
       });
     }
 
     if (nitrogen < 0 || phosphorus < 0 || potassium < 0) {
       return res.status(400).json({
         success: false,
-        message: "Nitrogen, phosphorus, and potassium must be positive numbers",
+        message: "Nitrogen, phosphorus and potassium must be positive",
       });
     }
-    // ✅ Check if category already exists first
+
+    // Profit validation (only if provided)
+    if (profitMin && profitMax && Number(profitMin) > Number(profitMax)) {
+      return res.status(400).json({
+        success: false,
+        message: "profitMin cannot be greater than profitMax",
+      });
+    }
+
+    // Get or create category
     let [category] = await db
       .select()
       .from(cropCategoryTable)
       .where(eq(cropCategoryTable.name, categoryName));
 
-    console.log("Category:", category);
-
-    // ✅ Only create if it doesn't exist
     if (!category) {
       [category] = await db
         .insert(cropCategoryTable)
         .values({ name: categoryName })
         .returning();
-      console.log("Created category:", category);
-    } else {
-      console.log("Category already exists:", category);
     }
 
-    // ✅ Add .returning() to get the inserted crop back
+    // Image from multer/cloudinary
+    const imageUrl = req.file?.path ?? null;
+
     const [crop] = await db
       .insert(cropTable)
       .values({
         name,
-        description,
         nepaliName,
+        description,
         categoryId: category.id,
+        // NPK
         nitrogen,
         phosphorus,
         potassium,
-        estimatedProfit,
+        // Soil & Climate
+        climate,
+        soilType,
+        season,
+        // Growing info
+        growingGuide,
+        wateringSchedule,
+        harvestingTips,
+        difficulty,
+        // Profit
+        profitMin,
+        profitMax,
+        // Image
+        imageUrl,
       })
       .returning();
 
     return res.status(201).json({ success: true, crop });
   } catch (error) {
-    console.log("error in adding crop");
+    console.log("error in adding crop", error);
     return res
       .status(500)
       .json({ success: false, message: "Internal server error" });

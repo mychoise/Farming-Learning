@@ -2,12 +2,24 @@ import {
   pgTable,
   uuid,
   varchar,
-  integer,
   numeric,
   timestamp,
   index,
   text,
+  pgEnum,
 } from "drizzle-orm/pg-core";
+
+export const difficultyEnum = pgEnum("difficulty", [
+  "beginner",
+  "intermediate",
+  "advanced",
+]);
+export const seasonEnum = pgEnum("season", [
+  "spring",
+  "monsoon",
+  "winter",
+  "all",
+]);
 
 export const cropCategoryTable = pgTable("crop_category", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -24,10 +36,24 @@ export const cropTable = pgTable(
       .notNull()
       .references(() => cropCategoryTable.id),
     description: text("description").notNull(),
-    nitrogen: integer("nitrogen").notNull(),
-    phosphorus: integer("phosphorus").notNull(),
-    potassium: integer("potassium").notNull(),
-    estimatedProfit: numeric("estimated_profit").notNull(),
+    // Soil & Climate
+    climate: varchar("climate", { length: 255 }),
+    soilType: varchar("soil_type", { length: 255 }),
+    season: seasonEnum("season"),
+    // NPK
+    nitrogen: numeric("nitrogen").notNull(),
+    phosphorus: numeric("phosphorus").notNull(),
+    potassium: numeric("potassium").notNull(),
+    // Growing info
+    growingGuide: text("growing_guide"),
+    wateringSchedule: text("watering_schedule"),
+    harvestingTips: text("harvesting_tips"),
+    difficulty: difficultyEnum("difficulty"),
+    // Profit
+    profitMin: numeric("profit_min"),
+    profitMax: numeric("profit_max"),
+    // UI
+    imageUrl: varchar("image_url", { length: 500 }),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at")
       .defaultNow()

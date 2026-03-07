@@ -1,6 +1,10 @@
 import { diseaseDetectionAI, generateAIResponse } from "../utils/gemini.js";
 import { db } from "../db.config.js";
-import { aiCommunicationSession, aiDiseaseDetection, aiTextQuery } from "../db/schema/aiQuery.js";
+import {
+  aiCommunicationSession,
+  aiDiseaseDetection,
+  aiTextQuery,
+} from "../db/schema/aiQuery.js";
 import { and, eq, sql } from "drizzle-orm";
 
 export const sendMessageToAi = async (req, res) => {
@@ -117,19 +121,29 @@ export const getSpecificSessionAll = async (req, res) => {
   try {
     const { id: userId } = req.user;
     const { aiSessionId } = req.params;
-    console.log("params is", aiSessionId)
-    const [aiSession] = await db.select().from(aiCommunicationSession).where(and(eq(aiCommunicationSession.id, aiSessionId), eq(aiCommunicationSession.userId, userId)));
+    console.log("params is", aiSessionId);
+    const [aiSession] = await db
+      .select()
+      .from(aiCommunicationSession)
+      .where(
+        and(
+          eq(aiCommunicationSession.id, aiSessionId),
+          eq(aiCommunicationSession.userId, userId),
+        ),
+      );
     if (!aiSession) {
-      return res.status(404).json({ success: false, message: "AI session not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "AI session not found" });
     }
     const allData = await db
       .select()
       .from(aiTextQuery)
       .where(and(eq(aiTextQuery.communicationId, aiSession.id)));
 
-      if(!allData){
-        return res.status(404).json({ success: false, message: "No data found" });
-      }
+    if (!allData) {
+      return res.status(404).json({ success: false, message: "No data found" });
+    }
 
     return res.status(200).json({ success: true, data: allData });
   } catch (error) {
@@ -148,50 +162,68 @@ export const getAllCommunication = async (req, res) => {
       .from(aiCommunicationSession)
       .where(eq(aiCommunicationSession.userId, userId));
 
-      if(!allData || allData.length === 0){
-        return res.status(404).json({ success: false, message: "No data found" });
-      }
+    if (!allData || allData.length === 0) {
+      return res.status(404).json({ success: false, message: "No data found" });
+    }
 
     return res.status(200).json({ success: true, data: allData });
   } catch (error) {
     console.log("error in getting all history", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
-export const diseaseDetection = async(req,res)=>{
+export const diseaseDetection = async (req, res) => {
   try {
-    const {id:userId} = req.user;
-    const {descriptionOfDisease} = req.body;
-    if(!descriptionOfDisease){
-      return res.status(400).json({ success: false, message: "Description of disease is required" });
+    const { id: userId } = req.user;
+    const { descriptionOfDisease, plantName } = req.body;
+    if (!descriptionOfDisease) {
+      return res.status(400).json({
+        success: false,
+        message: "Description of disease is required",
+      });
+    }
+    if (!plantName) {
+      return res.status(400).json({
+        success: false,
+        message: "Plant name is required",
+      });
     }
 
-    if(!req.file){
-      return res.status(400).json({ success: false, message: "Image is required" });
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Image is required" });
     }
 
     const imageUrl = req.file.path;
 
+    const [aiResponse] = await db.transaction(async (tx) => {
+      const response = await diseaseDetectionAI(descriptionOfDisease, imageUrl);
+      console.log("Response is", response);
+      return await tx
+        .insert(aiDiseaseDetection)
+        .values({
+          userId,
+          image: imageUrl,
+          predictedDisease: response.predictedDisease,
+          confirmatryScore: response.confirmatoryScore,
+          descriptionOfDiseaseByUser: descriptionOfDisease,
+          descriptionOfDiseaseByAI: response.descriptionByAi,
+          treatment: response.treatment,
+        })
+        .returning();
+    });
 
-    const [aiResponse] = await db.transaction(async(tx)=>{
-          const response = await diseaseDetectionAI(descriptionOfDisease, imageUrl);
-          console.log("Response is", response)
-return await tx.insert(aiDiseaseDetection).values({
-userId,
-image:imageUrl,
-predictedDisease:response.predictedDisease,
-confirmatryScore:response.confirmatoryScore,
-descriptionOfDiseaseByUser:descriptionOfDisease,
-descriptionOfDiseaseByAI:response.descriptionByAi,
-treatment:response.treatment,
-    }).returning()
-
-    })
-
-    return res.status(200).json({ success: true, data : aiResponse });
+    return res.status(200).json({ success: true, data: aiResponse });
   } catch (error) {
     console.log("error in disease detection", error);
-    return res.status(500).json({ success: false, message: "Internal server error" , error:error.message });
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
   }
-}
+};

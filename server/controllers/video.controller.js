@@ -20,15 +20,19 @@ export const addVideo = async (req, res) => {
         .json({ message: "Title and description are required" });
     }
 
-    const [addedVideo] = await db.insert(videoTable).values({
-      video_link: video.path,
-      thumbnail: thumbnail.path,
-      title,
-      description,
-    });
+    const [addedVideo] = await db
+      .insert(videoTable)
+      .values({
+        video_link: video.path,
+        thumbnail: thumbnail.path,
+        title,
+        description,
+      })
+      .returning();
 
     res.status(201).json({ success: true, video: addedVideo });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: error.message });
   }
 };

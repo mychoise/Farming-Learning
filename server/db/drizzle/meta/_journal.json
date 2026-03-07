@@ -57,6 +57,13 @@
       "when": 1772808503739,
       "tag": "0007_cute_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1772847240180,
+      "tag": "0008_real_speedball",
+      "breakpoints": true
     }
   ]
 }
