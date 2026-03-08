@@ -8,6 +8,13 @@
       "when": 1772896001619,
       "tag": "0000_loud_northstar",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1772953351236,
+      "tag": "0001_jazzy_galactus",
+      "breakpoints": true
     }
   ]
 }
