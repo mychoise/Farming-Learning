@@ -36,6 +36,7 @@ export const cropTable = pgTable(
       .notNull()
       .references(() => cropCategoryTable.id),
     description: text("description").notNull(),
+    icon: text("icon"),
     // Soil & Climate
     climate: varchar("climate", { length: 255 }),
     soilType: varchar("soil_type", { length: 255 }),

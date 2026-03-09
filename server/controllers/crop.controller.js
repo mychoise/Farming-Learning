@@ -81,6 +81,7 @@ export const addCrop = async (req, res) => {
       name,
       nepaliName,
       description,
+      icon,
       categoryName,
       // NPK
       nitrogen,
@@ -107,7 +108,8 @@ export const addCrop = async (req, res) => {
       !categoryName ||
       !nitrogen ||
       !phosphorus ||
-      !potassium
+      !potassium ||
+      !icon
     ) {
       return res.status(400).json({
         success: false,
@@ -161,6 +163,7 @@ export const addCrop = async (req, res) => {
         name,
         nepaliName,
         description,
+        icon,
         categoryId: category.id,
         // NPK
         nitrogen,
