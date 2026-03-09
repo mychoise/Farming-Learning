@@ -8,6 +8,7 @@ import newsRouter from "./routes/notice.route.js";
 import videoRouter from "./routes/video.route.js";
 import calculationRouter from "./routes/calculation.route.js";
 import weatherRouter from "./routes/weather.route.js";
+import postRouter from "./routes/post.route.js";
 dotenv.config();
 const app = express();
 app.use(cookieParser());
@@ -24,6 +25,7 @@ app.use("/api/notices", newsRouter);
 app.use("/api/video", videoRouter);
 app.use("/api/calculate",calculationRouter)
 app.use("/api/weather", weatherRouter);
+app.use("/api/post", postRouter);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");

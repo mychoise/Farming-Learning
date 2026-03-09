@@ -12,7 +12,7 @@ export const aiCommunicationSession = pgTable("ai_communication_session", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id")
     .notNull()
-    .references(() => userTable.id),
+    .references(() => userTable.id, {onDelete:'cascade'}),
   title: text("title"),
   createdAt: timestamp("created_at").defaultNow(),
 });
@@ -22,7 +22,7 @@ export const aiTextQuery = pgTable("ai_text_query", {
 
   communicationId: uuid("communication_id")
     .notNull()
-    .references(() => aiCommunicationSession.id),
+    .references(() => aiCommunicationSession.id, {onDelete:'cascade'}),
 
   question: text("question").notNull(),
   response: text("response").notNull(),
@@ -34,7 +34,7 @@ export const aiDiseaseDetection = pgTable("ai_disease_detection", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("userId")
     .notNull()
-    .references(() => userTable.id),
+    .references(() => userTable.id, {onDelete:'cascade'}),
   image: text("image").notNull(),
   predictedDisease: text("predicted_disease").notNull(),
   confirmatryScore: numeric("confirmatry_score").notNull(),
