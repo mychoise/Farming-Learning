@@ -1,6 +1,6 @@
-import {db} from "../db.config.js"
+import { db } from "../db.config.js";
 import { cropTable } from "../db/schema/crop.js";
-import {eq} from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { organicFertilizerTable } from "../db/schema/fertilizers.js";
 import { INORGANIC_FERTILIZERS } from "../constants/fertilizer.constant.js";
 import { animalCalculate } from "../db/schema/animalCalculator.js";
@@ -51,7 +51,9 @@ export const organicFertilizerCalculator = async (req, res) => {
     }
 
     if (!areaInHectare) {
-      return res.status(400).json({ message: "Invalid SystemOfLandCalculation" });
+      return res
+        .status(400)
+        .json({ message: "Invalid SystemOfLandCalculation" });
     }
 
     const N_needed = parseFloat(crop.N) * areaInHectare;
@@ -59,7 +61,6 @@ export const organicFertilizerCalculator = async (req, res) => {
     const K_needed = parseFloat(crop.K) * areaInHectare;
 
     const fertilizerResults = organicFertilizers.reduce((acc, f) => {
-
       const nPercent = parseFloat(f.nitrogen);
 
       if (!nPercent) {
@@ -72,7 +73,6 @@ export const organicFertilizerCalculator = async (req, res) => {
       acc[f.name] = parseFloat(amountKg.toFixed(2));
 
       return acc;
-
     }, {});
 
     return res.status(200).json({
@@ -88,7 +88,6 @@ export const organicFertilizerCalculator = async (req, res) => {
         fertilizers: fertilizerResults,
       },
     });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -135,7 +134,9 @@ export const InorganicFertilizerCalculator = async (req, res) => {
     }
 
     if (!areaInHectare) {
-      return res.status(400).json({ message: "Invalid SystemOfLandCalculation" });
+      return res
+        .status(400)
+        .json({ message: "Invalid SystemOfLandCalculation" });
     }
 
     const N_needed = parseFloat(crop.N) * areaInHectare;
@@ -146,7 +147,7 @@ export const InorganicFertilizerCalculator = async (req, res) => {
     const UREA_N = 0.46;
     const DAP_N = 0.18;
     const DAP_P = 0.46;
-    const MOP_K = 0.60;
+    const MOP_K = 0.6;
 
     // Step 1: Phosphorus from DAP
     const dapKg = P_needed / DAP_P;
@@ -180,7 +181,6 @@ export const InorganicFertilizerCalculator = async (req, res) => {
         fertilizers: fertilizerResults,
       },
     });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error" });
@@ -189,17 +189,25 @@ export const InorganicFertilizerCalculator = async (req, res) => {
 
 export const animalWeightCalculation = async (req, res) => {
   try {
-    const {animalName , HeartGrith , BodyLength} = req.body;
-    
+    const { animalName, HeartGrith, BodyLength } = req.body;
+
     if (!animalName || !HeartGrith || !BodyLength) {
-      return res.status(400).json({ success: false, message: "Missing required fields" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing required fields" });
     }
-    const [animal] = await db.select().from(animalCalculate).where(eq(animalCalculate.name, animalName));
+    const [animal] = await db
+      .select()
+      .from(animalCalculate)
+      .where(eq(animalCalculate.name, animalName));
     if (!animal) {
-      return res.status(404).json({ success: false, message: "Animal not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Animal not found" });
     }
 
-    const weight = ((HeartGrith * HeartGrith) * BodyLength) / parseInt(animal.constant);
+    const weight =
+      (HeartGrith * HeartGrith * BodyLength) / parseInt(animal.constant);
 
     return res.status(200).json({
       success: true,
@@ -208,9 +216,8 @@ export const animalWeightCalculation = async (req, res) => {
         HeartGrith,
         BodyLength,
         weight: parseFloat(weight.toFixed(2)),
-      }
+      },
     });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: "Internal server error" });
@@ -237,7 +244,7 @@ export const unitConversion = async (req, res) => {
 
     const units = {
       Ropani: 508.72,
-      Aana: 31.80,
+      Aana: 31.8,
       Bigha: 6772.63,
       Katha: 338.63,
       Acre: 4046.86,
@@ -257,7 +264,9 @@ export const unitConversion = async (req, res) => {
     const valueInSqMeter = firstValue * units[currentUnit];
 
     // Convert to target unit
-    const convertedValue = valueInSqMeter / units[targetUnit];
+    const convertedValue = parseFloat(
+      (valueInSqMeter / units[targetUnit]).toFixed(3),
+    );
 
     res.status(200).json({
       success: true,
