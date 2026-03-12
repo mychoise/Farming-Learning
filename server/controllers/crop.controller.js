@@ -84,25 +84,21 @@ export const addCrop = async (req, res) => {
       description,
       icon,
       categoryName,
-      // NPK
       nitrogen,
       phosphorus,
       potassium,
-      // Soil & Climate
       climate,
       soilType,
       season,
-      // Growing info
       growingGuide,
       wateringSchedule,
       harvestingTips,
       difficulty,
-      // Profit
       profitMin,
       profitMax,
     } = req.body;
 
-    // Required fields only
+    // Required fields
     if (
       !name ||
       !description ||
@@ -115,32 +111,63 @@ export const addCrop = async (req, res) => {
       return res.status(400).json({
         success: false,
         message:
-          "name, description, categoryName, nitrogen, phosphorus and potassium are required",
+          "name, description, categoryName, icon, nitrogen, phosphorus and potassium are required",
       });
     }
 
-    // NPK must be valid positive numbers
-    if (!Number(nitrogen) || !Number(phosphorus) || !Number(potassium)) {
+    // Convert NPK to numbers first
+    const n = Number(nitrogen);
+    const p = Number(phosphorus);
+    const k = Number(potassium);
+
+    // ✅ Fix 1: use isNaN instead of !Number()
+    if (isNaN(n) || isNaN(p) || isNaN(k)) {
       return res.status(400).json({
         success: false,
-        message: "Nitrogen, phosphorus and potassium must be valid numbers",
+        message: "nitrogen, phosphorus and potassium must be valid numbers",
       });
     }
 
-    if (nitrogen < 0 || phosphorus < 0 || potassium < 0) {
+    // ✅ Fix 2: compare converted numbers not raw strings
+    if (n < 0 || p < 0 || k < 0) {
       return res.status(400).json({
         success: false,
-        message: "Nitrogen, phosphorus and potassium must be positive",
+        message: "nitrogen, phosphorus and potassium must be positive",
       });
     }
 
-    // Profit validation (only if provided)
+    // ✅ Fix 3: enum validation
+    const VALID_SEASONS = ["spring", "monsoon", "winter", "all"];
+    const VALID_DIFFICULTIES = ["beginner", "intermediate", "advanced"];
+
+    if (season && !VALID_SEASONS.includes(season)) {
+      return res.status(400).json({
+        success: false,
+        message: `season must be one of: ${VALID_SEASONS.join(", ")}`,
+      });
+    }
+
+    if (difficulty && !VALID_DIFFICULTIES.includes(difficulty)) {
+      return res.status(400).json({
+        success: false,
+        message: `difficulty must be one of: ${VALID_DIFFICULTIES.join(", ")}`,
+      });
+    }
+
+    // Profit validation
     if (profitMin && profitMax && Number(profitMin) > Number(profitMax)) {
       return res.status(400).json({
         success: false,
         message: "profitMin cannot be greater than profitMax",
       });
     }
+
+    // ✅ Fix 4: parseList for text fields (handles textarea \n naturally)
+    const parseList = (val) => {
+      if (!val) return null;
+      if (Array.isArray(val)) return val.join("\n");
+      return val.trim();
+    };
 
     // Get or create category
     let [category] = await db
@@ -155,41 +182,44 @@ export const addCrop = async (req, res) => {
         .returning();
     }
 
-    // Image from multer/cloudinary
     const imageUrl = req.file?.path ?? null;
 
     const [crop] = await db
       .insert(cropTable)
       .values({
         name,
-        nepaliName,
+        nepaliName: nepaliName || null,
         description,
         icon,
         categoryId: category.id,
-        // NPK
-        nitrogen,
-        phosphorus,
-        potassium,
-        // Soil & Climate
-        climate,
-        soilType,
-        season,
-        // Growing info
-        growingGuide,
-        wateringSchedule,
-        harvestingTips,
-        difficulty,
-        // Profit
-        profitMin,
-        profitMax,
-        // Image
+        nitrogen: String(n),
+        phosphorus: String(p),
+        potassium: String(k),
+        climate: climate || null,
+        soilType: soilType || null,
+        season: season || null,
+        growingGuide: parseList(growingGuide),
+        wateringSchedule: parseList(wateringSchedule),
+        harvestingTips: parseList(harvestingTips),
+        difficulty: difficulty || null,
+        profitMin: profitMin ? String(profitMin) : null,
+        profitMax: profitMax ? String(profitMax) : null,
         imageUrl,
       })
       .returning();
 
     return res.status(201).json({ success: true, crop });
   } catch (error) {
-    console.log("error in adding crop", error);
+    console.error("error in addCrop:", error);
+
+    // ✅ Fix 5: handle duplicate crop name gracefully
+    if (error.code === "23505") {
+      return res.status(409).json({
+        success: false,
+        message: "A crop with this name already exists",
+      });
+    }
+
     return res
       .status(500)
       .json({ success: false, message: "Internal server error" });
