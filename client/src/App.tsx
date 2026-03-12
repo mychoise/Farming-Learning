@@ -1,8 +1,9 @@
-import React from 'react'
-
+import CropList from "./pages/CropList"
 const App = () => {
   return (
-    <div>App</div>
+    <div className="w-screen h-screen">
+      <CropList />
+    </div>
   )
 }
 
