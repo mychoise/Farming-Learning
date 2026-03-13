@@ -22,7 +22,7 @@ const Filter = () => {
     }
     console.log(selected)
     return (
-        <>
+        <div className="flex flex-col">
             <div className="flex gap-2 items-center text-green-600 font-[Inter] font-bold">
                 <FilterIcon size={17} />
                 <h1>Discover Filters</h1>
@@ -96,7 +96,7 @@ const Filter = () => {
         <button className="bg-[#E28C36] cursor-pointer font-[Inter] text-white px-4 py-2 rounded-lg mt-4">Update Results</button>
         <button onClick={() => setSelected([])} className="bg-gray-200 cursor-pointer font-[Inter] text-gray-700 px-4 py-2 rounded-lg mt-4 ml-2">Reset all filter</button>
     </div>
-        </>
+        </div>
     )
 }
 
