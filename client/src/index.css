@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@font-face {
+  font-family: 'Inter';
+  src: url('./assets/fonts/font1.otf');
+}
+
+@font-face {
+  font-family: 'bold';
+  src: url('./assets/fonts/bold.woff2');
+}
+@font-face {
+  font-family: 'medium';
+  src: url('./assets/fonts/o.woff2');
+}
+body{
+  overflow-x: hidden;
+}
