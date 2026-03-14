@@ -1,5 +1,15 @@
 @import "tailwindcss";
+@plugin "daisyui"{
 
+    themes: light --default;
+};
+
+
+[data-theme="light"] {
+  --color-primary: #22c55e;
+  --color-secondary: #f97316;
+  --color-accent: #eab308;
+}
 @font-face {
   font-family: 'Inter';
   src: url('./assets/fonts/font1.otf');

@@ -22,8 +22,8 @@ const Filter = () => {
     }
     console.log(selected)
     return (
-        <div className="flex flex-col">
-            <div className="flex gap-2 items-center text-green-600 font-[Inter] font-bold">
+        <div className="flex flex-col ">
+            <div className="flex w-[21vw] gap-2 items-center text-green-600 font-[Inter] font-bold">
                 <FilterIcon size={17} />
                 <h1>Discover Filters</h1>
             </div>
