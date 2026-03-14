@@ -3,12 +3,17 @@ import Filter from "../components/crop/Filter";
 import CropCard from "../components/crop/CropCard";
 import { Crops } from "../constants/crops";
 import { useState } from "react";
-
+import { useFilterStore } from "../store/useFilter";
 const CropList = () => {
   const [selectedvalue, setselectedvalue] = useState<string[]>([]);
-  const handleValue = (data: string[]) => {
-    setselectedvalue(data);
-  };
+  const { season, filteredCrops, allCrops } = useFilterStore();
+  console.log(allCrops);
+  const formatArray = (arr: string[]) =>
+    arr.length < 3
+      ? arr.join(" & ")
+      : `${arr.slice(0, -1).join(", ")} & ${arr.at(-1)}`;
+
+  console.log("formatted season byme:", formatArray(season));
   return (
     <>
       <div className="bg-[#F2FDF5] shadow pl-31.75 h-[25vh] pt-12 pb-6 flex flex-col w-full">
@@ -28,7 +33,7 @@ const CropList = () => {
       </div>
       {/* Filters and Result */}
       <div className="ml-31.75 flex flex-row gap-20 mt-10">
-        <Filter sendValue={handleValue} />
+        <Filter />
         <div className="flex flex-col  gap-5">
           <div className="flex flex-row items-center h-5 -gap-[6px]">
             <h1 className="bg-[#F2FDF5] px-4 py-2 rounded-full text-green-600 font-bold">
@@ -38,13 +43,13 @@ const CropList = () => {
               <ChevronRight size={20} />
             </span>
             <span className="text-gray-600 font-[medium] text-[16px]">
-              Showing {selectedvalue} crops
+              Showing {formatArray(season)} crops
             </span>
           </div>
           <h1 className="text-3xl font-black">Matching Results</h1>
           <hr className="border-gray-300 w-[60vw]" />
           <div className="flex flex-row flex-wrap mt-7 gap-11">
-            {Crops.crop.map((crop) => (
+            {filteredCrops.map((crop) => (
               <div>
                 <CropCard
                   crop={crop.crop}

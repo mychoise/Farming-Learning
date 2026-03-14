@@ -1,7 +1,19 @@
 import { FilterIcon, HelpCircle, Leaf } from "lucide-react";
-import { useState } from "react";
+import { useFilterStore } from "../../store/useFilter";
+import { useEffect } from "react";
+import { Crops } from "../../constants/crops";
 
-const Filter = ({ sendValue }) => {
+const Filter = () => {
+  const {
+    season,
+    setSeason,
+    difficulty,
+    setDifficulty,
+    resetFilters,
+    setCrops,
+    applyFilters,
+  } = useFilterStore();
+
   const FilterOptions = [
     {
       name: "Season",
@@ -18,26 +30,27 @@ const Filter = ({ sendValue }) => {
     },
   ];
 
-  const [selected, setSelected] = useState<string[]>([]);
-  const [season, setSeason] = useState<string[]>([]);
+  // toggle season
+  const toggleSeason = (option: string) => {
+    const updated = season.includes(option)
+      ? season.filter((o) => o !== option)
+      : [...season, option];
 
-  console.log(selected);
-  console.log("season are", season);
-
-  const formatArray = (season: string[]) =>
-    season.length < 3
-      ? season.join(" & ")
-      : `${season.slice(0, -1).join(", ")} & ${season.at(-1)}`;
-
-  console.log("formated data is", formatArray(season));
-
-  const toggle = (option: string) => {
-    setSelected((prev) =>
-      prev.includes(option)
-        ? prev.filter((o) => o !== option)
-        : [...prev, option],
-    );
+    setSeason(updated);
   };
+
+  // toggle difficulty
+  const toggleDifficulty = (option: string) => {
+    const updated = difficulty.includes(option)
+      ? difficulty.filter((o) => o !== option)
+      : [...difficulty, option];
+
+    setDifficulty(updated);
+  };
+
+  useEffect(() => {
+    setCrops(Crops.crop);
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -55,7 +68,7 @@ const Filter = ({ sendValue }) => {
 
         <div className="flex flex-col gap-2">
           {FilterOptions[0].options.map((option) => {
-            const checked = selected.includes(option.value);
+            const checked = season.includes(option.value);
 
             return (
               <label
@@ -63,16 +76,7 @@ const Filter = ({ sendValue }) => {
                 className="flex items-center gap-3 cursor-pointer text-sm text-gray-800"
               >
                 <span
-                  onClick={() => {
-                    toggle(option.value);
-
-                    setSeason((prev) =>
-                      prev.includes(option.value)
-                        ? prev.filter((o) => o !== option.value)
-                        : [...prev, option.value],
-                    );
-                    sendValue(formatArray(season));
-                  }}
+                  onClick={() => toggleSeason(option.value)}
                   className="w-5 h-5 rounded-md flex items-center justify-center shrink-0"
                   style={{
                     background: checked ? "#22C55E" : "#e5e7eb",
@@ -106,7 +110,7 @@ const Filter = ({ sendValue }) => {
 
         <div className="flex flex-col gap-2">
           {FilterOptions[1].options.map((option) => {
-            const checked = selected.includes(option);
+            const checked = difficulty.includes(option);
 
             return (
               <label
@@ -114,7 +118,7 @@ const Filter = ({ sendValue }) => {
                 className="flex items-center gap-3 cursor-pointer text-sm text-gray-800"
               >
                 <span
-                  onClick={() => toggle(option)}
+                  onClick={() => toggleDifficulty(option)}
                   className="w-5 h-5 rounded-md flex items-center justify-center shrink-0"
                   style={{
                     background: checked ? "#22C55E" : "#e5e7eb",
@@ -159,15 +163,15 @@ const Filter = ({ sendValue }) => {
 
       {/* Buttons */}
       <div className="flex flex-col max-w-xs mt-6">
-        <button className="bg-[#E28C36] cursor-pointer font-[Inter] text-white px-4 py-2 rounded-lg mt-4">
+        <button
+          onClick={applyFilters}
+          className="bg-[#E28C36] cursor-pointer font-[Inter] text-white px-4 py-2 rounded-lg mt-4"
+        >
           Update Results
         </button>
 
         <button
-          onClick={() => {
-            setSelected([]);
-            setSeason([]);
-          }}
+          onClick={resetFilters}
           className="bg-gray-200 cursor-pointer font-[Inter] text-gray-700 px-4 py-2 rounded-lg mt-4"
         >
           Reset all filter
