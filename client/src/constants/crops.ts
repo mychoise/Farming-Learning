@@ -237,3 +237,15 @@ export const Crops ={
     },
   ]
 }
+export const Colors = [
+  { "color": "#F5A83D" }, 
+  { "color": "#1DC964" },
+  { "color": "#F55A3D" },
+  { "color": "#1DA8C9" },
+  { "color": "#A83DF5" },
+  { "color": "#C91D4E" },
+  { "color": "#F5D83D" },
+  { "color": "#1DC9A8" },
+  { "color": "#F53D8A" },
+  { "color": "#3D7AF5" },
+];
