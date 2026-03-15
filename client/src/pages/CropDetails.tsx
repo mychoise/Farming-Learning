@@ -249,7 +249,7 @@ const CropDetails = () => {
             </button>
           </div>
           {/* Nutriorion */}
-          <div className="bg-white rounded-2xl shadow-md p-7 w-full max-w-md">
+          <div className="bg-white font-[Inter] rounded-2xl shadow-md p-7 w-full max-w-md">
             <h1 className="text-2xl font-bold text-gray-900">
               Nutrient Requirements
             </h1>
