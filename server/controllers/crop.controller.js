@@ -1,12 +1,28 @@
 import { db } from "../db.config.js";
 import { cropCategoryTable, cropTable } from "../db/schema/crop.js";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, or, sql, inArray } from "drizzle-orm";
 
 export const getAllcrop = async (req, res) => {
   try {
-    let { page } = req.query;
+    let { page, season, difficulty } = req.query;
+
     page = page ? parseInt(page) : 1;
-    const limit = 10;
+    const limit = 9;
+
+    const conditions = [];
+
+    // Season filter
+    if (season) {
+      const seasons = season.split(",");
+      conditions.push(inArray(cropTable.season, seasons));
+    }
+
+    // Difficulty filter
+    if (difficulty) {
+      const difficulties = difficulty.split(",");
+      conditions.push(inArray(cropTable.difficulty, difficulties));
+    }
+
     const crop = await db
       .select()
       .from(cropTable)
@@ -14,24 +30,32 @@ export const getAllcrop = async (req, res) => {
         cropCategoryTable,
         eq(cropTable.categoryId, cropCategoryTable.id),
       )
+      .where(conditions.length ? and(...conditions) : undefined)
       .limit(limit)
       .offset((page - 1) * limit);
 
     const [{ count }] = await db
       .select({ count: sql`count(*)` })
-      .from(cropTable);
+      .from(cropTable)
+      .where(conditions.length ? and(...conditions) : undefined);
 
     return res.status(200).json({
       success: true,
       crop,
-      pagination: { page, limit, total: count },
+      pagination: {
+        page,
+        limit,
+        total: Number(count),
+      },
     });
   } catch (error) {
     console.log("error in getting all crops");
     console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 

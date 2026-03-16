@@ -1,19 +1,30 @@
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Flower2 } from "lucide-react";
 import Filter from "../components/crop/Filter";
 import CropCard from "../components/crop/CropCard";
 import { Crops } from "../constants/crops";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useFilterStore } from "../store/useFilter";
 const CropList = () => {
   const [selectedvalue, setselectedvalue] = useState<string[]>([]);
-  const { season, filteredCrops, allCrops } = useFilterStore();
-  console.log(allCrops);
+  const {
+    season,
+    filteredCrops,
+    allCrops,
+    setCrops,
+    setPagination,
+    totalPage,
+    currentPage,
+    totalCrops,
+  } = useFilterStore();
+  useEffect(() => {
+    setCrops(Crops.crop);
+  }, []);
+  const simpleArray = Array.from({ length: totalPage }, (_, i) => i + 1);
   const formatArray = (arr: string[]) =>
     arr.length < 3
       ? arr.join(" & ")
       : `${arr.slice(0, -1).join(", ")} & ${arr.at(-1)}`;
 
-  console.log("formatted season byme:", formatArray(season));
   return (
     <>
       <div className="bg-[#F2FDF5] shadow pl-31.75 h-[25vh] pt-12 pb-6 flex flex-col w-full">
@@ -49,30 +60,59 @@ const CropList = () => {
           <h1 className="text-3xl font-black">Matching Results</h1>
           <hr className="border-gray-300 w-[60vw]" />
           <div className="flex flex-row flex-wrap mt-7 gap-11">
-            {filteredCrops.map((crop) => (
-              <div>
-                <CropCard
-                  crop={crop.crop}
-                  name={crop.crop_category.name}
-                  key={crop.crop.id}
-                />
+            {filteredCrops.length > 0 ? (
+              filteredCrops.map((crop) => (
+                <div>
+                  <CropCard
+                    crop={crop.crop}
+                    name={crop.crop_category.name}
+                    key={crop.crop.id}
+                  />
+                </div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center w-[60vw] h-[50vh] bg-white border-2 border-dashed border-emerald-100 rounded-[2.5rem] p-8 text-center">
+                {/* Icon Container with a soft glow */}
+                <div className="flex items-center justify-center w-20 h-20 mb-6 rounded-full bg-emerald-50">
+                  <Flower2
+                    className="text-emerald-600 animate-pulse"
+                    size={48}
+                    strokeWidth={1.5}
+                  />
+                </div>
+
+                {/* Text Content */}
+                <h3 className="text-2xl font-semibold text-slate-800 mb-2">
+                  No crops found
+                </h3>
+                <p className="text-slate-500 max-w-[280px] mb-8 leading-relaxed">
+                  It looks like your field is empty. Try adjusting your filters
+                  or adding a new crop to get started.
+                </p>
               </div>
-            ))}
+            )}
           </div>
           <hr className="border-gray-300 w-[60vw] mt-5 mb-5" />
           {/* Pagination */}
           <div className="mb-9">
             <div className="flex justify-between items-center flex-row w-[86%]">
               <h1 className="text-[14px] font-[Inter]">
-                Showing <span className="font-bold">1 of 6 </span>of 48 crops
+                Showing{" "}
+                <span className="font-bold">
+                  {currentPage} of {totalPage}{" "}
+                </span>
+                of {totalCrops} crops
               </h1>
               <div className="join">
-                {[1, 2, 3, 4].map((item) => (
+                {simpleArray.map((item) => (
                   <input
                     key={item}
                     className="join-item btn btn-square"
                     type="radio"
-                    onClick={() => console.log("Pagination item clicked", item)}
+                    onClick={() => {
+                      // TODO: Implement pagination logic
+                      setPagination(item);
+                    }}
                     name="pagination"
                     aria-label={item.toString()}
                     defaultChecked={item === 1}

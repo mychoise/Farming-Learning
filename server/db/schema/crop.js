@@ -32,6 +32,7 @@ export const cropTable = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: varchar("name", { length: 255 }).notNull().unique(),
     nepaliName: varchar("nepali_name", { length: 255 }).unique(),
+    scientificName: varchar("scientific_name", { length: 255 }).unique(),
     categoryId: uuid("category_id")
       .notNull()
       .references(() => cropCategoryTable.id),

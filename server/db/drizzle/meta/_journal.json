@@ -36,6 +36,13 @@
       "when": 1773100737099,
       "tag": "0004_cuddly_zodiak",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773620124274,
+      "tag": "0005_brief_quicksilver",
+      "breakpoints": true
     }
   ]
 }

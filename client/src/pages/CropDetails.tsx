@@ -11,9 +11,20 @@ import {
   CircleCheck,
   Save,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { Colors } from "../constants/crops";
+import { useFilterStore } from "../store/useFilter";
+import { useParams } from "react-router-dom";
 const CropDetails = () => {
+  const { IndividualCrop, getIndividualCrop } = useFilterStore();
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      getIndividualCrop(id);
+    }
+  }, [id]);
+
   const cropStats = [
     {
       name: "CLIMATE",
@@ -70,7 +81,7 @@ const CropDetails = () => {
       label: "Nitrogen",
       letter: "N",
       desc: "Vital for leafy foliage development",
-      value: 120,
+      value: Number(IndividualCrop?.crop.nitrogen),
       max: 200,
       badgeColor: "bg-green-500",
       barColor: "bg-green-500",
@@ -80,7 +91,7 @@ const CropDetails = () => {
       label: "Phosphorus",
       letter: "P",
       desc: "Encourages strong root and seed growth",
-      value: 80,
+      value: Number(IndividualCrop?.crop.phosphorus),
       max: 200,
       badgeColor: "bg-blue-500",
       barColor: "bg-blue-500",
@@ -90,7 +101,7 @@ const CropDetails = () => {
       label: "Potassium",
       letter: "K",
       desc: "Improves flower quality & disease resistance",
-      value: 150,
+      value: Number(IndividualCrop?.crop.potassium),
       max: 200,
       badgeColor: "bg-amber-400",
       barColor: "bg-amber-400",
@@ -103,30 +114,38 @@ const CropDetails = () => {
     return [...Colors].sort(() => Math.random() - 0.5);
   }, []);
 
+  console.log("IndividualCrop", IndividualCrop);
+
   return (
     <div className="bg-[#FAFAF9] h-[300vh]">
       {/* Headin part */}
       <div className="w-full gap-15 flex flex-row justify-between bg-[#F2FDF6]">
         <div className="pl-32 pt-24  flex flex-col w-full gap-9">
-          <h1 className="border font-[medium] text-[#1DC964] border-[#1DC964] pl-5 pr-4 w-40 rounded-full pt-1 pb-0.5">
-            Category: Plant
+          <h1 className="inline-block border border-[#1DC964] font-[Inter] w-50 pt-1.5 text-center text-[#1DC964] pl-1 pr-1 py-1 rounded-full">
+            Category: {IndividualCrop?.crop_category.name || "Vegetables"}
           </h1>
           <h1 className="text-[110px] font-[medium]  leading-26 word-spacing-[0.5rem]">
-            GOLDEN MARIGOLD
+            {IndividualCrop?.crop.name || "Golden Marigold"}
           </h1>
           <h1 className="text-[30px]  italic text-[#1DC964] font-[medium]">
             {" "}
-            सयपत्री <span className=" font-[Inter] ">(Sayapatri)</span>
+            {IndividualCrop?.crop.nepaliName}{" "}
+            <span className=" font-[Inter] ">
+              ({IndividualCrop?.crop.scientificName})
+            </span>
           </h1>
           <button className="bg-[#1DC964] w-[250px] pt-2 pb-2 font-[Inter] text-white text-lg  px-6 py-2 rounded-full">
             Get Growing Guide
           </button>
         </div>
         <div>
-          <div className="w-[50vw] h-[75vh] bg-red-300">
+          <div className="w-[50vw] ml-30 h-[75vh] bg-red-300">
             <img
               className="w-full h-full object-cover"
-              src="https://cdn.create.vista.com/api/media/medium/358927096/stock-photo-marigold-flower-or-tagetes-background?token="
+              src={
+                IndividualCrop?.crop.imageUrl ||
+                "https://cdn.create.vista.com/api/media/medium/358927096/stock-photo-marigold-flower-or-tagetes-background?token="
+              }
             ></img>
           </div>
         </div>
@@ -168,11 +187,8 @@ const CropDetails = () => {
 
             <div className="bg-white shadow-xl  rounded-4xl mt-2 w-[880px] pr-7 pb-10 text-[18px] pt-12 pl-14 font-[Inter]">
               <p className="text-[#3D3834]">
-                The Golden Marigold is a vibrant, hardy annual plant celebrated
-                in Nepal for its cultural significance and pest-repelling
-                properties. Widely used in festivals like Tihar, these flowers
-                thrive in various soil types and are essential for organic pest
-                management in diverse agricultural systems.
+                {IndividualCrop?.crop.description ||
+                  "The Golden Marigold is a vibrant, hardy annual plant celebrated in Nepal for its cultural significance and pest-repelling properties. Widely used in festivals like Tihar, these flowers thrive in various soil types and are essential for organic pest management in diverse agricultural systems."}
               </p>
             </div>
           </div>
@@ -190,25 +206,27 @@ const CropDetails = () => {
             </div>
             <div className="bg-white shadow-xl  rounded-4xl mt-2 w-220 pr-7 pb-10 text-[18px] pt-12 pl-14 font-[Inter]">
               <div className="flex flex-col gap-8">
-                {StepByStepProcess.map((step, index) => (
-                  <div className="flex gap-8" key={index}>
-                    <div
-                      style={{
-                        backgroundColor:
-                          shuffledColors[index % shuffledColors.length].color,
-                      }}
-                      className=" w-12.5 h-12.5 rounded-xl flex items-center justify-center shrink-0"
-                    >
-                      <h1 className="text-white font-bold">{index + 1}</h1>
-                    </div>
-                    <div className="flex gap-2 flex-col">
-                      <h2 className="text-[20px] text-gray-800 font-[medium]">
+                {IndividualCrop?.crop?.growingGuide
+                  .split("\n")
+                  .map((step: string, index: number) => (
+                    <div className="flex gap-8" key={index}>
+                      <div
+                        style={{
+                          backgroundColor:
+                            shuffledColors[index % shuffledColors.length].color,
+                        }}
+                        className=" w-12.5 h-12.5 rounded-xl flex items-center justify-center shrink-0"
+                      >
+                        <h1 className="text-white font-bold">{index + 1}</h1>
+                      </div>
+                      <div className="flex gap-2 flex-col">
+                        {/* <h2 className="text-[20px] text-gray-800 font-[medium]">
                         {step.title}
-                      </h2>
-                      <p>{step.description}</p>
+                      </h2> */}
+                        <p>{step}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </div>
@@ -224,10 +242,7 @@ const CropDetails = () => {
 
             <div className="bg-[#D2F9E2] shadow-xl  rounded-4xl mt-2 w-220 pr-7 pb-10 text-[18px] pt-12 pl-14 font-[Inter]">
               <p className="text-[#3D3834]">
-                Harvest in the cool of the morning for maximum longevity. Choose
-                flowers that are fully open but not yet starting to fade. Use
-                sharp garden shears and cut stems at a 45-degree angle. Place
-                immediately in lukewarm water.
+                {IndividualCrop?.crop.harvestingTips}
               </p>
             </div>
           </div>
@@ -315,7 +330,9 @@ const CropDetails = () => {
             </div>
 
             {/* Description */}
-            <p className="text-sm text-gray-500 leading-relaxed">{schedule}</p>
+            <p className="text-sm text-gray-500 leading-relaxed">
+              {IndividualCrop?.crop.wateringSchedule}
+            </p>
           </div>
         </div>
       </div>

@@ -1,7 +1,6 @@
 import { FilterIcon, HelpCircle, Leaf } from "lucide-react";
 import { useFilterStore } from "../../store/useFilter";
 import { useEffect } from "react";
-import { Crops } from "../../constants/crops";
 
 const Filter = () => {
   const {
@@ -10,23 +9,27 @@ const Filter = () => {
     difficulty,
     setDifficulty,
     resetFilters,
-    setCrops,
     applyFilters,
+    setCrops,
   } = useFilterStore();
 
   const FilterOptions = [
     {
       name: "Season",
       options: [
-        { label: "Spring(May-Aug)", value: "Spring" },
-        { label: "Summer(Sept-Nov)", value: "Summer" },
-        { label: "Autumn(Dec-Feb)", value: "Autumn" },
-        { label: "Winter(Mar-Apr)", value: "Winter" },
+        { label: "Spring(May-Aug)", value: "spring" },
+        { label: "Summer(Sept-Nov)", value: "summer" },
+        { label: "Monsoon", value: "monsoon" },
+        { label: "Winter(Mar-Apr)", value: "winter" },
       ],
     },
     {
       name: "Difficulty",
-      options: ["Beginner", "Intermediate", "Advanced"],
+      options: [
+        { label: "Beginner", value: "Beginner" },
+        { label: "Intermediate", value: "intermediate" },
+        { label: "Advance", value: "Advanced" },
+      ],
     },
   ];
 
@@ -49,7 +52,7 @@ const Filter = () => {
   };
 
   useEffect(() => {
-    setCrops(Crops.crop);
+    // Initial load is handled by CropList component
   }, []);
 
   return (
@@ -110,15 +113,15 @@ const Filter = () => {
 
         <div className="flex flex-col gap-2">
           {FilterOptions[1].options.map((option) => {
-            const checked = difficulty.includes(option);
+            const checked = difficulty.includes(option.value);
 
             return (
               <label
-                key={option}
+                key={option.value}
                 className="flex items-center gap-3 cursor-pointer text-sm text-gray-800"
               >
                 <span
-                  onClick={() => toggleDifficulty(option)}
+                  onClick={() => toggleDifficulty(option.value)}
                   className="w-5 h-5 rounded-md flex items-center justify-center shrink-0"
                   style={{
                     background: checked ? "#22C55E" : "#e5e7eb",
@@ -137,7 +140,7 @@ const Filter = () => {
                   )}
                 </span>
 
-                {option}
+                {option.label}
               </label>
             );
           })}
@@ -171,7 +174,12 @@ const Filter = () => {
         </button>
 
         <button
-          onClick={resetFilters}
+          onClick={() => {
+            console.log("clicked");
+            console.log("hi");
+            resetFilters();
+            setCrops();
+          }}
           className="bg-gray-200 cursor-pointer font-[Inter] text-gray-700 px-4 py-2 rounded-lg mt-4"
         >
           Reset all filter

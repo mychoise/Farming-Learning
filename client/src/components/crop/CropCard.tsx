@@ -1,9 +1,20 @@
-import { Leaf } from "lucide-react";
+import { Leaf, Link } from "lucide-react";
+import { useFilterStore } from "../../store/useFilter";
+import { useNavigate } from "react-router-dom";
 
 const CropCard = ({ crop, name }: { crop: any; name: any }) => {
+  const navigate = useNavigate();
+  const { getIndividualCrop } = useFilterStore();
   return (
-    <div className="w-72 rounded-2xl overflow-hidden shadow h-140">
-      <div className="w-full h-[50%] overflow-hidden bg-red-700">
+    <div
+      onClick={() => {
+        getIndividualCrop(crop.id);
+        console.log("clicked");
+        navigate(`/crop/${crop.id}`);
+      }}
+      className="w-72 rounded-2xl overflow-hidden shadow h-140"
+    >
+      <div className="w-full h-[50%] overflow-hidden">
         <img className="w-full h-full object-cover" src={crop.imageUrl}></img>
       </div>
       <div>
