@@ -7,6 +7,7 @@ import {
   index,
   text,
   pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
 
 export const difficultyEnum = pgEnum("difficulty", [
@@ -47,7 +48,7 @@ export const cropTable = pgTable(
     phosphorus: numeric("phosphorus").notNull(),
     potassium: numeric("potassium").notNull(),
     // Growing info
-    growingGuide: text("growing_guide"),
+    growingGuide: jsonb("growing_guide"),
     wateringSchedule: text("watering_schedule"),
     harvestingTips: text("harvesting_tips"),
     difficulty: difficultyEnum("difficulty"),

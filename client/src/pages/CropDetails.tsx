@@ -186,9 +186,8 @@ const CropDetails = () => {
             </div>
             <div className="bg-white shadow-xl  rounded-4xl mt-2 w-220 pr-7 pb-10 text-[18px] pt-12 pl-14 font-[Inter]">
               <div className="flex flex-col gap-8">
-                {IndividualCrop?.crop?.growingGuide
-                  .split("\n")
-                  .map((step: string, index: number) => (
+                {IndividualCrop?.crop?.growingGuide.map(
+                  (step: { title: string; desc: string }, index: number) => (
                     <div className="flex gap-8" key={index}>
                       <div
                         style={{
@@ -200,13 +199,14 @@ const CropDetails = () => {
                         <h1 className="text-white font-bold">{index + 1}</h1>
                       </div>
                       <div className="flex gap-2 flex-col">
-                        {/* <h2 className="text-[20px] text-gray-800 font-[medium]">
-                        {step.title}
-                      </h2> */}
-                        <p>{step}</p>
+                        <h2 className="text-[20px] text-gray-800 font-[medium]">
+                          {step.title}
+                        </h2>
+                        <p>{step.desc}</p>
                       </div>
                     </div>
-                  ))}
+                  ),
+                )}
               </div>
             </div>
           </div>

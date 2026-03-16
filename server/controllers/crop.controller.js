@@ -139,12 +139,11 @@ export const addCrop = async (req, res) => {
       });
     }
 
-    // Convert NPK to numbers first
+    // Convert NPK to numbers
     const n = Number(nitrogen);
     const p = Number(phosphorus);
     const k = Number(potassium);
 
-    // ✅ Fix 1: use isNaN instead of !Number()
     if (isNaN(n) || isNaN(p) || isNaN(k)) {
       return res.status(400).json({
         success: false,
@@ -152,7 +151,6 @@ export const addCrop = async (req, res) => {
       });
     }
 
-    // ✅ Fix 2: compare converted numbers not raw strings
     if (n < 0 || p < 0 || k < 0) {
       return res.status(400).json({
         success: false,
@@ -160,7 +158,7 @@ export const addCrop = async (req, res) => {
       });
     }
 
-    // ✅ Fix 3: enum validation
+    // Enum validation
     const VALID_SEASONS = ["spring", "monsoon", "winter", "all"];
     const VALID_DIFFICULTIES = ["beginner", "intermediate", "advanced"];
 
@@ -186,7 +184,32 @@ export const addCrop = async (req, res) => {
       });
     }
 
-    // ✅ Fix 4: parseList for text fields (handles textarea \n naturally)
+    // growingGuide validation (jsonb array)
+    if (growingGuide !== undefined && growingGuide !== null) {
+      if (!Array.isArray(growingGuide)) {
+        return res.status(400).json({
+          success: false,
+          message: "growingGuide must be an array",
+        });
+      }
+      const isValid = growingGuide.every(
+        (step) =>
+          step &&
+          typeof step.title === "string" &&
+          step.title.trim() !== "" &&
+          typeof step.description === "string" &&
+          step.description.trim() !== "",
+      );
+      if (!isValid) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "each growingGuide step must have a non-empty title and description",
+        });
+      }
+    }
+
+    // Parse text fields
     const parseList = (val) => {
       if (!val) return null;
       if (Array.isArray(val)) return val.join("\n");
@@ -222,7 +245,7 @@ export const addCrop = async (req, res) => {
         climate: climate || null,
         soilType: soilType || null,
         season: season || null,
-        growingGuide: parseList(growingGuide),
+        growingGuide: growingGuide ?? null, // jsonb — pass array directly
         wateringSchedule: parseList(wateringSchedule),
         harvestingTips: parseList(harvestingTips),
         difficulty: difficulty || null,
@@ -236,7 +259,6 @@ export const addCrop = async (req, res) => {
   } catch (error) {
     console.error("error in addCrop:", error);
 
-    // ✅ Fix 5: handle duplicate crop name gracefully
     if (error.code === "23505") {
       return res.status(409).json({
         success: false,

@@ -1,4 +1,4 @@
-import { Leaf, Link } from "lucide-react";
+import { Leaf } from "lucide-react";
 import { useFilterStore } from "../../store/useFilter";
 import { useNavigate } from "react-router-dom";
 
