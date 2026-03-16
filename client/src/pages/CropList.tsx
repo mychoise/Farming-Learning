@@ -2,14 +2,12 @@ import { ChevronRight, Flower2 } from "lucide-react";
 import Filter from "../components/crop/Filter";
 import CropCard from "../components/crop/CropCard";
 import { Crops } from "../constants/crops";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useFilterStore } from "../store/useFilter";
 const CropList = () => {
-  const [selectedvalue, setselectedvalue] = useState<string[]>([]);
   const {
     season,
     filteredCrops,
-    allCrops,
     setCrops,
     setPagination,
     totalPage,
@@ -17,7 +15,7 @@ const CropList = () => {
     totalCrops,
   } = useFilterStore();
   useEffect(() => {
-    setCrops(Crops.crop);
+    setCrops();
   }, []);
   const simpleArray = Array.from({ length: totalPage }, (_, i) => i + 1);
   const formatArray = (arr: string[]) =>
@@ -30,9 +28,7 @@ const CropList = () => {
       <div className="bg-[#F2FDF5] shadow pl-31.75 h-[25vh] pt-12 pb-6 flex flex-col w-full">
         <h1 className=" text-[40px] font-black font-[medium] text-black">
           Explore our{" "}
-          <span className=" font-black italic text-green-600">
-            Crop Catalog
-          </span>
+          <span className=" font-black  text-green-600">Crop Catalog</span>
         </h1>
         <div className="text-[17px] w-[43%] mt-5 font-[font1] text-black">
           <p className="text-[#676056] font-[Inter]">
@@ -85,7 +81,7 @@ const CropList = () => {
                 <h3 className="text-2xl font-semibold text-slate-800 mb-2">
                   No crops found
                 </h3>
-                <p className="text-slate-500 max-w-[280px] mb-8 leading-relaxed">
+                <p className="text-slate-500 max-w-70 mb-8 leading-relaxed">
                   It looks like your field is empty. Try adjusting your filters
                   or adding a new crop to get started.
                 </p>

@@ -58,23 +58,6 @@ const CropDetails = () => {
     },
   ];
 
-  const StepByStepProcess = [
-    {
-      title: "Seeding & Preparation",
-      description: "Start seeds indoors 6-8 weeks before the last frost.",
-    },
-    {
-      title: "Transplanting",
-      description:
-        "Transplant to a sunny location once soil has warmed. Space plants 10-12 inches apart to allow for bushy growth.",
-    },
-    {
-      title: "Care & Maintenance",
-      description:
-        "Pinching off the first flower buds will encourage a bushier plant with more blooms throughout the season.",
-    },
-  ];
-
   const nutrients = [
     {
       key: "nitrogen",
@@ -107,9 +90,6 @@ const CropDetails = () => {
       barColor: "bg-amber-400",
     },
   ];
-  const schedule =
-    "Water deeply once a week, providing about 1 inch of water. During extreme heat, increase frequency to twice weekly. Avoid overhead watering to prevent powdery mildew and fungal issues on the foliage.";
-
   const shuffledColors = useMemo(() => {
     return [...Colors].sort(() => Math.random() - 0.5);
   }, []);
@@ -134,7 +114,7 @@ const CropDetails = () => {
               ({IndividualCrop?.crop.scientificName})
             </span>
           </h1>
-          <button className="bg-[#1DC964] w-[250px] pt-2 pb-2 font-[Inter] text-white text-lg  px-6 py-2 rounded-full">
+          <button className="bg-[#1DC964] w-62.5 pt-2 pb-2 font-[Inter] text-white text-lg  px-6 py-2 rounded-full">
             Get Growing Guide
           </button>
         </div>
@@ -155,7 +135,7 @@ const CropDetails = () => {
               <div
                 key={i}
                 className="relative flex flex-col items-center gap-1 flex-1 font-[Inter]
-    before:absolute before:left-0 before:top-[-10px] before:bg-gray-300 before:h-20 before:w-px
+    before:absolute before:left-0 before:-top-2.5 before:bg-gray-300 before:h-20 before:w-px
     first:before:hidden"
               >
                 <span className="text-green-500">{stat.icon}</span>
@@ -185,7 +165,7 @@ const CropDetails = () => {
               <span className="text-[20px] font-[medium]">Crop Overview</span>
             </div>
 
-            <div className="bg-white shadow-xl  rounded-4xl mt-2 w-[880px] pr-7 pb-10 text-[18px] pt-12 pl-14 font-[Inter]">
+            <div className="bg-white shadow-xl  rounded-4xl mt-2 w-220 pr-7 pb-10 text-[18px] pt-12 pl-14 font-[Inter]">
               <p className="text-[#3D3834]">
                 {IndividualCrop?.crop.description ||
                   "The Golden Marigold is a vibrant, hardy annual plant celebrated in Nepal for its cultural significance and pest-repelling properties. Widely used in festivals like Tihar, these flowers thrive in various soil types and are essential for organic pest management in diverse agricultural systems."}
@@ -249,7 +229,7 @@ const CropDetails = () => {
         </div>
 
         {/* Crop Overview Righth side */}
-        <div className=" flex-col flex-shrink-0 flex-wrap flex gap-8 mt-20 w-[27%] ">
+        <div className=" flex-col shrink-0 flex-wrap flex gap-8 mt-20 w-[27%] ">
           {/* Crop Action */}
           <div className="flex flex-col pt-10 pl-10 rounded-2xl shadow-2xl h-45 w-full bg-[#1DC964] gap-4">
             <div className="flex gap-2 items-center">
@@ -317,7 +297,7 @@ const CropDetails = () => {
 
             {/* Weekly Cadence Card */}
             <div className="bg-gray-50 rounded-xl flex items-center gap-3 px-4 py-3 mb-4">
-              <div className="w-11 h-11 rounded-2xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+              <div className="w-11 h-11 rounded-2xl bg-blue-100 flex items-center justify-center shrink-0">
                 <Calendar color="#2F92F4" />
               </div>
 

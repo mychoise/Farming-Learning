@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
-import axios from "axios";
 
 type FilterStore = {
   season: string[];
@@ -34,43 +33,46 @@ export const useFilterStore = create<FilterStore>((set, get) => ({
   setDifficulty: (difficulty) => set({ difficulty }),
 
   setCrops: async () => {
-    const page = get().currentPage;
-    const result = await axiosInstance.get(`/crop/all?page=${page}`);
-    const totalPage = Math.ceil(result.data.pagination.total / 9);
-    console.log(result.data);
-    set({
-      allCrops: result.data.crop,
-      filteredCrops: result.data.crop,
-      currentPage: result.data.pagination.page,
-      totalPage,
-      totalCrops: result.data.pagination.total,
-    });
-    console.log("hi");
+    try {
+      const page = get().currentPage;
+      const result = await axiosInstance.get(`/crop/all?page=${page}`);
+      const totalPage = Math.ceil(result.data.pagination.total / 9);
+      console.log(result.data);
+      set({
+        allCrops: result.data.crop,
+        filteredCrops: result.data.crop,
+        currentPage: result.data.pagination.page,
+        totalPage,
+        totalCrops: result.data.pagination.total,
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
   },
 
   applyFilters: async () => {
-    const { season, difficulty, currentPage } = get();
-    const difficult = difficulty.map((difficult) =>
-      difficult.toLocaleLowerCase(),
-    );
+    try {
+      const { season, difficulty, currentPage } = get();
+      const difficult = difficulty.map((difficult) =>
+        difficult.toLocaleLowerCase(),
+      );
 
-    console.log("Filter clicked");
-
-    const result = await axiosInstance.get("/crop/all", {
-      params: {
-        page: currentPage,
-        season: season.join(","),
-        difficulty: difficult.join(","),
-      },
-    });
-
-    console.log(result.data);
-    set({
-      allCrops: result.data.crop,
-      filteredCrops: result.data.crop,
-      currentPage: result.data.pagination.page,
-      totalPage: Math.ceil(result.data.pagination.total / 9),
-    });
+      const result = await axiosInstance.get("/crop/all", {
+        params: {
+          page: currentPage,
+          season: season.join(","),
+          difficulty: difficult.join(","),
+        },
+      });
+      set({
+        allCrops: result.data.crop,
+        filteredCrops: result.data.crop,
+        currentPage: result.data.pagination.page,
+        totalPage: Math.ceil(result.data.pagination.total / 9),
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
   },
 
   resetFilters: () =>
@@ -80,14 +82,18 @@ export const useFilterStore = create<FilterStore>((set, get) => ({
       filteredCrops: state.allCrops,
     })),
   setPagination: async (page) => {
-    const result = await axiosInstance.get(`/crop/all?page=${page}`);
-    console.log(result.data);
-    set({
-      allCrops: result.data.crop,
-      filteredCrops: result.data.crop,
-      currentPage: result.data.pagination.page,
-      totalPage: Math.ceil(result.data.pagination.total / 9),
-    });
+    try {
+      const result = await axiosInstance.get(`/crop/all?page=${page}`);
+      console.log(result.data);
+      set({
+        allCrops: result.data.crop,
+        filteredCrops: result.data.crop,
+        currentPage: result.data.pagination.page,
+        totalPage: Math.ceil(result.data.pagination.total / 9),
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
   },
 
   getIndividualCrop: async (id) => {
