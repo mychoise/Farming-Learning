@@ -12,22 +12,22 @@ const CropCard = ({ crop, name }: { crop: any; name: any }) => {
         console.log("clicked");
         navigate(`/crop/${crop.id}`);
       }}
-      className="w-72 rounded-2xl overflow-hidden shadow h-140"
+      className="w-82 rounded-2xl overflow-hidden shadow pb-10"
     >
-      <div className="w-full h-[50%] overflow-hidden">
+      <div className="w-full h-62.5 overflow-hidden">
         <img className="w-full h-full object-cover" src={crop.imageUrl}></img>
       </div>
       <div>
         <div className="p-4 font-[Inter] flex justify-between">
           <h1 className="text-black font-[medium] text-[25px]">{crop.name}</h1>
-          <h1 className="text-black pt-2 pl-6 pr-6 border border-gray-500 bg-gray-100 text-[12px] rounded-full">
+          <h1 className="text-black pt-2 pl-6 pr-6 border border-gray-500 bg-gray-100 h-8.75 text-[12px] rounded-full">
             {crop.difficulty.charAt(0).toUpperCase() + crop.difficulty.slice(1)}
           </h1>
         </div>
         <div className="pl-4 -mt-3">
           <h1 className=" text-[18px] text-green-600">{crop.nepaliName}</h1>
           <h1 className="font-[Inter] mt-5 text-gray-500 text-[14px]">
-            {crop.description.slice(0, 130)}
+            {crop.description.slice(0, 69)}
           </h1>
           <div className="flex pt-2 pb-2 pr-2 pl-2  bg-[#FAFAF9] w-47 rounded-full items-center gap-2 mt-5">
             <Leaf size={17} color="green" />

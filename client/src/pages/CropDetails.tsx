@@ -97,7 +97,7 @@ const CropDetails = () => {
   console.log("IndividualCrop", IndividualCrop);
 
   return (
-    <div className="bg-[#FAFAF9] h-[300vh]">
+    <div className="bg-[#FAFAF9] ">
       {/* Headin part */}
       <div className="w-full gap-15 flex flex-row justify-between bg-[#F2FDF6]">
         <div className="pl-32 pt-24  flex flex-col w-full gap-9">
@@ -107,7 +107,7 @@ const CropDetails = () => {
           <h1 className="text-[110px] font-[medium]  leading-26 word-spacing-[0.5rem]">
             {IndividualCrop?.crop.name || "Golden Marigold"}
           </h1>
-          <h1 className="text-[30px]  italic text-[#1DC964] font-[medium]">
+          <h1 className="text-[30px] w-125  italic text-[#1DC964] font-[medium]">
             {" "}
             {IndividualCrop?.crop.nepaliName}{" "}
             <span className=" font-[Inter] ">
@@ -119,7 +119,7 @@ const CropDetails = () => {
           </button>
         </div>
         <div>
-          <div className="w-[50vw] ml-30 h-[75vh] bg-red-300">
+          <div className="w-[60vw] ml-40 h-[70vh]">
             <img
               className="w-full h-full object-cover"
               src={
@@ -187,7 +187,10 @@ const CropDetails = () => {
             <div className="bg-white shadow-xl  rounded-4xl mt-2 w-220 pr-7 pb-10 text-[18px] pt-12 pl-14 font-[Inter]">
               <div className="flex flex-col gap-8">
                 {IndividualCrop?.crop?.growingGuide.map(
-                  (step: { title: string; desc: string }, index: number) => (
+                  (
+                    step: { title: string; description: string },
+                    index: number,
+                  ) => (
                     <div className="flex gap-8" key={index}>
                       <div
                         style={{
@@ -202,7 +205,7 @@ const CropDetails = () => {
                         <h2 className="text-[20px] text-gray-800 font-[medium]">
                           {step.title}
                         </h2>
-                        <p>{step.desc}</p>
+                        <p>{step.description}</p>
                       </div>
                     </div>
                   ),
