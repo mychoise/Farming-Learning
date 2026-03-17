@@ -57,16 +57,25 @@ const getCropSuggestion = (temp, rain, humidity) => {
   const suggestions = [];
 
   if (temp >= 15 && temp <= 25 && rain < 5) {
-    suggestions.push({ crop: "आलु (Potato)", reason: "उपयुक्त तापमान र कम वर्षा" });
+    suggestions.push({
+      crop: "आलु (Potato)",
+      reason: "उपयुक्त तापमान र कम वर्षा",
+    });
   }
   if (temp >= 20 && temp <= 30 && humidity > 60) {
-    suggestions.push({ crop: "टमाटर (Tomato)", reason: "राम्रो तापमान र आर्द्रता" });
+    suggestions.push({
+      crop: "टमाटर (Tomato)",
+      reason: "राम्रो तापमान र आर्द्रता",
+    });
   }
   if (temp >= 25 && temp <= 35 && rain > 2) {
     suggestions.push({ crop: "मकै (Maize)", reason: "गर्मी र वर्षाको मौसम" });
   }
   if (temp >= 10 && temp <= 20) {
-    suggestions.push({ crop: "फूलगोभी (Cauliflower)", reason: "चिसो मौसम उपयुक्त" });
+    suggestions.push({
+      crop: "फूलगोभी (Cauliflower)",
+      reason: "चिसो मौसम उपयुक्त",
+    });
   }
   if (temp >= 18 && temp <= 28 && humidity > 70) {
     suggestions.push({ crop: "अदुवा (Ginger)", reason: "उष्ण र आर्द्र मौसम" });
@@ -140,39 +149,39 @@ export const getMyWeather = async (req, res) => {
 
       // Current weather variables (order matters for index!)
       current: [
-        "temperature_2m",          // index 0
-        "precipitation",           // index 1
-        "rain",                    // index 2
-        "soil_temperature_0cm",    // index 3
-        "soil_temperature_6cm",    // index 4
-        "soil_temperature_18cm",   // index 5
-        "weather_code",            // index 6
-        "relative_humidity_2m",    // index 7
-        "wind_speed_10m",          // index 8
+        "temperature_2m", // index 0
+        "precipitation", // index 1
+        "rain", // index 2
+        "soil_temperature_0cm", // index 3
+        "soil_temperature_6cm", // index 4
+        "soil_temperature_18cm", // index 5
+        "weather_code", // index 6
+        "relative_humidity_2m", // index 7
+        "wind_speed_10m", // index 8
         "precipitation_probability", // index 9
       ],
 
       // Hourly forecast (next 7 days)
       hourly: [
-        "temperature_2m",            // index 0
-        "rain",                      // index 1
-        "soil_temperature_0cm",      // index 2
-        "soil_temperature_6cm",      // index 3
-        "soil_temperature_18cm",     // index 4
-        "weather_code",              // index 5
+        "temperature_2m", // index 0
+        "rain", // index 1
+        "soil_temperature_0cm", // index 2
+        "soil_temperature_6cm", // index 3
+        "soil_temperature_18cm", // index 4
+        "weather_code", // index 5
         "precipitation_probability", // index 6
-        "wind_speed_10m",            // index 7
-        "relative_humidity_2m",      // index 8
+        "wind_speed_10m", // index 7
+        "relative_humidity_2m", // index 8
       ],
 
       // Daily summary (next 7 days)
       daily: [
-        "temperature_2m_max",            // index 0
-        "temperature_2m_min",            // index 1
-        "precipitation_sum",             // index 2
+        "temperature_2m_max", // index 0
+        "temperature_2m_min", // index 1
+        "precipitation_sum", // index 2
         "precipitation_probability_max", // index 3
-        "weather_code",                  // index 4
-        "wind_speed_10m_max",            // index 5
+        "weather_code", // index 4
+        "wind_speed_10m_max", // index 5
       ],
     };
 
@@ -216,27 +225,49 @@ export const getMyWeather = async (req, res) => {
     const hourlyLength =
       (Number(hourly.timeEnd()) - Number(hourly.time())) / hourly.interval();
 
-    const hourlyTimes = Array.from({ length: hourlyLength }, (_, i) =>
-      new Date((Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) * 1000)
+    const hourlyTimes = Array.from(
+      { length: hourlyLength },
+      (_, i) =>
+        new Date(
+          (Number(hourly.time()) + i * hourly.interval() + utcOffsetSeconds) *
+            1000,
+        ),
     );
 
     const hourlyWeatherCodes = Array.from(hourly.variables(5).valuesArray());
 
     const hourlyData = {
       time: hourlyTimes,
-      temperature_2m: Array.from(hourly.variables(0).valuesArray()).map(v => Math.round(v * 10) / 10),
-      rain: Array.from(hourly.variables(1).valuesArray()).map(v => Math.round(v * 10) / 10),
-      soil_temperature_0cm: Array.from(hourly.variables(2).valuesArray()).map(v => Math.round(v * 10) / 10),
-      soil_temperature_6cm: Array.from(hourly.variables(3).valuesArray()).map(v => Math.round(v * 10) / 10),
-      soil_temperature_18cm: Array.from(hourly.variables(4).valuesArray()).map(v => Math.round(v * 10) / 10),
+      temperature_2m: Array.from(hourly.variables(0).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
+      rain: Array.from(hourly.variables(1).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
+      soil_temperature_0cm: Array.from(hourly.variables(2).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
+      soil_temperature_6cm: Array.from(hourly.variables(3).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
+      soil_temperature_18cm: Array.from(hourly.variables(4).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
       weather_code: hourlyWeatherCodes,
-      precipitation_probability: Array.from(hourly.variables(6).valuesArray()).map(v => Math.round(v)),
-      wind_speed_10m: Array.from(hourly.variables(7).valuesArray()).map(v => Math.round(v * 10) / 10),
-      relative_humidity_2m: Array.from(hourly.variables(8).valuesArray()).map(v => Math.round(v)),
+      precipitation_probability: Array.from(
+        hourly.variables(6).valuesArray(),
+      ).map((v) => Math.round(v)),
+      wind_speed_10m: Array.from(hourly.variables(7).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
+      relative_humidity_2m: Array.from(hourly.variables(8).valuesArray()).map(
+        (v) => Math.round(v),
+      ),
       // 🌤️ Icons for each hour
-      icons: hourlyWeatherCodes.map(code => getWeatherIcon(Math.round(code))),
+      icons: hourlyWeatherCodes.map((code) => getWeatherIcon(Math.round(code))),
       icon_urls: hourlyWeatherCodes.map(
-        code => `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(Math.round(code))}.svg`
+        (code) =>
+          `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(Math.round(code))}.svg`,
       ),
     };
 
@@ -244,31 +275,53 @@ export const getMyWeather = async (req, res) => {
     const dailyLength =
       (Number(daily.timeEnd()) - Number(daily.time())) / daily.interval();
 
-    const dailyTimes = Array.from({ length: dailyLength }, (_, i) =>
-      new Date((Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) * 1000)
+    const dailyTimes = Array.from(
+      { length: dailyLength },
+      (_, i) =>
+        new Date(
+          (Number(daily.time()) + i * daily.interval() + utcOffsetSeconds) *
+            1000,
+        ),
     );
 
     const dailyWeatherCodes = Array.from(daily.variables(4).valuesArray());
 
     const dailyData = {
       time: dailyTimes,
-      temperature_max: Array.from(daily.variables(0).valuesArray()).map(v => Math.round(v * 10) / 10),
-      temperature_min: Array.from(daily.variables(1).valuesArray()).map(v => Math.round(v * 10) / 10),
-      precipitation_sum: Array.from(daily.variables(2).valuesArray()).map(v => Math.round(v * 10) / 10),
-      precipitation_probability_max: Array.from(daily.variables(3).valuesArray()).map(v => Math.round(v)),
-      weather_code: dailyWeatherCodes,
-      wind_speed_max: Array.from(daily.variables(5).valuesArray()).map(v => Math.round(v * 10) / 10),
-      // 🌤️ Icons for each day
-      icons: dailyWeatherCodes.map(code => getWeatherIcon(Math.round(code))),
-      icon_urls: dailyWeatherCodes.map(
-        code => `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(Math.round(code))}.svg`
+      temperature_max: Array.from(daily.variables(0).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
       ),
-      descriptions: dailyWeatherCodes.map(code => getWeatherDescription(Math.round(code))),
+      temperature_min: Array.from(daily.variables(1).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
+      precipitation_sum: Array.from(daily.variables(2).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
+      precipitation_probability_max: Array.from(
+        daily.variables(3).valuesArray(),
+      ).map((v) => Math.round(v)),
+      weather_code: dailyWeatherCodes,
+      wind_speed_max: Array.from(daily.variables(5).valuesArray()).map(
+        (v) => Math.round(v * 10) / 10,
+      ),
+      // 🌤️ Icons for each day
+      icons: dailyWeatherCodes.map((code) => getWeatherIcon(Math.round(code))),
+      icon_urls: dailyWeatherCodes.map(
+        (code) =>
+          `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(Math.round(code))}.svg`,
+      ),
+      descriptions: dailyWeatherCodes.map((code) =>
+        getWeatherDescription(Math.round(code)),
+      ),
     };
 
     // ── Farming Intelligence ──
     const farmingData = {
-      crop_suggestions: getCropSuggestion(currentTemp, currentRain, currentHumidity),
+      crop_suggestions: getCropSuggestion(
+        currentTemp,
+        currentRain,
+        currentHumidity,
+      ),
       alerts: getFarmingAlert(currentRain, currentHumidity, currentWindSpeed),
     };
 
@@ -287,7 +340,6 @@ export const getMyWeather = async (req, res) => {
     };
 
     return res.status(200).json({ success: true, data: weatherData });
-
   } catch (error) {
     console.error("Error in getMyWeather:", error);
     return res.status(500).json({
@@ -297,4 +349,3 @@ export const getMyWeather = async (req, res) => {
     });
   }
 };
-
