@@ -1,6 +1,7 @@
 import CropList from "./pages/CropList";
 import Navbar from "./components/Navbar";
 import CropDetails from "./pages/CropDetails";
+import Weather from "./pages/Weather";
 import { Routes, Route } from "react-router-dom";
 const App = () => {
   return (
@@ -10,6 +11,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<CropList />} />
           <Route path="/crop/:id" element={<CropDetails />} />
+          <Route path="/weather" element={<Weather />} />
         </Routes>
       </div>
     </div>
