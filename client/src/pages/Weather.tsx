@@ -6,7 +6,14 @@ import {
   Sun,
   ChevronLeft,
   ChevronRight,
+  SlidersVertical,
+  Thermometer,
+  Info,
+  MapPin,
+  TriangleAlert,
+  Sprout,
 } from "lucide-react";
+import WeatherForecastPanel from "../components/weather/WeatherForecastPanel";
 
 const Weather = () => {
   const weatherDetails = [
@@ -78,6 +85,55 @@ const Weather = () => {
     },
   ];
 
+  const SoilTemperatureValue = [
+    {
+        name:'Surface Temperature',
+        Depth:'0cm',
+        Temperature:'22°C',
+        color:'#F97316',
+        background:"#FEF9F2"
+    },
+    {
+        name:'Root Zone(Shallow)',
+        Depth:'6cm',
+        Temperature:'20°C',
+        color:'#10B981',
+        background:"#F3FCF7"
+    },
+    {
+        name:'Deep Root Zone',
+        Depth:'18cm',
+        Temperature:'18°C',
+        color:'#3B82F6',
+        background:"#F3FBFE"
+    }
+  ]
+const crops = [
+  {
+    emoji: "🌽",
+    title: "Maize Sowing",
+    subtitle: "Ideal soil temp & moisture detected",
+    status: "go",
+    bg: "bg-amber-50",
+    border: "border-amber-100",
+  },
+  {
+    emoji: "🍅",
+    title: "Tomato Transplanting",
+    subtitle: "Upcoming sunny window (3 days)",
+    status: "go",
+    bg: "bg-red-50",
+    border: "border-red-100",
+  },
+  {
+    emoji: "🌾",
+    title: "Rice Fertilization",
+    subtitle: "Postpone: High rain expected",
+    status: "warn",
+    bg: "bg-yellow-50",
+    border: "border-yellow-100",
+  },
+];
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: "left" | "right") => {
@@ -90,7 +146,7 @@ const Weather = () => {
   };
 
   return (
-    <div className=" pt-12 pl-45 bg-[#F8FAFC] w-screen h-[200vh]">
+    <div className=" pt-12 pl-45 flex bg-[#F8FAFC] gap-10 w-screen h-[200vh]">
       {/* Left Side */}
       <div>
         {/* Header */}
@@ -147,7 +203,7 @@ const Weather = () => {
         <div className="mt-10">
           <h1 className="text-[20px] font-[medium]">Hourly Forecast </h1>
 
-          <div className="relative w-[calc(100%-141px*5)]">
+          <div className="relative w-200">
             {/* Left Arrow */}
             <button
               onClick={() => scroll("left")}
@@ -197,11 +253,139 @@ const Weather = () => {
         </div>
 
         {/* Soil Temperatue */}
+        <div className="bg-[#FFFFFF] mt-15 rounded-4xl pl-8 pt-8 w-197.5 h-85">
+            {/* Heading for soil temprature */}
+            <div>
+                <div className="flex gap-3 items-center">
+                <div className="bg-[#FEF3C7] p-3 rounded-2xl w-[50px]">
+                    <SlidersVertical color="#B45309"  />
+                </div>
+                <span className="font-[medium] text-[23px]">Soil Insights (Farm-Specific)</span>
+                </div>
+                <div className="mt-6 flex flex-row gap-8">
+                    {SoilTemperatureValue.map((item,index)=>(
+                <div key={index} style={{ background: item.background }} className=" rounded-2xl p-6 w-57 shadow-sm relative overflow-hidden">
+        {/* Subtle glow */}
+        <div className="absolute -top-8 -right-8 w-24 h-24 bg-orange-200 rounded-full opacity-20 blur-2xl" />
+
+        {/* Title */}
+        <div style={{color:item.color}} className="flex items-center gap-1.5 font-[medium] text-[17px]">
+{item.name}
+        </div>
+
+        {/* Depth */}
+        <p className="text-stone-400 text-[13px] mt-0.5 font-[Inter]">Depth: {item.Depth}</p>
+
+        {/* Temperature */}
+        <div className="flex items-end gap-1 mt-4 mb-4">
+          <span className="text-4xl font-[medium] text-stone-800 tracking-tight leading-none">
+            {item.Temperature}
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        <div  className="h-1.5 bg-gray-300 w-full  rounded-full overflow-hidden">
+          <div style={{
+    background: `linear-gradient(to right, ${item.color}80, ${item.color})`
+  }} className="h-full w-[62%] bg-linear-to-r from-orange-400 to-orange-300 rounded-full" />
+        </div>
+      </div>
+                    ))}
+
+                </div>
+                <h1 className="text-stone-400 text-[13px] mt-4 font-[Inter] italic">
+                    <Info size={15} className="inline-block mr-1 italic" />
+                    Optimal for sowing: Corn, Soybeans, and Tomatoes require soil above 15°C.
+                </h1>
+            </div>
+
+        </div>
       </div>
 
       {/* Right Side */}
-      <div></div>
+      <div>
+{/* Search bar */}
+      <div className="w-100 font-[Inter]">
+        <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-blue-400 transition">
+       <MapPin />
+          <input
+            type="text"
+            placeholder="Search location (e.g., Kathmandu, Pokhara)"
+            className="w-full outline-none text-gray-600 placeholder-gray-400 text-[15px]"
+          />
+        </div>
+      </div>
+
+
+      {/* 7-Day Forecast Panel */}
+      <WeatherForecastPanel />
+
+      {/* Crop Alert */}
+      <div className="mt-10 ">
+        <h1 className="font-[medium] text-[20px]">Farming Intelligence</h1>
+        <div className="flex gap-4 bg-[#FEF2F2] mt-2 p-5 w-100 rounded-3xl">
+            <div className="bg-[#EF4444] w-14 p-1 rounded-[10px] h-9">
+                <TriangleAlert size={26} color="white" />
+            </div>
+
+          <div className="flex gap-1 flex-col">
+            <h1 className="font-[medium] text-[#991B1B] ">High Wind Alert</h1>
+            <h1 className="font-[Inter] text-[#B91C1C] text-[13px]">Winds up to 45km/h expected tonight. Secure delicate seedlings and cover greenhouses in the Bhaktapur area.</h1>
+          </div>
+        </div>
+      </div>
+      {/* Crop Suggestions */}
+<div className="bg-white pt-5 pl-9 pb-5 rounded-4xl mt-7">
+ <div className="flex items-center gap-2.5 mb-6">
+          <div className="relative flex items-center justify-center">
+            <Sprout
+              size={22}
+              className="text-green-500 animate-pulse"
+              strokeWidth={2.2}
+            />
+          </div>
+          <h2
+            className="text-xl font-bold text-gray-800 tracking-tight"
+            style={{ fontFamily: "'Nunito', 'Segoe UI', sans-serif" }}
+          >
+            Crop Suggestions
+          </h2>
+        </div>
+        {/* Cards */}
+        <div>
+        <div className="flex flex-col gap-3">
+          {crops.map((crop, i) => (
+            <div
+              key={i}
+              className={`flex items-center gap-4 rounded-2xl px-4 py-3.5   transition-all duration-200 hover:scale-[1.02] hover:shadow-md hover:bg-[#F0FDF4] cursor-pointer`}
+              style={{
+                animation: `fadeSlideIn 0.4s ease both`,
+                animationDelay: `${i * 0.1}s`,
+              }}
+            >
+              {/* Emoji Icon */}
+              <div className="w-11 h-11 rounded-xl bg-white shadow-sm flex items-center justify-center text-2xl shrink-0 border border-white/80">
+                {crop.emoji}
+              </div>
+
+              {/* Text */}
+              <div className="flex-1 font-[medium] min-w-0">
+                <p
+                  className="text-sm font-bold text-gray-800 leading-tight"
+                >
+                  {crop.title}
+                </p>
+                <p className="text-xs font-[Inter] text-gray-500 mt-0.5 leading-snug">
+                  {crop.subtitle}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      </div>
     </div>
+</div>
   );
 };
 
