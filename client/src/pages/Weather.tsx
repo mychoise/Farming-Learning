@@ -17,6 +17,7 @@ import {
 import WeatherForecastPanel from "../components/weather/WeatherForecastPanel";
 import { useQuery } from "@tanstack/react-query";
 import { getMyWeather } from "../api/api";
+import type { WeatherData } from "../api/api";
 
 
 const Weather = () => {
@@ -28,13 +29,14 @@ const Weather = () => {
 
   const [placeName, setplaceName] = useState<string>("");
 
-const {data , isLoading} = useQuery({
+const {data , isLoading} = useQuery<WeatherData>({
     queryKey:["my-weather" , coords],
-    queryFn:()=>getMyWeather(coords),
+    queryFn:()=>getMyWeather({ lat: coords!.lat, lon: coords!.lon }),
     enabled:!!coords, // Only run query when coords are available
     staleTime: 1000 * 60 * 60, // 1 hour
-    cacheTime: 1000 * 60 * 60, // 1 hour
 })
+
+console.log("weather data is ", data)
 
 
   function getMyLocation() {
@@ -144,32 +146,7 @@ const now = new Date().getHours();
         background:"#F3FBFE"
     }
   ]
-const crops = [
-  {
-    emoji: "🌽",
-    title: "Maize Sowing",
-    subtitle: "Ideal soil temp & moisture detected",
-    status: "go",
-    bg: "bg-amber-50",
-    border: "border-amber-100",
-  },
-  {
-    emoji: "🍅",
-    title: "Tomato Transplanting",
-    subtitle: "Upcoming sunny window (3 days)",
-    status: "go",
-    bg: "bg-red-50",
-    border: "border-red-100",
-  },
-  {
-    emoji: "🌾",
-    title: "Rice Fertilization",
-    subtitle: "Postpone: High rain expected",
-    status: "warn",
-    bg: "bg-yellow-50",
-    border: "border-yellow-100",
-  },
-];
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: "left" | "right") => {
@@ -300,8 +277,7 @@ const crops = [
           {/* Left part green */}
           <div className=" flex-col flex -gap-[90px]">
             <h1 className="text-[20px] text-[#E9F9F0] font-[Inter]">
-            {console.log("data is" , data?.location)}
-            {data?.location.city === "Unknown City"? data?.location.formated_address:data?.location.city+","+data?.location.country }
+            {data?.location.city === "Unknown City" ? data?.location.formated_address : data?.location.city + "," + data?.location.country}
             </h1>
             <h1 className="text-[75px] font-[medium] -mt-3">{data?.current.temperature_2m}°C</h1>
             <h1 className="text-[25px] -mt-1 font-[Inter]">{data?.current.description.en}</h1>

@@ -1,27 +1,16 @@
 import { Thermometer } from "lucide-react";
 import WeatherRow from "./WeatherRow";
+import type { WeatherData } from "../../api/api";
 
-type WeatherItem = {
-  day: string;
-  high: number;
-  low: number;
-  condition: string;
-  icon: string;
-  rain: number;
-  rainfall: number;
-  wind: number;
-  tag: string;
-  tagColor: string;
-  tagBg: string;
-  gradient: string;
-  iconBg: string;
+type WeatherForecastPanelProps = {
+  item?: WeatherData;
 };
 
 
 
 
 
-export default function WeatherForecastPanel({item}) {
+export default function WeatherForecastPanel({item}: WeatherForecastPanelProps) {
     console.log("item is ",item?.daily)
 //   const weatherData: WeatherItem[] = [
 //   { day: "Mon", high: item?.daily.temperature_max[0], low: 18, condition: "Sunny Day", icon: "☀️", rain: 5, rainfall: 0, wind: 12, tag: "GOOD SOWING", tagColor: "text-emerald-500", tagBg: "bg-emerald-50", gradient: "from-amber-100 to-orange-50", iconBg: "bg-amber-100" },
@@ -79,7 +68,7 @@ const weatherColors = [
 ];
 
 
-const weatherData = item?.daily?.time.map((_, index) => ({
+const weatherData = item?.daily?.time.map((_, index: number) => ({
   day: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][index],
   high: item?.daily.temperature_max[index],
   low: item?.daily.temperature_min[index],
