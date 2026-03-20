@@ -29,14 +29,14 @@ export default function WeatherRow({ item }: WeatherRowProps) {
           <span className="text-sm font-bold text-slate-700">{item.day}</span>
         </div>
         <div className={`w-11 h-11 rounded-xl ${item.iconBg} flex items-center justify-center text-xl shrink-0 shadow-sm`}>
-          {item.icon}
+            <img src={item.icon} alt={item.condition} className="w-12 h-12" />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-1">
             <span className="text-base font-bold text-slate-800">{item.high}°</span>
             <span className="text-xs text-slate-400 font-medium">/ {item.low}°</span>
           </div>
-          <p className="text-xs text-slate-500 mt-0.5 truncate">{item.condition}</p>
+          {/* <p className="text-xs text-slate-500 mt-0.5 truncate">{item.condition}</p> */}
         </div>
         <div className={`px-2.5 py-1 rounded-lg text-xs font-bold tracking-wider ${item.tagColor} ${item.tagBg} shrink-0`}>
           {item.tag}

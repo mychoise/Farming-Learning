@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CloudRain,
   FlaskConical,
@@ -7,103 +7,139 @@ import {
   ChevronLeft,
   ChevronRight,
   SlidersVertical,
-  Thermometer,
   Info,
   MapPin,
   TriangleAlert,
   Sprout,
+  Locate,
+  Search,
 } from "lucide-react";
 import WeatherForecastPanel from "../components/weather/WeatherForecastPanel";
+import { useQuery } from "@tanstack/react-query";
+import { getMyWeather } from "../api/api";
+
 
 const Weather = () => {
+
+  const [coords, setCoords] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
+
+  const [placeName, setplaceName] = useState<string>("");
+
+const {data , isLoading} = useQuery({
+    queryKey:["my-weather" , coords],
+    queryFn:()=>getMyWeather(coords),
+    enabled:!!coords, // Only run query when coords are available
+    staleTime: 1000 * 60 * 60, // 1 hour
+    cacheTime: 1000 * 60 * 60, // 1 hour
+})
+
+
+  function getMyLocation() {
+    if (!navigator.geolocation) {
+      console.log("Geolocation not supported");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoords({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        });
+      },
+      (error) => {
+        console.error("Location error:", error);
+      })
+}
+
+useEffect(() => {
+ getMyLocation();
+}, []);
+
+const searchHandler = async(placeName: string) => {
+    if(placeName.trim() === "") return;
+const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(placeName)}&format=json&limit=1`);
+const res= await response.json();
+setCoords({
+    lat: parseFloat(res[0].lat),
+    lon: parseFloat(res[0].lon),
+})
+}
+
+
+
   const weatherDetails = [
     {
       name: "Humidity",
       icon: <FlaskConical size={22} className="text-blue-500" />,
       bg: "bg-blue-50",
-      value: "64%",
+      value: `${data?.current.relative_humidity_2m}%`,
     },
     {
       name: "Wind",
       icon: <MoveRight size={22} className="text-teal-500" />,
       bg: "bg-teal-50",
-      value: "5 km/h",
+      value: `${data?.current.wind_speed_10m} m/s`,
     },
     {
       name: "Precip.",
       icon: <CloudRain size={22} className="text-indigo-500" />,
       bg: "bg-indigo-50",
-      value: "10%",
+      value: data?.current.precipitation,
     },
     {
       name: "Rain",
       icon: <Sun size={22} className="text-amber-500" />,
       bg: "bg-amber-50",
-      value: "0.0mm",
+      value: data?.current.rain,
     },
   ];
-  const WeatherHourDetail = [
-    {
-      time: "Now",
-      temp: "24°C",
-      image: "https://source.unsplash.com/random/160x160/?sunset",
-    },
-    {
-      time: "14:00",
-      temp: "25°C",
-      image: "https://source.unsplash.com/random/160x160/?water",
-    },
-    {
-      time: "15:00",
-      temp: "27°C",
-      image: "https://source.unsplash.com/random/160x160/?mountain",
-    },
-    {
-      time: "16:00",
-      temp: "28°C",
-      image: "https://source.unsplash.com/random/160x160/?sea",
-    },
-    {
-      time: "17:00",
-      temp: "26°C",
-      image: "https://source.unsplash.com/random/160x160/?forest",
-    },
-    {
-      time: "18:00",
-      temp: "24°C",
-      image: "https://source.unsplash.com/random/160x160/?city",
-    },
-    {
-      time: "19:00",
-      temp: "22°C",
-      image: "https://source.unsplash.com/random/160x160/?desert",
-    },
-    {
-      time: "20:00",
-      temp: "20°C",
-      image: "https://source.unsplash.com/random/160x160/?beach",
-    },
-  ];
+  function formatHour(iso:string) {
+  return  new Date(iso).toLocaleTimeString("en-GB", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+const now = new Date().getHours();
+
+ const WeatherHourDetail1 = (() => {
+  const mapped = data?.hourly.time.map((time: string, index: number) => ({
+    time: formatHour(time),
+    temp: data?.hourly.temperature_2m[index],
+    image: data?.hourly.icon_urls[index],
+    hour: new Date(time).getHours(),
+  }));
+
+  const currentIndex = mapped?.findIndex((item:any) => item.hour === now);
+
+  return mapped?.slice(currentIndex); // 👈 start from current hour, keep everything after
+})();
+
+
 
   const SoilTemperatureValue = [
     {
         name:'Surface Temperature',
         Depth:'0cm',
-        Temperature:'22°C',
+        Temperature:data?.current.soil_temperature_0cm + '°C',
         color:'#F97316',
         background:"#FEF9F2"
     },
     {
         name:'Root Zone(Shallow)',
         Depth:'6cm',
-        Temperature:'20°C',
+        Temperature:data?.current.soil_temperature_6cm + '°C',
         color:'#10B981',
         background:"#F3FCF7"
     },
     {
         name:'Deep Root Zone',
         Depth:'18cm',
-        Temperature:'18°C',
+        Temperature:data?.current.soil_temperature_18cm + '°C',
         color:'#3B82F6',
         background:"#F3FBFE"
     }
@@ -145,8 +181,111 @@ const crops = [
     }
   };
 
+
+
   return (
-    <div className=" pt-12 pl-45 flex bg-[#F8FAFC] gap-10 w-screen h-[200vh]">
+<>
+{isLoading?(
+    // Loading Animation
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] gap-8">
+    <style>{`
+      @keyframes sunPulse {
+        0%, 100% { transform: translateX(-50%) scale(1); }
+        50% { transform: translateX(-50%) scale(1.08); }
+      }
+      @keyframes rayRotate { to { transform: rotate(360deg); } }
+      @keyframes cloudFloat {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-6px); }
+      }
+      @keyframes rainFall {
+        0% { opacity: 0; transform: translateY(-4px); }
+        30% { opacity: 1; }
+        100% { opacity: 0; transform: translateY(18px); }
+      }
+      @keyframes barGrow {
+        0%, 100% { height: 8px; opacity: 0.35; }
+        50% { height: 28px; opacity: 1; }
+      }
+      @keyframes dotBlink {
+        0%, 80%, 100% { opacity: 0.3; }
+        40% { opacity: 1; }
+      }
+
+      .sun {
+        position: absolute; top: 10px; left: 50%;
+        width: 52px; height: 52px; border-radius: 50%;
+        background: #F59E0B;
+        animation: sunPulse 2.4s ease-in-out infinite;
+      }
+      .sun::before {
+        content: ''; position: absolute; inset: -10px; border-radius: 50%;
+        border: 3px solid #FCD34D; opacity: 0.4;
+        animation: rayRotate 6s linear infinite;
+      }
+      .sun::after {
+        content: ''; position: absolute; inset: -18px; border-radius: 50%;
+        border: 2px dashed #FDE68A; opacity: 0.25;
+        animation: rayRotate 9s linear infinite reverse;
+      }
+      .cloud-main {
+        position: absolute; bottom: 16px; left: 50%;
+        width: 96px; height: 36px; border-radius: 18px;
+        background: white; border: 1px solid #e2e8f0;
+        animation: cloudFloat 3s ease-in-out infinite;
+      }
+      .cloud-main::before {
+        content: ''; position: absolute; top: -18px; left: 14px;
+        width: 38px; height: 38px; border-radius: 50%;
+        background: white; border: 1px solid #e2e8f0;
+      }
+      .cloud-main::after {
+        content: ''; position: absolute; top: -10px; left: 42px;
+        width: 28px; height: 28px; border-radius: 50%;
+        background: white; border: 1px solid #e2e8f0;
+      }
+      .rain-drop {
+        width: 3px; height: 10px; border-radius: 2px;
+        background: #60A5FA; opacity: 0;
+        animation: rainFall 1.4s ease-in infinite;
+      }
+      .loading-bar {
+        width: 6px; border-radius: 3px;
+        background: #cbd5e1;
+        animation: barGrow 1.4s ease-in-out infinite;
+      }
+      .dot { display: inline-block; animation: dotBlink 1.2s ease-in-out infinite; }
+    `}</style>
+
+    {/* Scene */}
+    <div className="relative w-40 h-30">
+      <div className="sun" />
+      <div className="cloud-main">
+        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 flex gap-2.5">
+          {[0, 0.22, 0.44, 0.14, 0.36].map((delay, i) => (
+            <div key={i} className="rain-drop" style={{ animationDelay: `${delay}s` }} />
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* Bars */}
+    <div className="flex items-end gap-1.5 h-7">
+      {[0, 0.12, 0.24, 0.36, 0.48, 0.6, 0.72].map((delay, i) => (
+        <div key={i} className="loading-bar" style={{ animationDelay: `${delay}s` }} />
+      ))}
+    </div>
+
+    {/* Label */}
+    <p className="text-sm text-slate-400 tracking-wide">
+      Fetching weather data
+      <span className="dot" style={{ animationDelay: "0s" }}>.</span>
+      <span className="dot" style={{ animationDelay: "0.2s" }}>.</span>
+      <span className="dot" style={{ animationDelay: "0.4s" }}>.</span>
+    </p>
+  </div>
+):(
+        <div className=" pt-12 pl-45 flex bg-[#F8FAFC] gap-10 w-screen h-[200vh]">
       {/* Left Side */}
       <div>
         {/* Header */}
@@ -157,25 +296,21 @@ const crops = [
           </h1>
         </div>
         {/* Weather Display */}
-        <div className="bg-linear-to-br mt-9 flex justify-between from-[#22c55e] to-[#10b981] rounded-4xl p-8 text-white relative overflow-hidden custom-shadow w-[790px] h-[260px]">
+        <div className="bg-linear-to-br mt-9 flex justify-between from-[#22c55e] to-[#10b981] rounded-4xl p-8 text-white relative overflow-hidden custom-shadow w-197.5 h-55">
           {/* Left part green */}
           <div className=" flex-col flex -gap-[90px]">
             <h1 className="text-[20px] text-[#E9F9F0] font-[Inter]">
-              Kathmandu,Nepal
+              {data?.location.city},{data?.location.country}
             </h1>
-            <h1 className="text-[75px] font-[medium] -mt-3">24.5°C</h1>
-            <h1 className="text-[25px] -mt-1 font-[Inter]">Partly Cloudy</h1>
+            <h1 className="text-[75px] font-[medium] -mt-3">{data?.current.temperature_2m}°C</h1>
+            <h1 className="text-[25px] -mt-1 font-[Inter]">{data?.current.description.en}</h1>
             <div className="flex mt-2 text-[15px] font-[Inter] gap-4">
-              <div className="bg-white/40 rounded-full px-4 py-0.5">
-                <h1>H: 26°</h1>
-              </div>
-              <div className="bg-white/40 rounded-full px-4 py-0.5">
-                <h1>L: 18°</h1>
-              </div>
             </div>
           </div>
           {/* Right part green */}
-          <div className="w-[160px] mt-4 h-[160px] bg-orange-300"></div>
+          <div className="w-40 mt-4 h-40 ">
+            <img src={data?.current.icon_url} alt="Weather Icon" className="w-full h-full object-contain" />
+          </div>
         </div>
         {/* Weather downward */}
         <div className="mt-7">
@@ -217,25 +352,28 @@ const crops = [
               ref={scrollRef}
               className="flex flex-row gap-4 -mt-4 overflow-x-hidden pb-4 scroll-smooth scrollbar-hide px-2"
             >
-              {WeatherHourDetail.map((hour, index) => (
+
+              {WeatherHourDetail1?.map((hour: any, index: number) => (
                 <div
                   key={index}
-                  className="shrink-0 font-[Inter] justify-center items-center mt-10 bg-white rounded-2xl shadow-lg p-6 w-36 border border-gray-100"
+                  className={`shrink-0  font-[Inter] ${Number(hour.time.split(':')[0]) == now ? 'bg-[#F0FDF4]' : 'bg-white'} justify-center items-center mt-10 bg-[#F0FDF4] rounded-2xl shadow-lg p-6 w-36 border ${Number(hour.time.split(':')[0]) == now ? 'border-green-300' : 'border-gray-200'}`}
                 >
                   {/* Time */}
                   <div className="text-center mb-4">
                     <h3 className="text-lg font-semibold text-gray-400">
-                      {hour.time}
+                      {Number(hour.time.split(':')[0]) == now ? "Now" : hour.time}
                     </h3>
                   </div>
 
                   {/* Weather Image */}
-                  <div className="flex justify-center w-16 h-16 bg-amber-300 ml-4 mb-4" />
+                  <div className="flex justify-center w-16 h-16 rounded-2xl bg-amber-200 ml-4 mb-4" >
+<img src={hour.image} alt="Weather Icon" className="w-full h-full object-contain" />
+                    </div>
 
                   {/* Temperature */}
                   <div className="text-center">
                     <p className="text-[18px] font-bold text-gray-800">
-                      {hour.temp}
+                      {hour.temp}°C
                     </p>
                   </div>
                 </div>
@@ -305,32 +443,68 @@ const crops = [
       {/* Right Side */}
       <div>
 {/* Search bar */}
-      <div className="w-100 font-[Inter]">
-        <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-2xl px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-blue-400 transition">
-       <MapPin />
+      <div className=" flex items-center justify-center p-8">
+      <div className="w-full max-w-lg">
+
+        {/* Label */}
+        <div className="flex items-center gap-2 mb-2.5 pl-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+          <span className="text-xs font-medium uppercase tracking-widest text-slate-400">
+            Find your location
+          </span>
+        </div>
+
+        {/* Search bar */}
+        <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl pl-4 pr-1.5 py-1.5 shadow-sm focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-50 transition-all duration-200">
+
+          <MapPin size={18} className="text-indigo-500 shrink-0" />
+
           <input
             type="text"
-            placeholder="Search location (e.g., Kathmandu, Pokhara)"
-            className="w-full outline-none text-gray-600 placeholder-gray-400 text-[15px]"
+            placeholder="Search city, district, or area…"
+            className="flex-1 min-w-0 bg-transparent outline-none text-slate-700 placeholder-slate-300 text-sm"
+            value={placeName}
+            onChange={(e) => setplaceName(e.target.value)}
           />
+
+          <div className="w-px h-5 bg-slate-200 shrink-0" />
+
+          <button
+            onClick={getMyLocation}
+            title="Use my location"
+            className="p-2 rounded-xl text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 transition-all duration-150 shrink-0"
+          >
+            <Locate size={17} />
+          </button>
+
+          <button
+onClick={()=>searchHandler(placeName)}
+          className="flex items-center gap-1.5 bg-indigo-500 hover:bg-indigo-600 active:scale-95 text-white text-sm font-medium px-4 py-2 rounded-xl shadow-md shadow-indigo-200 transition-all duration-150 shrink-0">
+            <Search size={14} />
+            Search
+          </button>
         </div>
+
+
       </div>
+    </div>
 
 
       {/* 7-Day Forecast Panel */}
-      <WeatherForecastPanel />
+      <WeatherForecastPanel item={data} />
 
       {/* Crop Alert */}
       <div className="mt-10 ">
         <h1 className="font-[medium] text-[20px]">Farming Intelligence</h1>
         <div className="flex gap-4 bg-[#FEF2F2] mt-2 p-5 w-100 rounded-3xl">
-            <div className="bg-[#EF4444] w-14 p-1 rounded-[10px] h-9">
+            <div className="bg-[#EF4444]  p-1 rounded-[10px] h-9">
                 <TriangleAlert size={26} color="white" />
             </div>
 
           <div className="flex gap-1 flex-col">
-            <h1 className="font-[medium] text-[#991B1B] ">High Wind Alert</h1>
-            <h1 className="font-[Inter] text-[#B91C1C] text-[13px]">Winds up to 45km/h expected tonight. Secure delicate seedlings and cover greenhouses in the Bhaktapur area.</h1>
+            {/* <h1 className="font-[medium] text-[#991B1B] ">High Wind Alert</h1> */}
+            <h1 className="font-[Inter] text-[#B91C1C] text-[13px]">{data?.farming.alerts[0].en}</h1>
+                   <h1 className="font-[Inter] text-[#B91C1C] text-[13px]">{data?.farming.alerts[0].np}</h1>
           </div>
         </div>
       </div>
@@ -354,10 +528,10 @@ const crops = [
         {/* Cards */}
         <div>
         <div className="flex flex-col gap-3">
-          {crops.map((crop, i) => (
+          {data?.farming.crop_suggestions.map((crop:any, i:number) => (
             <div
               key={i}
-              className={`flex items-center gap-4 rounded-2xl px-4 py-3.5   transition-all duration-200 hover:scale-[1.02] hover:shadow-md hover:bg-[#F0FDF4] cursor-pointer`}
+              className={`flex items-center gap-4 rounded-2xl px-4 py-3.5   transition-all duration-200 hover:scale-[1.02]  cursor-pointer`}
               style={{
                 animation: `fadeSlideIn 0.4s ease both`,
                 animationDelay: `${i * 0.1}s`,
@@ -373,10 +547,10 @@ const crops = [
                 <p
                   className="text-sm font-bold text-gray-800 leading-tight"
                 >
-                  {crop.title}
+                  {crop.crop}
                 </p>
                 <p className="text-xs font-[Inter] text-gray-500 mt-0.5 leading-snug">
-                  {crop.subtitle}
+                  {crop.en}
                 </p>
               </div>
             </div>
@@ -386,6 +560,8 @@ const crops = [
       </div>
     </div>
 </div>
+)}
+</>
   );
 };
 
