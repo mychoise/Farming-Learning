@@ -98,3 +98,9 @@ export const getMyWeather = async(data: { lat: number | string; lon: number | st
     })
     return result.data.data as WeatherData
 }
+
+export const getOrganicFertilizerCalculation = async (data: { crop: string; landSystem: string; length: number; width: number }) => {
+const result = await axiosInstance.post("/calculate/organic-fertilizer",data)
+return result.data.data
+
+}

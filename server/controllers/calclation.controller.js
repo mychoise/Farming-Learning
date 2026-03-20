@@ -7,9 +7,11 @@ import { animalCalculate } from "../db/schema/animalCalculator.js";
 
 export const organicFertilizerCalculator = async (req, res) => {
   try {
+    console.log("Received request body:", req.body);
     const { cropName, SystemOfLandCalculation, length, wide } = req.body;
 
     if (!cropName || !SystemOfLandCalculation || !length || !wide) {
+        console.log("Missing required fields in request body:", req.body);
       return res.status(400).json({
         success: false,
         message: "Missing required fields",

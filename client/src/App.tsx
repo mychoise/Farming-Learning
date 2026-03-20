@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import CropDetails from "./pages/CropDetails";
 import Weather from "./pages/Weather";
 import { Routes, Route } from "react-router-dom";
+import FertilizerEngine from "./pages/FertilizerEngine";
 const App = () => {
   return (
     <div>
@@ -12,6 +13,7 @@ const App = () => {
           <Route path="/" element={<CropList />} />
           <Route path="/crop/:id" element={<CropDetails />} />
           <Route path="/weather" element={<Weather />} />
+          <Route path="/calculate" element={<FertilizerEngine/>}/>
         </Routes>
       </div>
     </div>

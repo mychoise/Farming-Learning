@@ -23,6 +23,21 @@
   font-family: 'medium';
   src: url('./assets/fonts/o.woff2');
 }
+
+@font-face {
+    font-family: "font3";
+    src: url('./assets/fonts/font3.woff2');
+}
+
+@font-face {
+    font-family: "font4";
+    src: url('./assets/fonts/font4.woff2');
+}
+
+@font-face {
+    font-family: "font5";
+    src: url('./assets/fonts/font5.woff2');
+}
 body{
   overflow-x: hidden;
 }
