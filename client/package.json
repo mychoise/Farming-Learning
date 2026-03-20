@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
+    "@tanstack/query-persist-client-core": "^5.92.4",
+    "@tanstack/query-sync-storage-persister": "^5.90.27",
     "@tanstack/react-query": "^5.91.0",
     "@tanstack/react-query-devtools": "^5.91.3",
+    "@tanstack/react-query-persist-client": "^5.90.27",
     "axios": "^1.13.6",
     "daisyui": "^5.5.19",
     "framer-motion": "^12.37.0",

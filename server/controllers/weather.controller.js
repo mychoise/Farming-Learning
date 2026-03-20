@@ -158,6 +158,7 @@ export const getMyWeather = async (req, res) => {
       `https://api.geoapify.com/v1/geocode/reverse?lat=${latitudeInput}&lon=${longitudeInput}&apiKey=62ac9a6bb8784edfadd94df3c5d09037`
     );
     const geo = await geoRes.json();
+    console.log("Geoapify response:", geo.features?.[0]?.properties);
 
     // ───────────────
     // Open-Meteo Weather Fetch
@@ -366,6 +367,8 @@ export const getMyWeather = async (req, res) => {
           geo.features?.[0]?.properties?.town ||
           geo.features?.[0]?.properties?.village ||
           "Unknown City",
+         formated_address: geo.features?.[0]?.properties?.formatted || "Unknown Location",
+
       },
       current: currentData,
       hourly: hourlyData,

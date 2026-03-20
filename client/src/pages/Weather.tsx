@@ -300,7 +300,8 @@ const crops = [
           {/* Left part green */}
           <div className=" flex-col flex -gap-[90px]">
             <h1 className="text-[20px] text-[#E9F9F0] font-[Inter]">
-              {data?.location.city},{data?.location.country}
+            {console.log("data is" , data?.location)}
+            {data?.location.city === "Unknown City"? data?.location.formated_address:data?.location.city+","+data?.location.country }
             </h1>
             <h1 className="text-[75px] font-[medium] -mt-3">{data?.current.temperature_2m}°C</h1>
             <h1 className="text-[25px] -mt-1 font-[Inter]">{data?.current.description.en}</h1>
