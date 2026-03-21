@@ -4,16 +4,25 @@ import CropDetails from "./pages/CropDetails";
 import Weather from "./pages/Weather";
 import { Routes, Route } from "react-router-dom";
 import FertilizerEngine from "./pages/FertilizerEngine";
+import InorganicFertilizer from "./pages/InorganicFertilizer";
+import CalculationLayout from "./layout/CalculationLayout";
+import  AnimalWeightEstimator from "./pages/AnimalWeightEstimator";
+import UnitConversion from "./pages/UnitConversion";
 const App = () => {
   return (
     <div>
       <Navbar />
       <div className="h-[calc(100vh-64px)]">
         <Routes>
-          <Route path="/" element={<CropList />} />
+          <Route path="/crops" element={<CropList />} />
           <Route path="/crop/:id" element={<CropDetails />} />
           <Route path="/weather" element={<Weather />} />
-          <Route path="/calculate" element={<FertilizerEngine/>}/>
+    <Route path="/calculate" element={<CalculationLayout/>}>
+  <Route path="organic" element={<FertilizerEngine/>}/>
+  <Route path="inorganic" element={<InorganicFertilizer/>}/>
+  <Route path="animal" element={<AnimalWeightEstimator/>}/>
+  <Route path="unit-conversion" element={<UnitConversion/>}/>
+</Route>
         </Routes>
       </div>
     </div>

@@ -191,9 +191,9 @@ export const InorganicFertilizerCalculator = async (req, res) => {
 
 export const animalWeightCalculation = async (req, res) => {
   try {
-    const { animalName, HeartGrith, BodyLength } = req.body;
+    const { animalName, HeartGirth, BodyLength } = req.body;
 
-    if (!animalName || !HeartGrith || !BodyLength) {
+    if (!animalName || !HeartGirth || !BodyLength) {
       return res
         .status(400)
         .json({ success: false, message: "Missing required fields" });
@@ -209,13 +209,13 @@ export const animalWeightCalculation = async (req, res) => {
     }
 
     const weight =
-      (HeartGrith * HeartGrith * BodyLength) / parseInt(animal.constant);
+      (HeartGirth * HeartGirth * BodyLength) / parseInt(animal.constant);
 
     return res.status(200).json({
       success: true,
       data: {
         animalName,
-        HeartGrith,
+        heartGirth:  HeartGirth,
         BodyLength,
         weight: parseFloat(weight.toFixed(2)),
       },

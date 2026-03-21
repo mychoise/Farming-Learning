@@ -1,6 +1,8 @@
 import { fetchWeatherApi } from "openmeteo";
 
-const getWeatherIcon = (code) => {
+const getWeatherIcon = (code,rain) => {
+
+    console.log("Mapping weather code to icon:", { code, rain });
   const map = {
     0: "clear-day",
     1: "clear-day",
@@ -18,15 +20,16 @@ const getWeatherIcon = (code) => {
     73: "snow",
     75: "snow",
     77: "snowflake",
-    80: "rain",
-    81: "rain",
-    82: "rain",
+    80: rain > 0 ? "rain" : "cloudy",
+    81: rain > 0 ? "rain" : "cloudy",
+    82: rain > 0 ? "rain" : "cloudy",
     85: "snow",
     86: "snow",
     95: "thunderstorms",
     96: "thunderstorms-rain",
     99: "thunderstorms-rain",
   };
+
   return map[code] ?? "not-available";
 };
 const getWeatherDescription = (code) => {
@@ -234,8 +237,8 @@ export const getMyWeather = async (req, res) => {
       relative_humidity_2m: currentHumidity,
       wind_speed_10m: currentWindSpeed,
       precipitation_probability: Math.round(current.variables(9).value()),
-      icon: getWeatherIcon(currentWeatherCode),
-      icon_url: `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(currentWeatherCode)}.svg`,
+      icon: getWeatherIcon(currentWeatherCode, currentRain),
+      icon_url: `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(currentWeatherCode, currentRain)}.svg`,
       description: getWeatherDescription(currentWeatherCode),
     };
 
@@ -294,7 +297,7 @@ export const getMyWeather = async (req, res) => {
       ),
       icon_urls: filteredIndexes.map(
         (i) =>
-          `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(Math.round(hourlyWeatherCodes[i]))}.svg`
+          `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(Math.round(hourlyWeatherCodes[i]), rain)}.svg`
       ),
     };
 

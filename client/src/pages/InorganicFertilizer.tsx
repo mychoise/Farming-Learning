@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, BarChart2, Leaf, Beaker, Sprout, FlaskConical } from "lucide-react";
+import { ChevronDown, BarChart2, Leaf, Beaker, FlaskConical } from "lucide-react";
 import StrategyCard from "../components/organic/StrategyCard";
-import { useOrganicFertilizer } from "../hooks/hooks";
+import { useInorganicFertilizer } from "../hooks/hooks";
 import {  useQueryClient } from "@tanstack/react-query";
-import type { OrganicFertilizerCalculation } from "../api/api";
+import type { InOrganicFertilizerCalculation } from "../api/api";
 const CROPS = [
   { name: "Rice",
     scientific: "Oryza sativa"
@@ -37,7 +37,7 @@ function NutrientBar({ value, max, color }:{ value: number; max: number; color: 
 }
 
 
-export default function FertilizerEngine() {
+export default function InorganicFertilizer() {
   const [crop, setCrop] = useState(CROPS[0]);
   const [landSystem, setLandSystem] = useState("Bigha");
   const [length, setLength] = useState("");
@@ -47,10 +47,10 @@ export default function FertilizerEngine() {
   const [generated, setGenerated] = useState(false);
   const [animating, setAnimating] = useState(false);
 
- const { mutate } = useOrganicFertilizer();
+ const { mutate } = useInorganicFertilizer();
 const queryClient = useQueryClient();
 
-const data = queryClient.getQueryData<OrganicFertilizerCalculation>(["organicFertilizerResult"]);
+const data = queryClient.getQueryData<InOrganicFertilizerCalculation>(["inorganicFertilizerResult"]);
 
 useEffect(() => {
   if (data) {
@@ -79,9 +79,9 @@ useEffect(() => {
 
 const FERTILIZERS = [
   {
-    name: "Farmyard Manure",
-    key: "Farmyard Manure",
-    defaultAmount: data?.fertilizers["Farmyard Manure"] || 260,
+    name: "Urea",
+    key: "Urea",
+    defaultAmount: data?.fertilizers.Urea || 260,
     unit: "kg",
     icon: Beaker,
     borderColor: "#2d6a2d",
@@ -89,9 +89,9 @@ const FERTILIZERS = [
     badgeText: "#166534",
   },
   {
-    name: "Mustard Oil Cake",
-    key: "Mustard Oil Cake",
-    defaultAmount: data?.fertilizers["Mustard Oil Cake"] || 130,
+    name: "DAP",
+    key: "DAP",
+    defaultAmount: data?.fertilizers.DAP || 130,
     unit: "kg",
     icon: FlaskConical,
     borderColor: "#9b2335",
@@ -99,24 +99,14 @@ const FERTILIZERS = [
     badgeText: "#991b1b",
   },
   {
-    name: "Vermicompost",
-    key: "Vermicompost",
-    defaultAmount: data?.fertilizers.Vermicompost || 1.5,
+    name: "MOP",
+    key: "MOP",
+    defaultAmount: data?.fertilizers.MOP || 1.5,
     unit: "kg",
     icon: Leaf,
     borderColor: "#d97706",
     badgeBg: "#fef9c3",
     badgeText: "#92400e",
-  },
-  {
-    name: "Compost",
-    key: "Compost",
-    defaultAmount: data?.fertilizers.Compost || 3.2,
-    unit: "kg",
-    icon: Sprout,
-    borderColor: "#16a34a",
-    badgeBg: "#f0fdf4",
-    badgeText: "#15803d",
   },
 ];
 
@@ -134,7 +124,7 @@ const total = (data?.nutrientsNeeded?.N_kg || 0) + (data?.nutrientsNeeded?.P_kg 
         }
       `}</style>
 
-      <div className="max-w-5xl mx-15 py-12">
+      <div className="max-w-5xl mx-15  px-6 py-12">
         {/* Header */}
         <div className="mb-10">
           <p className="text-xs font-[font3] tracking-[0.25em] text-green-700 uppercase mb-3">
@@ -258,7 +248,7 @@ const total = (data?.nutrientsNeeded?.N_kg || 0) + (data?.nutrientsNeeded?.P_kg 
           </div>
 
           {/* Right: Results */}
-          {generated?(<div className="-mt-[40%] -ml-[25%] space-y-5 w-122.5">
+          {generated?(<div className="-mt-[40%] -ml-[20%] space-y-5 w-122.5">
             {/* NPK Targets */}
             <div className={`bg-white w-175 rounded-3xl p-6 shadow-sm ${animating ? "opacity-50" : "fade-in"}`}>
               <div className="flex items-center justify-between mb-5">
@@ -294,13 +284,13 @@ const total = (data?.nutrientsNeeded?.N_kg || 0) + (data?.nutrientsNeeded?.P_kg 
             {/* Application Strategy */}
             <div>
               <h3 className="text-xl font-bold text-stone-900 mb-4">Application Strategy</h3>
-              <div className={`grid grid-cols-2 gap-5 w-187.5 ${animating ? "opacity-50" : "fade-in"}`}>
+              <div className={`grid grid-cols-2 gap-5 w-160 ${animating ? "opacity-50" : "fade-in"}`}>
  {FERTILIZERS.map((f) => (
     <StrategyCard
       key={f.name}
       label="Organic Supply"
       name={f.name}
-      amount={data?.fertilizers?.[f.key as keyof OrganicFertilizerCalculation['fertilizers']] || f.defaultAmount}
+      amount={data?.fertilizers?.[f.key as keyof InOrganicFertilizerCalculation['fertilizers']] || f.defaultAmount}
       unit={f.unit}
       icon={f.icon}
       borderColor={f.borderColor}
@@ -311,7 +301,7 @@ const total = (data?.nutrientsNeeded?.N_kg || 0) + (data?.nutrientsNeeded?.P_kg 
               </div>
             </div>
           </div>):(
-            <div className="bg-white w-175 rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center h-64 border-2 border-dashed -ml-[20%] border-stone-200">
+            <div className="bg-white w-175 -ml-[20%] rounded-3xl p-6 shadow-sm flex flex-col items-center justify-center h-64 border-2 border-dashed border-stone-200">
       <BarChart2 size={40} className="text-stone-300 mb-4" />
       <p className="text-lg font-bold text-stone-400">No Data Yet</p>
       <p className="text-sm text-stone-400 mt-1">

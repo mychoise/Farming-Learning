@@ -1,41 +1,21 @@
-import { db } from "./db.config.js"; // your drizzle db instance
-import { organicFertilizerTable } from "./db/schema/fertilizers.js";
+import { db } from "./db.config.js"; // your Drizzle DB instance
+import { animalCalculate } from "./db/schema/animalCalculator.js";
 
-async function seedOrganicFertilizers() {
-  try {
-    await db.insert(organicFertilizerTable).values([
-      {
-        name: "Farmyard Manure",
-        nitrogen: "0.50",
-        phosphorus: "0.20",
-        potassium: "0.50",
-      },
-      {
-        name: "Vermicompost",
-        nitrogen: "1.50",
-        phosphorus: "1.80",
-        potassium: "0.60",
-      },
-      {
-        name: "Compost",
-        nitrogen: "0.60",
-        phosphorus: "1.15",
-        potassium: "2.30",
-      },
-      {
-        name: "Mustard Oil Cake",
-        nitrogen: "5.20",
-        phosphorus: "1.80",
-        potassium: "1.10",
-      },
-    ]);
+async function seedAnimals() {
+  const animals = [
+    { name: "buffalo", constant: 10840 }, // replace with actual formula constant
+    { name: "cow", constant: 10840},     // replace with actual formula constant
+    { name: "goat", constant: 300 },     // replace with actual formula constant
+    { name: "sheep", constant: 300 },    // replace with actual formula constant
+  ];
 
-    console.log("✅ Organic fertilizers seeded successfully");
-  } catch (error) {
-    console.error("❌ Error seeding fertilizers:", error);
-  } finally {
-    process.exit(0);
+  for (const animal of animals) {
+    await db.insert(animalCalculate).values(animal).onConflictDoNothing();
   }
+
+  console.log("Animal constants seeded successfully!");
 }
 
-seedOrganicFertilizers();
+seedAnimals()
+  .catch((err) => console.error("Error seeding animals:", err))
+  .finally(() => process.exit());

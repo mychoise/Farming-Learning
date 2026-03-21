@@ -91,6 +91,45 @@ type Farming = {
   alerts: FarmingAlert[];
 };
 
+export type OrganicFertilizerCalculation = {
+  crop: string;
+  areaInHectare: number;
+  nutrientsNeeded: {
+    N_kg: number;
+    P_kg: number;
+    K_kg: number;
+  };
+  fertilizers: {
+    "Farmyard Manure": number;
+    Vermicompost: number;
+    Compost: number;
+    "Mustard Oil Cake": number;
+  };
+};
+
+
+export type InOrganicFertilizerCalculation = {
+        crop: string,
+        areaInHectare: number,
+        nutrientsNeeded: {
+            N_kg: number,
+            P_kg: number,
+            K_kg: number
+        },
+        fertilizers: {
+            Urea: number,
+            DAP: number,
+            MOP: number
+        }
+}
+
+export type animalWeightEstimationResponse = {
+        animalName: string,
+        HeartGrith: string,
+        BodyLength: string,
+        weight: number
+}
+
 export const getMyWeather = async(data: { lat: number | string; lon: number | string }) => {
     const result = await axiosInstance.post("/weather/my-weather",{
         latitudeInput: Number(data.lat),
@@ -99,8 +138,24 @@ export const getMyWeather = async(data: { lat: number | string; lon: number | st
     return result.data.data as WeatherData
 }
 
-export const getOrganicFertilizerCalculation = async (data: { crop: string; landSystem: string; length: number; width: number }) => {
+export const getOrganicFertilizerCalculation = async (data: { cropName: string; SystemOfLandCalculation: string; length: number; wide: number }) => {
 const result = await axiosInstance.post("/calculate/organic-fertilizer",data)
-return result.data.data
+return result.data.data as OrganicFertilizerCalculation
 
+}
+
+
+export const InorganicFertilizerCalculation  = async (data:{ cropName: string; SystemOfLandCalculation: string; length: number; wide: number }) => {
+    const result = await axiosInstance.post("/calculate/inorganic-fertilizer",data)
+    return result.data.data as InOrganicFertilizerCalculation
+}
+
+export const getAnimalWeightEstimation = async (data: { HeartGirth: number; BodyLength: number ;animalName: string}) => {
+    const result = await axiosInstance.post("/calculate/animal-weight",data)
+    return result.data.data as animalWeightEstimationResponse
+}
+
+export const getUnitConversion = async (data: { currentUnit: string; firstValue: number; targetUnit: string }) => {
+    const result = await axiosInstance.post("/calculate/unit-conversion",data)
+    return result.data.result as number
 }

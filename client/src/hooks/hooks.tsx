@@ -1,14 +1,91 @@
  import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { getOrganicFertilizerCalculation } from "../api/api";
+import { getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation} from "../api/api";
+import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
- export const useOrganicFertilizer = () => {
-    const queryClient = useQueryClient();
+type OrganicFertilizerInput = {
+  cropName: string;
+  SystemOfLandCalculation: string;
+  length: number;
+  wide: number;
+};
 
- return useMutation({
-    mutationFn: (finalData) => getOrganicFertilizerCalculation(finalData),
+type InorganicFertilizerInput = {
+    cropName: string;
+  SystemOfLandCalculation: string;
+  length: number;
+  wide: number;
+}
+
+type AnimalWeightEstimationInput = {
+    heartGirth: string;
+    bodyLength: string;
+    animalName: string;
+}
+
+export const useOrganicFertilizer = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<OrganicFertilizerCalculation, Error, OrganicFertilizerInput>({
+    mutationFn: (finalData) => getOrganicFertilizerCalculation({
+      cropName: finalData.cropName,
+      SystemOfLandCalculation: finalData.SystemOfLandCalculation,
+      length: finalData.length,
+      wide: finalData.wide
+    }),
     onSuccess: (data) => {
       console.log("Response from server is", data);
-queryClient.setQueryData(["organicFertilizerResult"], data);
-}
- });
+      queryClient.setQueryData(["organicFertilizerResult"], data);
+    }
+  });
 };
+
+export const useInorganicFertilizer = () => {
+const queryClient = useQueryClient();
+
+return useMutation<InOrganicFertilizerCalculation, Error, InorganicFertilizerInput>({
+    mutationFn: (finalData) => InorganicFertilizerCalculation({
+        cropName: finalData.cropName,
+        SystemOfLandCalculation: finalData.SystemOfLandCalculation,
+        length: finalData.length,
+        wide: finalData.wide
+    }),
+    onSuccess:(data)=>{
+        console.log("Response from server is", data);
+        queryClient.setQueryData(["inorganicFertilizerResult"], data);}
+
+})
+}
+
+export const useAnimalWeightEstimation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation< animalWeightEstimationResponse, Error, AnimalWeightEstimationInput>(
+        {
+            mutationFn: (finalData) => getAnimalWeightEstimation({
+                HeartGirth: Number(finalData.heartGirth),
+                BodyLength: Number(finalData.bodyLength),
+                animalName: finalData.animalName
+            }),
+            onSuccess:(data)=>{
+                console.log("Response from server is", data);
+                queryClient.setQueryData(["animalWeightEstimationResult"], data);}
+        }
+    )
+}
+
+export const useUnitConversion = () => {
+const queryClient = useQueryClient();
+
+return useMutation<number, Error, { currentUnit: string; firstValue: number; targetUnit: string }>(
+    {
+        mutationFn: (finalData) => getUnitConversion({
+            currentUnit: finalData.currentUnit,
+            firstValue: finalData.firstValue,
+            targetUnit: finalData.targetUnit
+        }),
+        onSuccess:(data)=>{
+            console.log("Response from server is", data);
+            queryClient.setQueryData(["unitConversionResult"], data);}
+    }
+)
+}
