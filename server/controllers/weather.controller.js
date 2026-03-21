@@ -1,8 +1,7 @@
 import { fetchWeatherApi } from "openmeteo";
+const getWeatherIcon = (code, rain) => {
+  console.log("Mapping weather code to icon:", { code, rain });
 
-const getWeatherIcon = (code,rain) => {
-
-    console.log("Mapping weather code to icon:", { code, rain });
   const map = {
     0: "clear-day",
     1: "clear-day",
@@ -13,16 +12,16 @@ const getWeatherIcon = (code,rain) => {
     51: "drizzle",
     53: "drizzle",
     55: "drizzle",
-    61: "rain",
+    61: "cloudy",
     63: "rain",
     65: "rain",
     71: "snow",
     73: "snow",
     75: "snow",
     77: "snowflake",
-    80: rain > 0 ? "rain" : "cloudy",
-    81: rain > 0 ? "rain" : "cloudy",
-    82: rain > 0 ? "rain" : "cloudy",
+    80: rain >= 0 ? "rain" : "cloudy",
+    81: rain >= 0 ? "rain" : "cloudy",
+    82: rain >= 0 ? "rain" : "cloudy",
     85: "snow",
     86: "snow",
     95: "thunderstorms",
@@ -265,41 +264,58 @@ export const getMyWeather = async (req, res) => {
       .filter(({ time }) => time.toISOString().startsWith(targetDate))
       .map(({ index }) => index);
 
-    const hourlyData = {
-      time: filteredIndexes.map((i) => hourlyTimes[i]),
-      temperature_2m: filteredIndexes.map(
-        (i) => Math.round(hourly.variables(0).valuesArray()[i] * 10) / 10
-      ),
-      rain: filteredIndexes.map(
-        (i) => Math.round(hourly.variables(1).valuesArray()[i] * 10) / 10
-      ),
-      soil_temperature_0cm: filteredIndexes.map(
-        (i) => Math.round(hourly.variables(2).valuesArray()[i] * 10) / 10
-      ),
-      soil_temperature_6cm: filteredIndexes.map(
-        (i) => Math.round(hourly.variables(3).valuesArray()[i] * 10) / 10
-      ),
-      soil_temperature_18cm: filteredIndexes.map(
-        (i) => Math.round(hourly.variables(4).valuesArray()[i] * 10) / 10
-      ),
-      weather_code: filteredIndexes.map((i) => hourlyWeatherCodes[i]),
-      precipitation_probability: filteredIndexes.map((i) =>
-        Math.round(hourly.variables(6).valuesArray()[i])
-      ),
-      wind_speed_10m: filteredIndexes.map(
-        (i) => Math.round(hourly.variables(7).valuesArray()[i] * 10) / 10
-      ),
-      relative_humidity_2m: filteredIndexes.map((i) =>
-        Math.round(hourly.variables(8).valuesArray()[i])
-      ),
-      icons: filteredIndexes.map((i) =>
-        getWeatherIcon(Math.round(hourlyWeatherCodes[i]))
-      ),
-      icon_urls: filteredIndexes.map(
-        (i) =>
-          `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(Math.round(hourlyWeatherCodes[i]), rain)}.svg`
-      ),
-    };
+   const rainArray = filteredIndexes.map(
+  (i) => Math.round(hourly.variables(1).valuesArray()[i] * 10) / 10
+);
+
+const hourlyData = {
+  time: filteredIndexes.map((i) => hourlyTimes[i]),
+
+  temperature_2m: filteredIndexes.map(
+    (i) => Math.round(hourly.variables(0).valuesArray()[i] * 10) / 10
+  ),
+
+  rain: rainArray,
+
+  soil_temperature_0cm: filteredIndexes.map(
+    (i) => Math.round(hourly.variables(2).valuesArray()[i] * 10) / 10
+  ),
+  soil_temperature_6cm: filteredIndexes.map(
+    (i) => Math.round(hourly.variables(3).valuesArray()[i] * 10) / 10
+  ),
+  soil_temperature_18cm: filteredIndexes.map(
+    (i) => Math.round(hourly.variables(4).valuesArray()[i] * 10) / 10
+  ),
+
+  weather_code: filteredIndexes.map((i) => hourlyWeatherCodes[i]),
+
+  precipitation_probability: filteredIndexes.map((i) =>
+    Math.round(hourly.variables(6).valuesArray()[i])
+  ),
+
+  wind_speed_10m: filteredIndexes.map(
+    (i) => Math.round(hourly.variables(7).valuesArray()[i] * 10) / 10
+  ),
+
+  relative_humidity_2m: filteredIndexes.map((i) =>
+    Math.round(hourly.variables(8).valuesArray()[i])
+  ),
+
+ icons: filteredIndexes.map((i, idx) =>
+  getWeatherIcon(
+    Math.round(hourlyWeatherCodes[i]),
+    rainArray[idx]
+  )
+),
+
+ icon_urls: filteredIndexes.map(
+  (i, idx) =>
+    `https://basmilius.github.io/weather-icons/production/fill/all/${getWeatherIcon(
+      Math.round(hourlyWeatherCodes[i]),
+      rainArray[idx]   // ✅ correct rain per hour
+    )}.svg`
+),
+};
 
     // ───────────────
     // Daily Weather
