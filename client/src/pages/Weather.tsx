@@ -77,25 +77,25 @@ setCoords({
       name: "Humidity",
       icon: <FlaskConical size={22} className="text-blue-500" />,
       bg: "bg-blue-50",
-      value: `${data?.current.relative_humidity_2m}%`,
+      value: `${data?.current.relative_humidity_2m || 0}%`,
     },
     {
       name: "Wind",
       icon: <MoveRight size={22} className="text-teal-500" />,
       bg: "bg-teal-50",
-      value: `${data?.current.wind_speed_10m} m/s`,
+      value: `${data?.current.wind_speed_10m || 0} m/s`,
     },
     {
       name: "Precip.",
       icon: <CloudRain size={22} className="text-indigo-500" />,
       bg: "bg-indigo-50",
-      value: data?.current.precipitation,
+      value: data?.current.precipitation || 0,
     },
     {
       name: "Rain",
       icon: <Sun size={22} className="text-amber-500" />,
       bg: "bg-amber-50",
-      value: data?.current.rain,
+      value: data?.current.rain || 0,
     },
   ];
   function formatHour(iso:string) {
@@ -162,107 +162,144 @@ const now = new Date().getHours();
 
   return (
 <>
-{isLoading?(
-    // Loading Animation
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] gap-8">
-    <style>{`
-      @keyframes sunPulse {
-        0%, 100% { transform: translateX(-50%) scale(1); }
-        50% { transform: translateX(-50%) scale(1.08); }
-      }
-      @keyframes rayRotate { to { transform: rotate(360deg); } }
-      @keyframes cloudFloat {
-        0%, 100% { transform: translateX(-50%) translateY(0); }
-        50% { transform: translateX(-50%) translateY(-6px); }
-      }
-      @keyframes rainFall {
-        0% { opacity: 0; transform: translateY(-4px); }
-        30% { opacity: 1; }
-        100% { opacity: 0; transform: translateY(18px); }
-      }
-      @keyframes barGrow {
-        0%, 100% { height: 8px; opacity: 0.35; }
-        50% { height: 28px; opacity: 1; }
-      }
-      @keyframes dotBlink {
-        0%, 80%, 100% { opacity: 0.3; }
-        40% { opacity: 1; }
-      }
+{isLoading ? (
+  // Loading Animation
+<div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] gap-8">
+  <style>{`
+    @keyframes sunPulse {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.08); }
+    }
+    @keyframes rayRotate { to { transform: rotate(360deg); } }
+    @keyframes cloudFloat {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+    @keyframes rainFall {
+      0% { opacity: 0; transform: translateY(-4px); }
+      30% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(18px); }
+    }
+    @keyframes barGrow {
+      0%, 100% { height: 8px; opacity: 0.35; }
+      50% { height: 28px; opacity: 1; }
+    }
+    @keyframes dotBlink {
+      0%, 80%, 100% { opacity: 0.3; }
+      40% { opacity: 1; }
+    }
 
-      .sun {
-        position: absolute; top: 10px; left: 50%;
-        width: 52px; height: 52px; border-radius: 50%;
-        background: #F59E0B;
-        animation: sunPulse 2.4s ease-in-out infinite;
-      }
-      .sun::before {
-        content: ''; position: absolute; inset: -10px; border-radius: 50%;
-        border: 3px solid #FCD34D; opacity: 0.4;
-        animation: rayRotate 6s linear infinite;
-      }
-      .sun::after {
-        content: ''; position: absolute; inset: -18px; border-radius: 50%;
-        border: 2px dashed #FDE68A; opacity: 0.25;
-        animation: rayRotate 9s linear infinite reverse;
-      }
-      .cloud-main {
-        position: absolute; bottom: 16px; left: 50%;
-        width: 96px; height: 36px; border-radius: 18px;
-        background: white; border: 1px solid #e2e8f0;
-        animation: cloudFloat 3s ease-in-out infinite;
-      }
-      .cloud-main::before {
-        content: ''; position: absolute; top: -18px; left: 14px;
-        width: 38px; height: 38px; border-radius: 50%;
-        background: white; border: 1px solid #e2e8f0;
-      }
-      .cloud-main::after {
-        content: ''; position: absolute; top: -10px; left: 42px;
-        width: 28px; height: 28px; border-radius: 50%;
-        background: white; border: 1px solid #e2e8f0;
-      }
-      .rain-drop {
-        width: 3px; height: 10px; border-radius: 2px;
-        background: #60A5FA; opacity: 0;
-        animation: rainFall 1.4s ease-in infinite;
-      }
-      .loading-bar {
-        width: 6px; border-radius: 3px;
-        background: #cbd5e1;
-        animation: barGrow 1.4s ease-in-out infinite;
-      }
-      .dot { display: inline-block; animation: dotBlink 1.2s ease-in-out infinite; }
-    `}</style>
+    .sun {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #F59E0B;
+      animation: sunPulse 2.4s ease-in-out infinite;
+    }
+    .sun::before {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      border: 3px solid #FCD34D;
+      opacity: 0.4;
+      animation: rayRotate 6s linear infinite;
+    }
+    .sun::after {
+      content: '';
+      position: absolute;
+      inset: -18px;
+      border-radius: 50%;
+      border: 2px dashed #FDE68A;
+      opacity: 0.25;
+      animation: rayRotate 9s linear infinite reverse;
+    }
+    .cloud-main {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      width: 96px;
+      height: 36px;
+      border-radius: 18px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      animation: cloudFloat 3s ease-in-out infinite;
+    }
+    .cloud-main::before {
+      content: '';
+      position: absolute;
+      top: -18px;
+      left: 14px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid #e2e8f0;
+    }
+    .cloud-main::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 42px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid #e2e8f0;
+    }
+    .rain-drop {
+      width: 3px;
+      height: 10px;
+      border-radius: 2px;
+      background: #60A5FA;
+      opacity: 0;
+      animation: rainFall 1.4s ease-in infinite;
+    }
+    .loading-bar {
+      width: 6px;
+      border-radius: 3px;
+      background: #cbd5e1;
+      animation: barGrow 1.4s ease-in-out infinite;
+    }
+    .dot {
+      display: inline-block;
+      animation: dotBlink 1.2s ease-in-out infinite;
+    }
+  `}</style>
 
-    {/* Scene */}
-    <div className="relative w-40 h-30">
-      <div className="sun" />
-      <div className="cloud-main">
-        <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 flex gap-2.5">
-          {[0, 0.22, 0.44, 0.14, 0.36].map((delay, i) => (
-            <div key={i} className="rain-drop" style={{ animationDelay: `${delay}s` }} />
-          ))}
-        </div>
+  {/* Scene */}
+  <div className="relative w-40 h-30">
+    <div className="sun" />
+    <div className="cloud-main">
+      <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 flex gap-2.5">
+        {[0, 0.22, 0.44, 0.14, 0.36].map((delay, i) => (
+          <div key={i} className="rain-drop" style={{ animationDelay: `${delay}s` }} />
+        ))}
       </div>
     </div>
-
-    {/* Bars */}
-    <div className="flex items-end gap-1.5 h-7">
-      {[0, 0.12, 0.24, 0.36, 0.48, 0.6, 0.72].map((delay, i) => (
-        <div key={i} className="loading-bar" style={{ animationDelay: `${delay}s` }} />
-      ))}
-    </div>
-
-    {/* Label */}
-    <p className="text-sm text-slate-400 tracking-wide">
-      Fetching weather data
-      <span className="dot" style={{ animationDelay: "0s" }}>.</span>
-      <span className="dot" style={{ animationDelay: "0.2s" }}>.</span>
-      <span className="dot" style={{ animationDelay: "0.4s" }}>.</span>
-    </p>
   </div>
-):(
-        <div className=" pt-12 pl-45 flex bg-[#F8FAFC] gap-10 w-screen h-[200vh]">
+
+  {/* Bars */}
+  <div className="flex items-end gap-1.5 h-7">
+    {[0, 0.12, 0.24, 0.36, 0.48, 0.6, 0.72].map((delay, i) => (
+      <div key={i} className="loading-bar" style={{ animationDelay: `${delay}s` }} />
+    ))}
+  </div>
+
+  {/* Label */}
+  <p className="text-sm text-slate-400 tracking-wide">
+    Fetching weather data
+    <span className="dot" style={{ animationDelay: "0s" }}>.</span>
+    <span className="dot" style={{ animationDelay: "0.2s" }}>.</span>
+    <span className="dot" style={{ animationDelay: "0.4s" }}>.</span>
+  </p>
+</div>
+) : (
+  data ? (
+   <div className=" pt-12 pl-45 flex bg-[#F8FAFC] gap-10 w-screen h-[200vh]">
       {/* Left Side */}
       <div>
         {/* Header */}
@@ -537,6 +574,14 @@ onClick={()=>searchHandler(placeName)}
       </div>
     </div>
 </div>
+  ) : (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-yellow-100 gap-4">
+      <TriangleAlert size={48} className="text-yellow-600" />
+      <p className="text-lg text-yellow-700 text-center">
+        Unable to fetch weather data. Please try again later.
+      </p>
+    </div>
+  )
 )}
 </>
   );

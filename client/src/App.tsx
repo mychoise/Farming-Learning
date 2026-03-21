@@ -8,6 +8,7 @@ import InorganicFertilizer from "./pages/InorganicFertilizer";
 import CalculationLayout from "./layout/CalculationLayout";
 import  AnimalWeightEstimator from "./pages/AnimalWeightEstimator";
 import UnitConversion from "./pages/UnitConversion";
+import CropCalendar from "./pages/CropCalender";
 const App = () => {
   return (
     <div>
@@ -23,6 +24,7 @@ const App = () => {
   <Route path="animal" element={<AnimalWeightEstimator/>}/>
   <Route path="unit-conversion" element={<UnitConversion/>}/>
 </Route>
+<Route path="/crop-calendar" element={<CropCalendar />} />
         </Routes>
       </div>
     </div>

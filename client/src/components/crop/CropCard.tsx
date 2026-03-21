@@ -12,6 +12,7 @@ const CropCard = ({ crop, name }: { crop: any; name: any }) => {
         console.log("clicked");
         navigate(`/crop/${crop.id}`);
       }}
+
       className="w-82 rounded-2xl overflow-hidden shadow pb-10"
     >
       <div className="w-full h-62.5 overflow-hidden">

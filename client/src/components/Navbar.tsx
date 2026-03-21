@@ -57,6 +57,7 @@ const Navbar = () => {
     { label: "Crops Library", href: "/crops" },
     { label: "Weather", href: "/weather" },
     { label: "Resources", href: "/resources" },
+    { label: "Crop Calendar", href: "/crop-calendar" },
   ];
 
   return (
