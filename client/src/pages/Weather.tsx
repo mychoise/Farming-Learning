@@ -575,12 +575,34 @@ onClick={()=>searchHandler(placeName)}
     </div>
 </div>
   ) : (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-yellow-100 gap-4">
-      <TriangleAlert size={48} className="text-yellow-600" />
-      <p className="text-lg text-yellow-700 text-center">
-        Unable to fetch weather data. Please try again later.
+  <div className="flex flex-col font-[Inter] items-center justify-center min-h-screen bg-[#F5F5F4] gap-6 px-4">
+  <div className="bg-white rounded-3xl shadow-md border border-orange-100 px-12 py-14 flex flex-col items-center gap-5 max-w-sm w-full">
+
+    {/* Icon */}
+    <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5">
+      <TriangleAlert size={40} className="text-orange-400" />
+    </div>
+
+    {/* Text */}
+    <div className="flex flex-col items-center gap-2 text-center">
+      <h2 className="text-lg font-bold text-stone-700 tracking-tight">
+        Weather Unavailable
+      </h2>
+      <p className="text-sm text-stone-400 leading-relaxed">
+        Unable to fetch weather data.<br />Please check your connection and try again.
       </p>
     </div>
+
+    {/* Retry Button */}
+    <button
+      onClick={() => window.location.reload()}
+      className="mt-2 w-full py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 active:scale-95 transition-all text-white text-sm font-semibold tracking-wide shadow-sm"
+    >
+      Try Again
+    </button>
+
+  </div>
+</div>
   )
 )}
 </>
