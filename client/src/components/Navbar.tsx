@@ -63,7 +63,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="w-full bg-[#F7F7F0] border-b border-gray-200/70 font-[font5] flex items-center justify-between px-8 h-14 relative z-50">
+    <nav className="w-full bg-[#F7F7F0] border-b border-gray-200/70 font-[font4] flex items-center justify-between px-8 h-14 relative z-50">
 
       {/* Logo — text only, no icon, matching screenshot */}
       <Link

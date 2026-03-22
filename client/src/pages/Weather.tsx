@@ -29,7 +29,7 @@ const Weather = () => {
 
   const [placeName, setplaceName] = useState<string>("");
 
-const {data , isLoading , isError} = useQuery<WeatherData>({
+const {data , isLoading , isError , isFetching} = useQuery<WeatherData>({
     queryKey:["my-weather" , coords],
     queryFn:()=>getMyWeather({ lat: coords!.lat, lon: coords!.lon }),
     enabled:!!coords, // Only run query when coords are available
@@ -38,6 +38,7 @@ const {data , isLoading , isError} = useQuery<WeatherData>({
 
 console.log("weather data is ", data)
 console.log('error is', isError)
+console.log("fetching is",isFetching)
 
 
   function getMyLocation() {
@@ -163,7 +164,7 @@ const now = new Date().getHours();
 
   return (
 <>
-{isLoading ? (
+{isLoading || isFetching || !data ? (
   // Loading Animation
 <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] gap-8">
   <style>{`
@@ -300,7 +301,7 @@ const now = new Date().getHours();
 </div>
 ) : (
   !isError ? (
-   <div className=" pt-12 pl-45 flex bg-[#F8FAFC] gap-10 w-screen h-[200vh]">
+   <div className=" pt-12 pl-45 flex bg-[#F8FAFC] gap-10 w-screen">
       {/* Left Side */}
       <div>
         {/* Header */}
