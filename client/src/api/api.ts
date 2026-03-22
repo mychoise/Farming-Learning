@@ -159,3 +159,10 @@ export const getUnitConversion = async (data: { currentUnit: string; firstValue:
     const result = await axiosInstance.post("/calculate/unit-conversion",data)
     return result.data.result as number
 }
+
+
+export const getCropCalender =  async ()=>{
+    console.log('api called')
+    const result = await axiosInstance.get("/cropcalender/get")
+    return result.data.data
+}

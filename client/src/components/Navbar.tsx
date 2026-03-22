@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { Leaf, ChevronDown, FlaskConical, Sprout, MapPin,Scale,PawPrint } from "lucide-react";
-import { href, Link, useLocation } from "react-router-dom";
+import { UserCircle, ChevronDown, FlaskConical, Sprout, Scale, PawPrint } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 const calcItems = [
   {
@@ -22,11 +22,11 @@ const calcItems = [
     desc: "Livestock weight estimation",
   },
   {
-    label:"Unit Conversion",
-    href:"/calculate/unit-conversion",
+    label: "Unit Conversion",
+    href: "/calculate/unit-conversion",
     icon: Scale,
-    desc: "Land measurement conversions"
-  }
+    desc: "Land measurement conversions",
+  },
 ];
 
 const Navbar = () => {
@@ -53,43 +53,46 @@ const Navbar = () => {
 
   const isCalcActive = pathname.startsWith("/calculate");
 
+  // Nav links matching the screenshot exactly
   const navLinks = [
     { label: "Crops Library", href: "/crops" },
     { label: "Weather", href: "/weather" },
+    { label: "Market Trends", href: "/market-trends" },
+    { label: "Crop Calender", href: "/crop-calendar" },
     { label: "Resources", href: "/resources" },
-    { label: "Crop Calendar", href: "/crop-calendar" },
   ];
 
   return (
-    <nav className="w-full h-17 font-[Inter] bg-white border-b border-gray-100 shadow-sm flex items-center justify-between px-8 relative z-50">
-      {/* Logo */}
-      <Link to="/" className="flex items-center gap-2.5 shrink-0 no-underline">
-        <div className="w-9 h-9 bg-green-500 rounded-full flex items-center justify-center shrink-0">
-          <Leaf size={18} color="white" strokeWidth={2} />
-        </div>
-        <span className="text-[20px] font-bold text-gray-900 tracking-tight">
+    <nav className="w-full bg-[#F7F7F0] border-b border-gray-200/70 font-[font5] flex items-center justify-between px-8 h-14 relative z-50">
+
+      {/* Logo — text only, no icon, matching screenshot */}
+      <Link
+        to="/"
+        className="flex items-center shrink-0 no-underline"
+      >
+        <span className="text-[19px] font-bold text-[#1a3a1a] tracking-tight">
           AgriLearn
         </span>
       </Link>
 
-      {/* Nav Links - centered */}
-      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1">
+      {/* Nav Links — centered absolutely */}
+      <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-0.5">
         {navLinks.map(({ label, href }) => {
           const isActive = pathname === href;
           return (
             <Link
               key={label}
               to={href}
-              className={`relative text-[14.5px] font-medium px-3.5 py-1.5 rounded-md transition-all duration-150 no-underline
+              className={`relative text-[14px] font-medium px-3.5 py-1.5 rounded-md transition-all duration-150 no-underline
                 ${
                   isActive
-                    ? "text-green-500 font-semibold"
-                    : "text-gray-500 hover:text-gray-900 hover:bg-green-50"
+                    ? "text-[#2d6a2d] font-semibold"
+                    : "text-[#4a4a4a] hover:text-gray-900 hover:bg-green-50/60"
                 }`}
             >
               {label}
               {isActive && (
-                <span className="absolute -bottom-0.5 left-3.5 right-3.5 h-0.5 bg-green-500 rounded-full" />
+                <span className="absolute -bottom-0.5 left-3.5 right-3.5 h-[1.5px] bg-[#2d6a2d] rounded-full" />
               )}
             </Link>
           );
@@ -99,20 +102,20 @@ const Navbar = () => {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setCalcOpen((prev) => !prev)}
-            className={`relative flex items-center gap-1 text-[14.5px] font-medium px-3.5 py-1.5 rounded-md transition-all duration-150
+            className={`relative flex items-center gap-1 text-[14px] font-medium px-3.5 py-1.5 rounded-md transition-all duration-150 cursor-pointer
               ${
                 isCalcActive || calcOpen
-                  ? "text-green-500 font-semibold"
-                  : "text-gray-500 hover:text-gray-900 hover:bg-green-50"
+                  ? "text-[#2d6a2d] font-semibold"
+                  : "text-[#4a4a4a] hover:text-gray-900 hover:bg-green-50/60"
               }`}
           >
             Calculations
             <ChevronDown
-              size={14}
+              size={13}
               className={`transition-transform duration-200 ${calcOpen ? "rotate-180" : ""}`}
             />
             {isCalcActive && (
-              <span className="absolute -bottom-0.5 left-3.5 right-[18px] h-0.5 bg-green-500 rounded-full" />
+              <span className="absolute -bottom-0.5 left-3.5 right-[20px] h-[1.5px] bg-[#2d6a2d] rounded-full" />
             )}
           </button>
 
@@ -153,17 +156,10 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Right: Location + Sign In */}
-      <div className="flex items-center gap-3 shrink-0">
-        <button className="flex items-center gap-1.5 text-[13px] text-gray-500 hover:text-green-500 transition-colors duration-150">
-          <MapPin size={14} />
-          <span className="font-medium">Pokhara, NP</span>
-        </button>
-
-        <div className="w-px h-4 bg-gray-200" />
-
-        <button className="text-sm font-semibold text-gray-800 border border-gray-200 rounded-lg px-4 py-1.5 hover:border-green-400 hover:text-green-500 hover:bg-green-50 transition-all duration-150">
-          Sign In
+      {/* Right: user avatar icon only — matching screenshot */}
+      <div className="flex items-center shrink-0">
+        <button className="flex items-center justify-center text-[#2d6a2d] hover:text-green-700 transition-colors duration-150 cursor-pointer">
+          <UserCircle size={26} strokeWidth={1.5} />
         </button>
       </div>
     </nav>

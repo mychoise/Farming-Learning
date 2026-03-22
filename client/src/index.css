@@ -28,7 +28,10 @@
     font-family: "font3";
     src: url('./assets/fonts/font3.woff2');
 }
-
+::selection {
+  background-color: #ACF4A4; /* Tailwind green-400 */
+  color: black;              /* text color when selected */
+}
 @font-face {
     font-family: "font4";
     src: url('./assets/fonts/font4.woff2');

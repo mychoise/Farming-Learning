@@ -8,7 +8,7 @@ import { auth } from "../middleware/auth.js";
 import { admin } from "../middleware/admin.js";
 const cropCalenderRouter = express.Router();
 
-cropCalenderRouter.get("/get", auth, getCropCalender);
+cropCalenderRouter.get("/get", getCropCalender);
 cropCalenderRouter.post("/add", auth, admin, makeCropCalender);
 cropCalenderRouter.delete("/delete", auth, admin, deleteCropCalender);
 
