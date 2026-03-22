@@ -29,7 +29,7 @@ const Weather = () => {
 
   const [placeName, setplaceName] = useState<string>("");
 
-const {data , isLoading} = useQuery<WeatherData>({
+const {data , isLoading , isError} = useQuery<WeatherData>({
     queryKey:["my-weather" , coords],
     queryFn:()=>getMyWeather({ lat: coords!.lat, lon: coords!.lon }),
     enabled:!!coords, // Only run query when coords are available
@@ -37,6 +37,7 @@ const {data , isLoading} = useQuery<WeatherData>({
 })
 
 console.log("weather data is ", data)
+console.log('error is', isError)
 
 
   function getMyLocation() {
@@ -298,7 +299,7 @@ const now = new Date().getHours();
   </p>
 </div>
 ) : (
-  data ? (
+  !isError ? (
    <div className=" pt-12 pl-45 flex bg-[#F8FAFC] gap-10 w-screen h-[200vh]">
       {/* Left Side */}
       <div>
