@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useMemo } from "react";
 import { getCropCalender } from "../api/api";
+import NepaliDate from "nepali-date";
+
 
 interface Crop {
   id: string;
@@ -38,22 +40,47 @@ interface CropListItem {
   calendar: Record<string, string>;
 }
 
-const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-const seasons = [
-  { name: "Winter", months: [12, 1, 2], color: "#1565C0", bg: "#DBEAFE" },
-  { name: "Spring", months: [3, 4, 5],  color: "#2E7D32", bg: "#DCFCE7" },
-  { name: "Summer", months: [6, 7, 8],  color: "#B45309", bg: "#FEF3C7" },
-  { name: "Autumn", months: [9, 10, 11],color: "#9A3412", bg: "#FFEDD5" },
+// Nepali month names (Bikram Sambat), months 1–12
+const months = [
+  "Baisakh",  // 1
+  "Jestha",   // 2
+  "Ashadh",   // 3
+  "Shrawan",  // 4
+  "Bhadra",   // 5
+  "Ashwin",   // 6
+  "Kartik",   // 7
+  "Mangsir",  // 8
+  "Poush",    // 9
+  "Magh",     // 10
+  "Falgun",   // 11
+  "Chaitra",  // 12
 ];
 
-const getSeasonForMonth = (m: number) => {
-  const idx = m === 0 ? 12 : m;
-  return seasons.find(s => s.months.includes(idx));
-};
+// Short labels for the table header (3–4 chars)
+const monthsShort = [
+  "Bai", "Jes", "Ash", "Shr", "Bha", "Asw",
+  "Kar", "Man", "Pou", "Mag", "Fal", "Cha",
+];
+
+// Nepali seasons mapped to Bikram Sambat months
+// Basanta (Spring):   Falgun–Chaitra–Baisakh  (11, 12, 1)
+// Grishma (Summer):   Jestha–Ashadh–Shrawan   (2, 3, 4)
+// Barkha  (Monsoon):  Bhadra–Ashwin           (5, 6)
+// Sharad  (Autumn):   Kartik–Mangsir          (7, 8)
+// Hemanta (PreWinter):Poush–Magh              (9, 10)
+// (Shishir merges back into Basanta here for a clean 4-season display)
+const seasons = [
+  { name: "Basanta", months: [11, 12, 1], color: "#2E7D32", bg: "#DCFCE7" },  // Spring
+  { name: "Grishma", months: [2, 3, 4],   color: "#B45309", bg: "#FEF3C7" },  // Summer
+  { name: "Barkha",  months: [5, 6],      color: "#1565C0", bg: "#DBEAFE" },  // Monsoon
+  { name: "Sharad",  months: [7, 8],      color: "#9A3412", bg: "#FFEDD5" },  // Autumn
+  { name: "Hemanta", months: [9, 10],     color: "#5B21B6", bg: "#EDE9FE" },  // Pre-winter
+];
+
+const getSeasonForMonth = (m: number) =>
+  seasons.find(s => s.months.includes(m));
 
 const EVENT_TYPE_MAP: Record<string, string> = {
-  // sow variants
   seed:          "sow",
   seeding:       "sow",
   sow:           "sow",
@@ -62,12 +89,10 @@ const EVENT_TYPE_MAP: Record<string, string> = {
   planting:      "sow",
   transplant:    "sow",
   transplanting: "sow",
-  // grow variants
   growth:        "grow",
   grow:          "grow",
   growing:       "grow",
   vegetative:    "grow",
-  // harvest variants
   harvest:       "harvest",
   harvesting:    "harvest",
   maturity:      "harvest",
@@ -80,15 +105,12 @@ const cellColors: Record<string, { bg: string; border: string; dot: string }> = 
   harvest: { bg: "rgba(245,127,23,0.15)", border: "#F57F17", dot: "#F57F17" },
 };
 
-// FIX 6: moved outside component so it's not recreated on every render
 const getPhaseMonths = (calendar: Record<string, string>, type: string) =>
   Object.entries(calendar)
     .filter(([, t]) => t === type)
     .map(([m]) => Number(m))
     .sort((a, b) => a - b);
 
-// FIX 2: key by `cropId__regionId` so a crop appearing in multiple regions
-//         gets a separate row per region instead of the first region winning.
 function buildCropList(data: ApiEntry[] | undefined): CropListItem[] {
   if (!Array.isArray(data)) return [];
   const map: Record<string, CropListItem> = {};
@@ -99,7 +121,6 @@ function buildCropList(data: ApiEntry[] | undefined): CropListItem[] {
 
     const regionName = regions?.name ?? "Unknown";
     const regionId   = regions?.id   ?? "unknown";
-    // unique key per crop+region combination
     const key = `${crop.id}__${regionId}`;
 
     if (!map[key]) {
@@ -107,15 +128,12 @@ function buildCropList(data: ApiEntry[] | undefined): CropListItem[] {
     }
 
     const displayType = EVENT_TYPE_MAP[crop_calendar.eventType?.toLowerCase()] ?? crop_calendar.eventType;
-    // FIX 1: store month as a STRING key so `calendar[String(month)]` lookups
-    //        always match regardless of how JS coerces numeric vs string keys.
     map[key].calendar[String(crop_calendar.month)] = displayType;
   }
 
   return Object.values(map);
 }
 
-// FIX 4: extracted detail panel into its own component — no more IIFE in JSX
 function CropDetailPanel({ selectedCrop }: { selectedCrop: CropListItem | null }) {
   if (!selectedCrop) return null;
   const { crop, region, calendar } = selectedCrop;
@@ -166,6 +184,7 @@ function CropDetailPanel({ selectedCrop }: { selectedCrop: CropListItem | null }
                       color:      phase.color,
                     }}
                   >
+                    {/* Show full Nepali month name in detail panel */}
                     {months[m - 1]}
                   </span>
                 ))}
@@ -214,9 +233,14 @@ function CropDetailPanel({ selectedCrop }: { selectedCrop: CropListItem | null }
 export default function CropCalendar() {
   const [regionFilter, setRegionFilter] = useState<string>("All");
   const [hovered, setHovered]           = useState<string | null>(null);
-  const [selectedKey, setSelectedKey]   = useState<string | null>(null); // FIX 3: track by stable key, not object ref
+  const [selectedKey, setSelectedKey]   = useState<string | null>(null);
 
-  const currentMonth = new Date().getMonth(); // 0-indexed
+ const currentMonth = new NepaliDate(new Date()).getMonth(); // 0-indexed (Gregorian)
+  // NOTE: If your API returns Nepali month numbers (1–12 BS), map the current
+  // Gregorian month to the approximate BS month here. Rough offset: BS ≈ Greg + 2
+  // (mid-April Gregorian ≈ Baisakh BS month 1). Adjust as needed.
+  // const currentBSMonth = ((currentMonth + 2) % 12); // 0-indexed BS
+  // For now we keep currentMonth as 0-indexed to highlight the column.
 
   const { data: rawData, isLoading, isError } = useQuery({
     queryKey: ["cropCalendarData"],
@@ -224,7 +248,6 @@ export default function CropCalendar() {
     staleTime: 1000 * 60 * 60,
   });
 
-  // FIX 5: memoize so expensive transform only re-runs when rawData changes
   const allCrops = useMemo(() => buildCropList(rawData), [rawData]);
 
   const regions = useMemo(
@@ -237,14 +260,13 @@ export default function CropCalendar() {
     [allCrops, regionFilter]
   );
 
-  // FIX 3: derive selectedCrop from the stable key; auto-clears if crop leaves filtered list
   const selectedCrop = selectedKey
     ? (filtered.find(c => `${c.crop.id}__${c.region}` === selectedKey) ?? null)
     : null;
 
   const handleRegionChange = (r: string) => {
     setRegionFilter(r);
-    setSelectedKey(null); // clear detail panel when region changes
+    setSelectedKey(null);
   };
 
   return (
@@ -255,9 +277,12 @@ export default function CropCalendar() {
           Agricultural Planning Guide
         </div>
         <h1 className="text-[clamp(28px,5vw,52px)] font-black m-0 bg-linear-to-br from-green-700 via-yellow-700 to-green-800 bg-clip-text text-transparent tracking-tight leading-tight">
-          Crop Calendar
+          बाली पात्रो
         </h1>
-        <p className="text-green-800/80 mt-2 font-[font5] text-[15px]">
+        <p className="text-green-800/80 mt-1 font-[font5] text-[13px] tracking-wide">
+          Crop Calendar — Bikram Sambat
+        </p>
+        <p className="text-green-800/60 mt-1 font-[font5] text-[14px]">
           Plan your farming season with precision
         </p>
       </div>
@@ -273,6 +298,19 @@ export default function CropCalendar() {
             <div className="w-7 h-4 rounded" style={{ background: l.bg, border: `2px solid ${l.color}` }} />
             <span className="text-[13px] text-green-900 tracking-wide">{l.label}</span>
           </div>
+        ))}
+      </div>
+
+      {/* Season key */}
+      <div className="flex font-[font5] justify-center gap-3 mb-6 flex-wrap">
+        {seasons.map(s => (
+          <span
+            key={s.name}
+            className="px-3 py-1 rounded-full text-[12px] font-semibold tracking-wide"
+            style={{ background: s.bg, color: s.color, border: `1px solid ${s.color}30` }}
+          >
+            {s.name}
+          </span>
         ))}
       </div>
 
@@ -300,28 +338,27 @@ export default function CropCalendar() {
         </div>
       )}
 
-      {/* FIX 7: error state */}
+      {/* Error State */}
       {isError && (
         <div className="text-center py-16 text-red-600 text-[15px]">
           Failed to load crop data. Please try again.
         </div>
       )}
 
-      {/* Calendar Table — only render when we have data */}
+      {/* Calendar Table */}
       {!isLoading && !isError && rawData && (
         <div className="overflow-x-auto">
-          {/* FIX 6: replaced border-black/6 and border-black/8 with valid arbitrary values */}
           <div className="min-w-175 max-w-275 mx-auto bg-white rounded-2xl border border-black/8 shadow-md overflow-hidden">
 
             {/* Season Row */}
-            <div className="grid grid-cols-[160px_repeat(12,1fr)]">
-              <div className="px-4 py-2 text-[11px] text-gray-400 tracking-wider bg-gray-100">SEASON</div>
+            <div className="grid  font-[font5] grid-cols-[160px_repeat(12,1fr)]">
+              <div className="px-4 py-2 text-[13px] text-gray-400 tracking-wider bg-gray-100">ऋतु / SEASON</div>
               {months.map((_, i) => {
-                const s = getSeasonForMonth(i + 1);
+                const s = getSeasonForMonth(i + 1); // months are 1-indexed
                 return (
                   <div
                     key={i}
-                    className="py-2 text-center text-[9px] tracking-wide font-[font3] border-l border-black/6"
+                    className="py-2 text-center text-[11px] tracking-wide font-[font3] border-l border-black/6"
                     style={{ color: s?.color || "#999", background: s?.bg || "#F5F5F4" }}
                   >
                     {s?.name.slice(0, 3).toUpperCase()}
@@ -332,19 +369,19 @@ export default function CropCalendar() {
 
             {/* Month Header */}
             <div className="grid grid-cols-[160px_repeat(12,1fr)] bg-gray-50 border-b border-black/8 border-t border-black/6">
-              <div className="px-4 py-3 text-[11px] font-[font5] text-green-700">CROP</div>
-              {months.map((m, i) => (
+              <div className="px-4 py-3 text-[11px] font-[font5] text-green-700">बाली / CROP</div>
+              {monthsShort.map((m, i) => (
                 <div
                   key={i}
-                  className={`px-1 py-3 text-center text-[11px] border-l border-black/6 relative ${
+                  className={`px-1 py-3 text-center font-[font5] text-[12px] border-l border-black/6 relative ${
                     i === currentMonth
                       ? "font-extrabold text-orange-700 bg-orange-100/20"
                       : "font-semibold text-green-700"
                   }`}
                 >
-                  {m.toUpperCase()}
+                  {m}
                   {i === currentMonth && (
-                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-700" />
+                    <div className="absolute font-[font5] bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-700" />
                   )}
                 </div>
               ))}
@@ -358,8 +395,8 @@ export default function CropCalendar() {
             )}
 
             {filtered.map(({ crop, region, calendar }, ci) => {
-              const rowKey      = `${crop.id}__${region}`;
-              const isSelected  = selectedKey === rowKey;
+              const rowKey     = `${crop.id}__${region}`;
+              const isSelected = selectedKey === rowKey;
 
               return (
                 <div
@@ -384,6 +421,9 @@ export default function CropCalendar() {
                       <div className="text-[13px] font-bold text-green-900 tracking-tight">
                         {crop.name}
                       </div>
+                      {crop.nepaliName && (
+                        <div className="text-[10px] text-green-600">{crop.nepaliName}</div>
+                      )}
                       <div className="text-[10px] uppercase tracking-wide text-green-700/70">
                         {region}
                       </div>
@@ -399,7 +439,7 @@ export default function CropCalendar() {
                     return (
                       <div
                         key={mi}
-                        className={`px-1 py-2 flex items-center justify-center border-l border-black/5 ${
+                        className={`px-1 py-2 flex font-[font5] items-center justify-center border-l border-black/5 ${
                           isCurrentM ? "bg-orange-100/20" : ""
                         }`}
                       >
@@ -425,11 +465,11 @@ export default function CropCalendar() {
         </div>
       )}
 
-      {/* FIX 4: detail panel is now a proper component, not an IIFE */}
+      {/* Detail Panel */}
       <CropDetailPanel selectedCrop={selectedCrop} />
 
-      <div className="text-center mt-10 text-green-200 text-[12px] tracking-widest opacity-80">
-        CLICK ANY CROP FOR DETAILS · {new Date().getFullYear()} CROP CALENDAR
+      <div className="text-center mt-10 text-[12px] tracking-widest opacity-80">
+        CLICK ANY CROP FOR DETAILS · बिक्रम सम्वत् {new Date().getFullYear() + 56 /* approx BS year */} CROP CALENDAR
       </div>
     </div>
   );
