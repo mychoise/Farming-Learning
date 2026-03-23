@@ -6,9 +6,13 @@ import { Routes, Route } from "react-router-dom";
 import FertilizerEngine from "./pages/FertilizerEngine";
 import InorganicFertilizer from "./pages/InorganicFertilizer";
 import CalculationLayout from "./layout/CalculationLayout";
-import  AnimalWeightEstimator from "./pages/AnimalWeightEstimator";
+import AnimalWeightEstimator from "./pages/AnimalWeightEstimator";
 import UnitConversion from "./pages/UnitConversion";
 import CropCalendar from "./pages/CropCalender";
+import AiChatDescription from "./pages/AiChatDescription";
+import AiLayout from "./layout/AiLayout";
+import AiNewChat from "./pages/AiNewChat";
+
 const App = () => {
   return (
     <div>
@@ -18,13 +22,17 @@ const App = () => {
           <Route path="/crops" element={<CropList />} />
           <Route path="/crop/:id" element={<CropDetails />} />
           <Route path="/weather" element={<Weather />} />
-    <Route path="/calculate" element={<CalculationLayout/>}>
-  <Route path="organic" element={<FertilizerEngine/>}/>
-  <Route path="inorganic" element={<InorganicFertilizer/>}/>
-  <Route path="animal" element={<AnimalWeightEstimator/>}/>
-  <Route path="unit-conversion" element={<UnitConversion/>}/>
-</Route>
-<Route path="/crop-calendar" element={<CropCalendar />} />
+          <Route path="/calculate" element={<CalculationLayout />}>
+            <Route path="organic" element={<FertilizerEngine />} />
+            <Route path="inorganic" element={<InorganicFertilizer />} />
+            <Route path="animal" element={<AnimalWeightEstimator />} />
+            <Route path="unit-conversion" element={<UnitConversion />} />
+          </Route>
+          <Route path="/crop-calendar" element={<CropCalendar />} />
+          <Route path="/ai" element={<AiLayout />}>
+            <Route index element={<AiNewChat />} />
+            <Route path="text" element={<AiChatDescription />} />
+          </Route>
         </Routes>
       </div>
     </div>

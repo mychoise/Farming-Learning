@@ -57,9 +57,9 @@ const Navbar = () => {
   const navLinks = [
     { label: "Crops Library", href: "/crops" },
     { label: "Weather", href: "/weather" },
-    { label: "Market Trends", href: "/market-trends" },
     { label: "Crop Calender", href: "/crop-calendar" },
     { label: "Resources", href: "/resources" },
+    { label: "Assistant", href: "/ai" },
   ];
 
   return (
