@@ -12,6 +12,7 @@ import CropCalendar from "./pages/CropCalender";
 import AiChatDescription from "./pages/AiChatDescription";
 import AiLayout from "./layout/AiLayout";
 import AiNewChat from "./pages/AiNewChat";
+import AiDiseaseDetection from "./pages/AiDiseaseDetection";
 
 const App = () => {
   return (
@@ -32,6 +33,7 @@ const App = () => {
           <Route path="/ai" element={<AiLayout />}>
             <Route index element={<AiNewChat />} />
             <Route path="text" element={<AiChatDescription />} />
+            <Route path="disease" element={<AiDiseaseDetection/>} />
           </Route>
         </Routes>
       </div>
