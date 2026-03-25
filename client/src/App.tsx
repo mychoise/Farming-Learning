@@ -32,7 +32,7 @@ const App = () => {
           <Route path="/crop-calendar" element={<CropCalendar />} />
           <Route path="/ai" element={<AiLayout />}>
             <Route index element={<AiNewChat />} />
-            <Route path="text" element={<AiChatDescription />} />
+            <Route path="text/:id" element={<AiChatDescription />} />
             <Route path="disease" element={<AiDiseaseDetection/>} />
           </Route>
         </Routes>

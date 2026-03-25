@@ -1,4 +1,7 @@
+import { useQuery } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { getAllAiChat } from "../api/api";
 
 const INITIAL_MESSAGES = [
   {
@@ -58,6 +61,8 @@ export default function AiChatDescription() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
+
+
   const send = () => {
     if (!input.trim()) return;
     setMessages((m) => [...m, { id: Date.now(), role: "user", text: input }]);
@@ -75,6 +80,18 @@ export default function AiChatDescription() {
       ]);
     }, 1800);
   };
+
+const params= useParams();
+  console.log("params is" , params)
+
+  const {data} = useQuery({
+    queryKey: ["aiChatHistory", params.id],
+    queryFn: () => getAllAiChat(params.id!),
+    enabled: !!params.id,
+    onSuccess: (data: any) => {
+      console.log("AI chat history data:", data);
+    },
+  });
 
   return (
     <div

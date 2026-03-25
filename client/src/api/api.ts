@@ -166,3 +166,8 @@ export const getCropCalender =  async ()=>{
     const result = await axiosInstance.get("/cropcalender/get")
     return result.data.data
 }
+
+export const getAllAiChat = async(data)=>{
+const result = await axiosInstance.get(`/ai/chat/${data}`);
+return result.data
+}
