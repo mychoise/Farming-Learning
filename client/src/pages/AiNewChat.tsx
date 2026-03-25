@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {useAI} from "../store/useAI"
 
 const FEATURES = [
   {
@@ -54,6 +55,7 @@ const FEATURES = [
 export default function AiNewChat() {
     const navigate = useNavigate()
   const [query, setQuery] = useState("");
+    const {createNewSession,paramForId} = useAI()
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
@@ -95,8 +97,11 @@ export default function AiNewChat() {
           />
           <button
             className="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 transition-all hover:opacity-90 active:scale-95 bg-[#2d6a2f]"
-            onClick={() => {setQuery("")
-                                navigate("/ai/text")
+            onClick={async() => {
+                setQuery("")
+                const result=await createNewSession()
+                console.log(result.id)
+                navigate(`/ai/text/${result.id}`)
             }}
           >
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

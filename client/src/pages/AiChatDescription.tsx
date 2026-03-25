@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getAllAiChat } from "../api/api";
-
+import { useAI } from "../store/useAI";
 const INITIAL_MESSAGES = [
   {
     id: 1,
@@ -51,14 +51,17 @@ function LeafIcon({ size = 15 }) {
 }
 
 export default function AiChatDescription() {
+    const {id} = useParams()
 
   const [messages, setMessages] = useState(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const bottomRef = useRef(null);
+  const {getSpecificDataAll} = useAI()
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    getSpecificDataAll(id)
   }, [messages, typing]);
 
 
@@ -88,9 +91,9 @@ const params= useParams();
     queryKey: ["aiChatHistory", params.id],
     queryFn: () => getAllAiChat(params.id!),
     enabled: !!params.id,
-    onSuccess: (data: any) => {
-      console.log("AI chat history data:", data);
-    },
+    // onSuccess: (data: any) => {
+    //   console.log("AI chat history data:", data);
+    // },
   });
 
   return (

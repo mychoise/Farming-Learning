@@ -9,8 +9,7 @@ import {
 import { auth } from "../middleware/auth.js";
 import upload from './../config/Image.config.js';
 
-const aiRouter = express.Router();
-
+const aiRouter = express.Router()
 aiRouter.post("/chat/:aiSessionId", auth, sendMessageToAi);
 aiRouter.get("/chat/:aiSessionId", auth, getSpecificSessionAll);
 aiRouter.get("/new-session", auth, createNewAiSession);
