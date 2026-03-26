@@ -24,6 +24,8 @@ Make the answer:
 - Step-by-step (if needed)
 - Suitable for local climate
 - Farmer-friendly
+
+And you don't have to say anythink like this "Namaste! As an agricultural consultant in Nepal, I can tell you: " , this is not required.
 `;
 
   console.log("Prompt:", prompt);

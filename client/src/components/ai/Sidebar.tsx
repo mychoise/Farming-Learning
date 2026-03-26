@@ -1,20 +1,33 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { chatHistory } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
      const [activeChat, setActiveChat] = useState(1);
   const [activeTab, setActiveTab] = useState("chat");
 
+  const {data} = useQuery({
+    queryKey: ["ai-chats"],
+    queryFn: chatHistory,
+    staleTime:0,
+    refetchOnWindowFocus:false,
+  })
 
-const CHAT_LIST = [
-  { id: 1, title: "Corn rust treatment", date: "Today", preview: "Early-stage rust on lower leaves" },
-  { id: 2, title: "Wheat irrigation plan", date: "Yesterday", preview: "Optimal schedule for dry season" },
-  { id: 3, title: "Soil pH adjustment", date: "Mar 20", preview: "Lime application rates for acidic soil" },
-  { id: 4, title: "Tomato blight check", date: "Mar 18", preview: "Brown lesions on stems identified" },
-  { id: 5, title: "Fertilizer dosing Q2", date: "Mar 15", preview: "NPK ratios for spring planting" },
-  { id: 6, title: "Pest scouting report", date: "Mar 12", preview: "Aphid pressure in north field" },
-  { id: 7, title: "Cover crop selection", date: "Mar 10", preview: "Legume mix for nitrogen fixation" },
-];
+
+  console.log(data);
+  const navigate = useNavigate();
+
+// const CHAT_LIST = [
+//   { id: 1, title: "Corn rust treatment", date: "Today", preview: "Early-stage rust on lower leaves" },
+//   { id: 2, title: "Wheat irrigation plan", date: "Yesterday", preview: "Optimal schedule for dry season" },
+//   { id: 3, title: "Soil pH adjustment", date: "Mar 20", preview: "Lime application rates for acidic soil" },
+//   { id: 4, title: "Tomato blight check", date: "Mar 18", preview: "Brown lesions on stems identified" },
+//   { id: 5, title: "Fertilizer dosing Q2", date: "Mar 15", preview: "NPK ratios for spring planting" },
+//   { id: 6, title: "Pest scouting report", date: "Mar 12", preview: "Aphid pressure in north field" },
+//   { id: 7, title: "Cover crop selection", date: "Mar 10", preview: "Legume mix for nitrogen fixation" },
+// ];
   return (
     <div>
 
@@ -29,10 +42,13 @@ const CHAT_LIST = [
     className="flex rounded-xl p-1"
     style={{ background: "#dddbd3" }}
   >
-    {[{ key: "chat", label: "AI Chat" }, { key: "disease", label: "Disease Detection" }].map((t) => (
+    {[{ key: "chat", label: "AI Chat", path:"/ai" }, { key: "disease", label: "Disease Detection", path:"/ai/disease" }].map((t) => (
       <button
         key={t.key}
-        onClick={() => setActiveTab(t.key)}
+        onClick={() => {
+          setActiveTab(t.key);
+          navigate(t.path);
+        }}
         className="flex-1 text-[14px] font-[font3] py-2 rounded-lg transition-all"
         style={{
           background: activeTab === t.key ? "#ffffff" : "transparent",
@@ -50,12 +66,22 @@ const CHAT_LIST = [
         <div className="flex-1 font-[Inter] overflow-y-auto px-2 space-y-0.5 pb-2">
             <h1 className=" ml-2 font-[font4] text-[#2F2F2E] text-[13px]">Recents</h1>
             <div className="mt-3">
-          {CHAT_LIST.map((chat) => {
+
+                {data?.data?.length === 0 ? (
+                    <div className="text-center text-[#9a9a8c] text-[14px] py-4">
+                        No chats yet
+                    </div>
+                ) : (
+          data?.data?.map((chat: any) => {
             const active = activeChat === chat.id;
             return (
               <button
                 key={chat.id}
-                onClick={() => setActiveChat(chat.id)}
+                onClick={() => {
+                  console.log(chat);
+                  setActiveChat(chat.id);
+                  navigate(`/ai/text/${chat.id}`);
+                }}
                 className="w-full px-2  cursor-pointer rounded-xl py-2.5 transition-all"
                 style={{
                   background: active ? "#F0EEE6" : "transparent",
@@ -69,12 +95,13 @@ const CHAT_LIST = [
                     className="text-[13.7px]  font-[font4] truncate"
                     style={{ color: "#aeac a4", maxWidth: "200px" }}
                   >
-                    {chat.preview}
+                    {chat.title}
                   </span>
                 </div>
               </button>
             );
-          })}
+          })
+                )}
           </div>
         </div>
 
@@ -84,6 +111,7 @@ const CHAT_LIST = [
         {/* New Consultation */}
         <div className="px-4 py-3">
           <button
+          onClick={() => navigate("/ai")}
             className="w-full flex font-[font4] tracking-wide items-center justify-center gap-2 rounded-xl py-2.5 text-[17px]font-semibold text-white transition-all hover:opacity-90 active:scale-95"
             style={{ background: "#2d6a2f" }}
           >

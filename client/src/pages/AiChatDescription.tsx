@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useAI } from "../store/useAI";
 import { useSendMessageToAI, useAiChatAll } from "../hooks/hooks";
 import ReactMarkdown from "react-markdown";
+import { useQueryClient } from "@tanstack/react-query";
 const INITIAL_MESSAGES = [
   {
     "id": "95ab829e-6526-434b-9b5c-dec6012609d1",
@@ -60,6 +61,9 @@ export default function AiChatDescription() {
     }
 }, [chatAll])
 
+    const queryClient = useQueryClient()
+
+
 
 
   useEffect(() => {
@@ -98,7 +102,11 @@ const send = () => {
                     response: data?.data?.response || "No response",
                     createdAt: data?.data?.createdAt || new Date().toISOString()
                 },
+
             ]);
+            queryClient.invalidateQueries({
+                queryKey: ["ai-chats"],
+            });
         },
         onError: () => {
             setMessages((m) => [
@@ -113,6 +121,7 @@ const send = () => {
             ]);
         }
     });
+
 };
 
 

@@ -182,3 +182,8 @@ export const sendMessageToAI= async(data:{id:string , question:string})=>{
     const result = await axiosInstance.post(`/ai/chat/${data.id}`, {question:data.question});
     return result.data
 }
+
+export const chatHistory = async()=>{
+    const result = await axiosInstance.get("/ai/all/history")
+    return result.data
+}

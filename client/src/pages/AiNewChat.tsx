@@ -4,6 +4,7 @@ import {useAI} from "../store/useAI"
 import { toast } from "react-hot-toast";
 import { createNewSession } from "../api/api";
 import { useNewSession } from "../hooks/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 
 const FEATURES = [
   {
@@ -61,6 +62,15 @@ export default function AiNewChat() {
     const {setSessionID , paramForId , setQuestionForAI} = useAI()
 
     const {mutateAsync  } = useNewSession()
+
+    const queryClient = useQueryClient()
+
+useEffect(() => {
+  queryClient.invalidateQueries({
+    queryKey: ["ai-chats"],
+  });
+}, [queryClient]);
+
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";

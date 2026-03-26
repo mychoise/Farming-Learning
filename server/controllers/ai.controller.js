@@ -162,9 +162,9 @@ export const getAllCommunication = async (req, res) => {
       .from(aiCommunicationSession)
       .where(eq(aiCommunicationSession.userId, userId));
 
-    if (!allData || allData.length === 0) {
-      return res.status(404).json({ success: false, message: "No data found" });
-    }
+    // if (!allData || allData.length === 0) {
+    //   return res.status(404).json({ success: false, message: "No data found" });
+    // }
 
     return res.status(200).json({ success: true, data: allData });
   } catch (error) {
