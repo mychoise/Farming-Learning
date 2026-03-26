@@ -167,8 +167,8 @@ export const getCropCalender =  async ()=>{
     return result.data.data
 }
 
-export const getAllAiChat = async(data)=>{
-const result = await axiosInstance.get(`/ai/chat/${data}`);
+export const getAllAiChat = async(id:string)=>{
+const result = await axiosInstance.get(`/ai/chat/${id}`);
 return result.data
 }
 
@@ -178,7 +178,7 @@ export const createNewSession = async ()=>{
     return result.data
 }
 
-export const sendMessageToAI= async(id:string, question:string)=>{
-    const result = await axiosInstance.post(`/ai/chat/${id}`, {question});
+export const sendMessageToAI= async(data:{id:string , question:string})=>{
+    const result = await axiosInstance.post(`/ai/chat/${data.id}`, {question:data.question});
     return result.data
 }

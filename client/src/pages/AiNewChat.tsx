@@ -58,7 +58,7 @@ const FEATURES = [
 export default function AiNewChat() {
     const navigate = useNavigate()
   const [query, setQuery] = useState("");
-    const {setSessionID , paramForId} = useAI()
+    const {setSessionID , paramForId , setQuestionForAI} = useAI()
 
     const {mutateAsync  } = useNewSession()
 
@@ -117,6 +117,7 @@ console.log("id is" , params)
                console.log("data is hgfj" , data)
                setSessionID(data?.data?.id)
                console.log("session id is" , data?.data?.id)
+               setQuestionForAI(query)
                navigate(`/ai/text/${data?.data?.id}`)
                 // console.log(data)
                 // setSessionID(data?.id)

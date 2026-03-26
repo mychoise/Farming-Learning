@@ -1,45 +1,33 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { getAllAiChat } from "../api/api";
 import { useAI } from "../store/useAI";
-const INITIAL_MESSAGES = [
-  {
-    id: 1,
-    role: "ai",
-    text: "Hello, John! I've analyzed the local weather data for your region. It looks like humidity will rise significantly this week. Are you concerned about fungal growth on your corn crops?",
-  },
-  {
-    id: 2,
-    role: "user",
-    text: "Yes, I noticed some yellow spots on the lower leaves. What treatment do you recommend for early-stage rust?",
-  },
-  {
-    id: 3,
-    role: "ai",
-    text: "For early-stage Common Rust, I recommend a focused fungicide application. Here is a summary of the best immediate actions:",
-    cards: [
-      {
-        icon: (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6a2f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-          </svg>
-        ),
-        label: "ACTION",
-        value: "Reduce Irrigation",
-      },
-      {
-        icon: (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2d6a2f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 3h6M9 3v8l-4 9h14L15 11V3" />
-          </svg>
-        ),
-        label: "PRODUCT",
-        value: "Azoxystrobin (7%)",
-      },
-    ],
-  },
-];
+import { useSendMessageToAI, useAiChatAll } from "../hooks/hooks";
+import ReactMarkdown from "react-markdown";
+// const INITIAL_MESSAGES = [
+//   {
+//     "id": "95ab829e-6526-434b-9b5c-dec6012609d1",
+//     "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
+//     "question": "hi",
+//     "response": "Namaste! I am your agricultural consultant...",
+//     "createdAt": "2026-03-25T21:15:14.298Z"
+//   },
+//   {
+//     "id": "87b76ad4-fd6a-40c3-b2d3-9d656e4cad82",
+//     "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
+//     "question": "namaste",
+//     "response": "Namaste! As an agricultural consultant...",
+//     "createdAt": "2026-03-26T15:24:48.289Z"
+//   },
+//   {
+//     "id": "a191d400-9314-415e-9c07-08ae68ce02b2",
+//     "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
+//     "question": "what is compost manure",
+//     "response": "Namaste! As an agricultural consultant working in the diverse landscapes of Nepal...",
+//     "createdAt": "2026-03-26T15:25:39.150Z"
+//   }
+// ]
 
 function LeafIcon({ size = 15 }) {
   return (
@@ -52,37 +40,85 @@ function LeafIcon({ size = 15 }) {
 
 export default function AiChatDescription() {
     const {id} = useParams()
+  const {questionForAI} = useAI()
 
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState(null);
+  const [input, setInput] = useState(questionForAI);
   const [typing, setTyping] = useState(false);
   const bottomRef = useRef(null);
-  const {getSpecificDataAll} = useAI()
+
+  const{data:chatAll} = useAiChatAll(id || "")
+
+  console.log("all data is",chatAll)
+// const likelyMessage = chatAll?.data.map((item)=>(
+// id:item.id,
+// role
+// ))
+
+
+useEffect(() => {
+    if (chatAll?.data) {
+        setMessages(chatAll.data);
+    }
+}, [chatAll])
+
+
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    getSpecificDataAll(id)
   }, [messages, typing]);
 
+  const queryClient = useQueryClient()
+  const aiResponse = queryClient.getQueryData(["sendMessageToAI"])
+  const {mutate , isPending} = useSendMessageToAI()
 
 
-  const send = () => {
+
+
+
+const send = () => {
     if (!input.trim()) return;
-    setMessages((m) => [...m, { id: Date.now(), role: "user", text: input }]);
+
+    const finalData = { id, question: input };
+
+    // add user message with proper structure
+    const tempMessage = {
+        id: Date.now().toString(),
+        communicationId: id || "",
+        question: input,
+        response: "",
+        createdAt: new Date().toISOString()
+    };
+
+    setMessages((m) => [...m, tempMessage]);
     setInput("");
-    setTyping(true);
-    setTimeout(() => {
-      setTyping(false);
-      setMessages((m) => [
-        ...m,
-        {
-          id: Date.now() + 1,
-          role: "ai",
-          text: "Thanks for the update! I'd recommend monitoring the spread daily and keeping detailed records. Would you like me to generate a full 2-week treatment schedule with dosage details?",
+    mutate(finalData, {
+        onSuccess: (data) => {
+            setMessages((m) => [
+                ...m.slice(0, -1), // Remove the temporary message
+                {
+                    id: data?.data?.id || Date.now().toString(),
+                    communicationId: data?.data?.communicationId || id || "",
+                    question: input,
+                    response: data?.data?.response || "No response",
+                    createdAt: data?.data?.createdAt || new Date().toISOString()
+                },
+            ]);
         },
-      ]);
-    }, 1800);
-  };
+        onError: () => {
+            setMessages((m) => [
+                ...m.slice(0, -1), // Remove the temporary message
+                {
+                    id: (Date.now() + 1).toString(),
+                    communicationId: id || "",
+                    question: input,
+                    response: "Something went wrong.",
+                    createdAt: new Date().toISOString()
+                },
+            ]);
+        }
+    });
+};
 
 const params= useParams();
   console.log("params is" , params)
@@ -110,39 +146,36 @@ const params= useParams();
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto py-8 px-10 space-y-8">
-          {messages.map((msg) =>
-            msg.role === "ai" ? (
-              /* AI message */
-              <div key={msg.id} className="flex gap-4" style={{ maxWidth: "620px" }}>
-                <div className="flex-1">
+{messages?.map((msg) => (
+  <div key={msg.id}>
+    {/* User message */}
+    <div className="flex flex-row-reverse items-start gap-4 ml-auto" style={{ maxWidth: "580px" }}>
+      <div className="flex flex-col items-end">
+        <div
+          className="rounded-2xl rounded-tr-sm bg-[#F0EEE6] font-[font5] px-5 py-4 text-[15px] leading-relaxed"
+          style={{ color: "black" }}
+        >
+          {msg.question}
+        </div>
+      </div>
+    </div>
 
-                  <div
-                    className="rounded-2xl rounded-tl-sm px-5 py-4 text-[15px] font-[font5] leading-relaxed"
-                    style={{ background: "#FAF9F5", color: "#1c1c18", border: "1px solid #e2e0d8" }}
-                  >
-                    {msg.text}
-                  </div>
-
-                </div>
-              </div>
-            ) : (
-              /* User message */
-              <div key={msg.id} className="flex flex-row-reverse items-start gap-4 ml-auto" style={{ maxWidth: "580px" }}>
-
-                <div className="flex flex-col items-end">
-                  <div
-                    className="rounded-2xl rounded-tr-sm bg-[#F0EEE6] font-[font5] px-5 py-4 text-[15px] leading-relaxed"
-                    style={{  color: "black" }}
-                  >
-                    {msg.text}
-                  </div>
-                </div>
-              </div>
-            )
-          )}
+    {/* AI message */}
+    <div className="flex gap-4 mt-4" style={{ maxWidth: "820px" }}>
+      <div className="flex-1">
+        <div
+          className="rounded-2xl rounded-tl-sm px-5 py-4 text-[15px] font-[font5] leading-relaxed"
+          style={{ background: "#FAF9F5", color: "#1c1c18", border: "1px solid #e2e0d8" }}
+        >
+          <ReactMarkdown>{msg.response}</ReactMarkdown>
+        </div>
+      </div>
+    </div>
+  </div>
+))}
 
           {/* Typing indicator */}
-          {typing && (
+          {isPending && (
             <div className="flex gap-4">
               <div
                 className="w-9 h-9 rounded-full flex items-center justify-center text-white shrink-0"

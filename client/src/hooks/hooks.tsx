@@ -1,5 +1,5 @@
  import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { createNewSession, getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation} from "../api/api";
+import { createNewSession, getAllAiChat, getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation, sendMessageToAI} from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
 type OrganicFertilizerInput = {
@@ -98,4 +98,28 @@ return useMutation({
         console.log("Response from server is", data);
     }
 })
+}
+
+export const useSendMessageToAI = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (finalData:{id:string , question:string}) => sendMessageToAI({
+            id: finalData.id,
+            question: finalData.question
+        }),
+        onSuccess: (data) => {
+            console.log("Response from server is", data);
+            queryClient.setQueryData(["sendMessageToAI"], data);
+        }
+    })
+}
+
+
+export const useAiChatAll = (id: string) => {
+    return useQuery({
+        queryKey: ["getAllAiChat", id],
+        queryFn: () => getAllAiChat(id),
+        staleTime:0
+    })
 }
