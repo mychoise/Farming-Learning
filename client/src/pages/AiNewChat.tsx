@@ -110,11 +110,9 @@ console.log("id is" , params)
             value={query}
             onChange={(e) =>
                 {
-                    console.log('clicked')
                     setQuery(e.target.value)
                 }
             }
-            onKeyDown={(e) => e.key === "Enter" && setQuery("")}
           />
           <button
             className="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 transition-all hover:opacity-90 active:scale-95 bg-[#2d6a2f]"
@@ -124,13 +122,9 @@ console.log("id is" , params)
                     return;
                 }
                const data =  await mutateAsync()
-               console.log("data is hgfj" , data)
                setSessionID(data?.data?.id)
-               console.log("session id is" , data?.data?.id)
                setQuestionForAI(query)
                navigate(`/ai/text/${data?.data?.id}`)
-                // console.log(data)
-                // setSessionID(data?.id)
             }}
           >
             <span className="text-white">
