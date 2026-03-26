@@ -1,33 +1,31 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { getAllAiChat } from "../api/api";
 import { useAI } from "../store/useAI";
 import { useSendMessageToAI, useAiChatAll } from "../hooks/hooks";
 import ReactMarkdown from "react-markdown";
-// const INITIAL_MESSAGES = [
-//   {
-//     "id": "95ab829e-6526-434b-9b5c-dec6012609d1",
-//     "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
-//     "question": "hi",
-//     "response": "Namaste! I am your agricultural consultant...",
-//     "createdAt": "2026-03-25T21:15:14.298Z"
-//   },
-//   {
-//     "id": "87b76ad4-fd6a-40c3-b2d3-9d656e4cad82",
-//     "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
-//     "question": "namaste",
-//     "response": "Namaste! As an agricultural consultant...",
-//     "createdAt": "2026-03-26T15:24:48.289Z"
-//   },
-//   {
-//     "id": "a191d400-9314-415e-9c07-08ae68ce02b2",
-//     "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
-//     "question": "what is compost manure",
-//     "response": "Namaste! As an agricultural consultant working in the diverse landscapes of Nepal...",
-//     "createdAt": "2026-03-26T15:25:39.150Z"
-//   }
-// ]
+const INITIAL_MESSAGES = [
+  {
+    "id": "95ab829e-6526-434b-9b5c-dec6012609d1",
+    "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
+    "question": "hi",
+    "response": "Namaste! I am your agricultural consultant...",
+    "createdAt": "2026-03-25T21:15:14.298Z"
+  },
+  {
+    "id": "87b76ad4-fd6a-40c3-b2d3-9d656e4cad82",
+    "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
+    "question": "namaste",
+    "response": "Namaste! As an agricultural consultant...",
+    "createdAt": "2026-03-26T15:24:48.289Z"
+  },
+  {
+    "id": "a191d400-9314-415e-9c07-08ae68ce02b2",
+    "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
+    "question": "what is compost manure",
+    "response": "Namaste! As an agricultural consultant working in the diverse landscapes of Nepal...",
+    "createdAt": "2026-03-26T15:25:39.150Z"
+  }
+]
 
 function LeafIcon({ size = 15 }) {
   return (
@@ -40,11 +38,11 @@ function LeafIcon({ size = 15 }) {
 
 export default function AiChatDescription() {
     const {id} = useParams()
-  const {questionForAI} = useAI()
+  const {questionForAI}: any = useAI()
 
-  const [messages, setMessages] = useState(null);
-  const [input, setInput] = useState(questionForAI);
-  const [typing, setTyping] = useState(false);
+  const [messages, setMessages] = useState<typeof INITIAL_MESSAGES | null>(null);
+  const [input, setInput] = useState(questionForAI || "");
+  const [typing] = useState(false);
   const bottomRef = useRef(null);
 
   const{data:chatAll} = useAiChatAll(id || "")
@@ -56,7 +54,7 @@ export default function AiChatDescription() {
 // ))
 
 
-useEffect(() => {
+  useEffect(() => {
     if (chatAll?.data) {
         setMessages(chatAll.data);
     }
@@ -68,8 +66,6 @@ useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const queryClient = useQueryClient()
-  const aiResponse = queryClient.getQueryData(["sendMessageToAI"])
   const {mutate , isPending} = useSendMessageToAI()
 
 
@@ -86,7 +82,6 @@ const send = () => {
         id: Date.now().toString(),
         communicationId: id || "",
         question: input,
-        response: "",
         createdAt: new Date().toISOString()
     };
 
@@ -95,7 +90,7 @@ const send = () => {
     mutate(finalData, {
         onSuccess: (data) => {
             setMessages((m) => [
-                ...m.slice(0, -1), // Remove the temporary message
+                ...(m || []).slice(0, -1), // Remove the temporary message
                 {
                     id: data?.data?.id || Date.now().toString(),
                     communicationId: data?.data?.communicationId || id || "",
@@ -107,7 +102,7 @@ const send = () => {
         },
         onError: () => {
             setMessages((m) => [
-                ...m.slice(0, -1), // Remove the temporary message
+                ...(m || []).slice(0, -1), // Remove the temporary message
                 {
                     id: (Date.now() + 1).toString(),
                     communicationId: id || "",
@@ -120,17 +115,7 @@ const send = () => {
     });
 };
 
-const params= useParams();
-  console.log("params is" , params)
 
-  const {data} = useQuery({
-    queryKey: ["aiChatHistory", params.id],
-    queryFn: () => getAllAiChat(params.id!),
-    enabled: !!params.id,
-    // onSuccess: (data: any) => {
-    //   console.log("AI chat history data:", data);
-    // },
-  });
 
   return (
     <div
@@ -161,6 +146,7 @@ const params= useParams();
     </div>
 
     {/* AI message */}
+    {msg.response && (
     <div className="flex gap-4 mt-4" style={{ maxWidth: "820px" }}>
       <div className="flex-1">
         <div
@@ -171,6 +157,7 @@ const params= useParams();
         </div>
       </div>
     </div>
+    )}
   </div>
 ))}
 
