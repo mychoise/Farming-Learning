@@ -1,5 +1,5 @@
- import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation} from "../api/api";
+ import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { createNewSession, getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation} from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
 type OrganicFertilizerInput = {
@@ -90,3 +90,12 @@ return useMutation<number, Error, { currentUnit: string; firstValue: number; tar
 )
 }
 
+
+export const useNewSession = ()=>{
+return useMutation({
+    mutationFn: createNewSession,
+    onSuccess: (data) => {
+        console.log("Response from server is", data);
+    }
+})
+}

@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {useAI} from "../store/useAI"
+import { toast } from "react-hot-toast";
+import { createNewSession } from "../api/api";
+import { useNewSession } from "../hooks/hooks";
 
 const FEATURES = [
   {
@@ -55,10 +58,18 @@ const FEATURES = [
 export default function AiNewChat() {
     const navigate = useNavigate()
   const [query, setQuery] = useState("");
-    const {createNewSession,paramForId} = useAI()
+    const {setSessionID , paramForId} = useAI()
+
+    const {mutateAsync  } = useNewSession()
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  useEffect(() => {
+const params  = paramForId
+console.log("id is" , params)
+  }, [])
+
 
   return (
     <div className="min-h-screen w-full flex flex-col relative overflow-hidden bg-[#f0efe8] font-sans">
@@ -91,23 +102,32 @@ export default function AiNewChat() {
                 {
                     console.log('clicked')
                     setQuery(e.target.value)
-                         }
+                }
             }
             onKeyDown={(e) => e.key === "Enter" && setQuery("")}
           />
           <button
             className="w-10 h-10 rounded-full flex items-center justify-center text-white shrink-0 transition-all hover:opacity-90 active:scale-95 bg-[#2d6a2f]"
             onClick={async() => {
-                setQuery("")
-                const result=await createNewSession()
-                console.log(result.id)
-                navigate(`/ai/text/${result.id}`)
+                if(!query.trim()) {
+                    toast.error("Please enter a query");
+                    return;
+                }
+               const data =  await mutateAsync()
+               console.log("data is hgfj" , data)
+               setSessionID(data?.data?.id)
+               console.log("session id is" , data?.data?.id)
+               navigate(`/ai/text/${data?.data?.id}`)
+                // console.log(data)
+                // setSessionID(data?.id)
             }}
           >
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="5" y1="12" x2="19" y2="12" />
-              <polyline points="12 5 19 12 12 19" />
-            </svg>
+            <span className="text-white">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </span>
           </button>
         </div>
 

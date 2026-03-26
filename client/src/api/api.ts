@@ -177,3 +177,8 @@ export const createNewSession = async ()=>{
     const result = await axiosInstance.get("/ai/new-session");
     return result.data
 }
+
+export const sendMessageToAI= async(id:string, question:string)=>{
+    const result = await axiosInstance.post(`/ai/chat/${id}`, {question});
+    return result.data
+}

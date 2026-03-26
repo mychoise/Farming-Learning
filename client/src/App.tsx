@@ -13,10 +13,12 @@ import AiChatDescription from "./pages/AiChatDescription";
 import AiLayout from "./layout/AiLayout";
 import AiNewChat from "./pages/AiNewChat";
 import AiDiseaseDetection from "./pages/AiDiseaseDetection";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
     <div>
+        <Toaster />
       <Navbar />
       <div className="h-[calc(100vh-64px)]">
         <Routes>

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import {create} from "zustand"
-import { createNewSession, getAllAiChat } from "../api/api"
+import {  getAllAiChat } from "../api/api"
 
 export const useAI = create((set)=>({
     paramForId:null,
@@ -13,12 +13,6 @@ export const useAI = create((set)=>({
         console.log("obtainded data is",data)
         return data
     },
-
-    createNewSession: async()=>{
-        const {data} =  await createNewSession()
-        console.log("created session",data)
-        set({paramForId:data.id})
-        return data
-    }
+    setSessionID: (id:string) => set({paramForId:id})
 
 }))
