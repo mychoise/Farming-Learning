@@ -187,3 +187,14 @@ export const chatHistory = async()=>{
     const result = await axiosInstance.get("/ai/all/history")
     return result.data
 }
+
+
+export const detectDisease  = async (data:{image:File , description:string , plantName:string})=>{
+    console.log("data is",data)
+    const result = await axiosInstance.post("/ai/detect-disease",data,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return result.data
+}

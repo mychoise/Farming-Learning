@@ -1,5 +1,7 @@
 import { Microscope } from "lucide-react";
 import { useState, useRef } from "react";
+import { useDetectDisease } from "../hooks/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 
 const protocols = [
   {
@@ -67,9 +69,13 @@ export default function AiDiseaseDetection() {
   const [dragging, setDragging] = useState(false);
   const [uploaded, setUploaded] = useState<{ url: string; name: string } | false>(false);
   const [context, setContext] = useState("");
+  const [selectedCrop, setSelectedCrop] = useState("");
   const [diagnosed, setDiagnosed] = useState(true);
-  const fileRef = useRef();
+  const fileRef = useRef<HTMLInputElement>(null);
 
+const queryClient = useQueryClient();
+  const {mutate} = useDetectDisease();
+  const data = queryClient.getQueryData(["disease"]) as any;
   function handleDrop(e) {
     e.preventDefault();
     setDragging(false);
@@ -91,10 +97,26 @@ export default function AiDiseaseDetection() {
     console.log("Sending diagnosis request...");
     console.log("file is" , fileRef.current?.files[0])
     console.log("context is" , context)
+
+const finalData = new FormData();
+
+const image = (fileRef.current as any)?.files?.[0];
+if (image) {
+  finalData.append("image", image);
+}
+
+finalData.append("descriptionOfDisease", context);
+finalData.append("plantName", selectedCrop)
+
+for (const pair of finalData.entries()) {
+  console.log(pair[0], pair[1]);
+}
+    mutate(finalData);
+    console.log('your fucking data is', data)
   }
 
 
-  function removeImage(e) {
+  function removeImage(e)    {
     e.stopPropagation();
     setUploaded(false);
     if (fileRef.current) fileRef.current.value = "";
@@ -187,6 +209,80 @@ export default function AiDiseaseDetection() {
                 </>
               )}
             </div>
+          </div>
+
+          {/* Crop Selection */}
+          <div className="bg-white rounded-2xl border border-[#dde8d8] p-5 shadow-sm">
+            <p
+              className="text-xs font-semibold text-[#8a9e88] mb-3 tracking-widest uppercase font-[font3]"
+            >
+              Crop Selection
+            </p>
+            <div className="relative">
+              <select
+                value={selectedCrop}
+                onChange={(e) => setSelectedCrop(e.target.value)}
+                className="w-full rounded-xl border border-[#d4e0d0] bg-[#fafaf6] p-4 text-[#3a4e38] text-[15px] outline-none focus:border-[#2d5a27] transition-colors font-[font3] appearance-none cursor-pointer"
+                style={{
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%232d5a27' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 16px center',
+                  paddingRight: '40px'
+                }}
+              >
+                <option value="" className="text-[#8a9e88]">
+                  Select crop type...
+                </option>
+                <option value="Tomato" className="text-[#3a4e38]">
+                  🍅 Tomato
+                </option>
+                <option value="Potato" className="text-[#3a4e38]">
+                  🥔 Potato
+                </option>
+                <option value="Corn" className="text-[#3a4e38]">
+                  🌽 Corn
+                </option>
+                <option value="Wheat" className="text-[#3a4e38]">
+                  🌾 Wheat
+                </option>
+                <option value="Rice" className="text-[#3a4e38]">
+                  🌾 Rice
+                </option>
+                <option value="Cucumber" className="text-[#3a4e38]">
+                  🥒 Cucumber
+                </option>
+                <option value="Pepper" className="text-[#3a4e38]">
+                  🌶️ Bell Pepper
+                </option>
+                <option value="Lettuce" className="text-[#3a4e38]">
+                  🥬 Lettuce
+                </option>
+                <option value="Strawberry" className="text-[#3a4e38]">
+                  🍓 Strawberry
+                </option>
+                <option value="Grape" className="text-[#3a4e38]">
+                  🍇 Grape
+                </option>
+                <option value="Apple" className="text-[#3a4e38]">
+                  🍎 Apple
+                </option>
+              </select>
+              {!selectedCrop && (
+                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                    <path d="M1 1l5 5 5-5" stroke="#2d5a27" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+              )}
+            </div>
+            {selectedCrop && (
+              <div className="mt-2 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#2d5a27]"></span>
+                <span className="text-xs text-[#5a6b58] font-[font3]">
+                  {selectedCrop.charAt(0).toUpperCase() + selectedCrop.slice(1)} selected for analysis
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Environmental Context */}

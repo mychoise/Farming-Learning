@@ -201,7 +201,7 @@ export const diseaseDetection = async (req, res) => {
     const imageUrl = req.file.path;
 
     const [aiResponse] = await db.transaction(async (tx) => {
-      const response = await diseaseDetectionAI(descriptionOfDisease, imageUrl);
+      const response = await diseaseDetectionAI(descriptionOfDisease, imageUrl,plantName);
       console.log("Response is", response);
       return await tx
         .insert(aiDiseaseDetection)
