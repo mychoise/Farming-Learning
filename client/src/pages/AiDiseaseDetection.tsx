@@ -2,28 +2,17 @@ import { Microscope } from "lucide-react";
 import { useState, useRef } from "react";
 import { useDetectDisease } from "../hooks/hooks";
 import { useQueryClient } from "@tanstack/react-query";
+import ReactMarkdown from "react-markdown";
 
 const protocols = [
   {
-    icon: "🌿",
     bg: "bg-[#eef4ee]",
     iconBg: "bg-[#d4e8d4]",
-    title: "Potassium Bicarbonate Application",
-    desc: "Apply organic spray during morning hours to disrupt spore germination.",
-  },
-  {
-    icon: "💨",
-    bg: "bg-[#fdf3f0]",
-    iconBg: "bg-[#fde0d8]",
-    title: "Canopy Thinning",
-    desc: "Reduce local humidity by increasing airflow through selective pruning of North-side vines.",
-  },
-  {
-    icon: "🧪",
-    bg: "bg-[#eef4ee]",
-    iconBg: "bg-[#d4e8d4]",
-    title: "Neem Oil Integration",
-    desc: "Bi-weekly application to strengthen plant resistance and prevent further spread.",
+    confidence: 0.92,
+    treatment:
+      "The symptoms of yellowing leaves and dark, circular spots with concentric 'target-like' rings are characteristic of Early Blight (Alternaria solani). In Nepal's warm and humid spring climate, this fungus thrives on lower leaves first and spreads upwards. While the farmer called it 'black spot', in tomato pathology, these symptoms specifically point to Early Blight rather than the rose-specific Black Spot disease.",
+    desc:
+      "1. Pruning: Immediately remove and burn infected lower leaves to prevent spores from splashing onto healthy foliage. 2. Organic Spray: Mix 5ml of Neem oil in 1 liter of water with a few drops of liquid soap and spray every 7-10 days. 3. Bio-fungicide: Apply Trichoderma viride to the soil and foliage. 4. Chemical Control: If the infection is severe, spray Mancozeb (Indofil M-45) at a rate of 2 grams per liter of water. 5. Cultural Practice: Avoid overhead watering; always water at the base of the plant to keep leaves dry. 6. Staking: Use bamboo sticks to keep the fruit and leaves off the ground.",
   },
 ];
 
@@ -73,9 +62,9 @@ export default function AiDiseaseDetection() {
   const [diagnosed, setDiagnosed] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
 
-const queryClient = useQueryClient();
-  const {mutate} = useDetectDisease();
-  const data = queryClient.getQueryData(["disease"]) as any;
+  const {mutate, data , isPending} = useDetectDisease();
+
+
   function handleDrop(e) {
     e.preventDefault();
     setDragging(false);
@@ -100,7 +89,7 @@ const queryClient = useQueryClient();
 
 const finalData = new FormData();
 
-const image = (fileRef.current as any)?.files?.[0];
+const image = (fileRef.current )?.files?.[0];
 if (image) {
   finalData.append("image", image);
 }
@@ -124,7 +113,7 @@ for (const pair of finalData.entries()) {
 
   return (
     <div
-      className="h-[200vh] overflow-auto bg-[#FAFAF5] font-[font3] w-full"
+      className=" h-[250vh] overflow-auto bg-[#FAFAF5] font-[font3] w-full"
     >
       {/* Header */}
       <div className="px-8 pt-10 pb-6 max-w-6xl mx-auto">
@@ -139,7 +128,9 @@ for (const pair of finalData.entries()) {
       </div>
 
       {/* Main Grid */}
-      <div className="px-8 h-full pb-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+
+      <div className="px-8 h-[300vh] pb-10 max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* LEFT PANEL */}
         <div className="flex flex-col gap-5">
           {/* Upload Box */}
@@ -321,7 +312,10 @@ for (const pair of finalData.entries()) {
 
         {/* RIGHT PANEL */}
         <div className="flex flex-col gap-5">
-          {diagnosed && (
+
+
+
+          {data && (
             <>
               {/* Result Card */}
               <div
@@ -354,14 +348,15 @@ for (const pair of finalData.entries()) {
                 </h2>
 
                 <div className="flex font-[font3] items-start gap-5">
-                  <CircleProgress value={94} />
+                  <CircleProgress value={Math.round(data?.data?.confirmatryScore * 100)} />
                   <p
-                    className="text-[#4a5e48] text-[2xl] leading-relaxed italic mt-2 flex-1 font-[font3]"
+                    className="text-[#4a5e48] leading-relaxed italic mt-2 flex-1 font-[font3]"
                   >
-                    "Visual signatures match <em>Podosphaera xanthii</em> colonies. Early-stage detection on lower leaf surface."
+                   {data?.data?.descriptionOfDiseaseByAI}
                   </p>
                 </div>
               </div>
+
 
               {/* Recommended Protocol */}
               <div className="bg-white rounded-2xl border border-[#dde8d8] p-6 shadow-sm">
@@ -372,38 +367,123 @@ for (const pair of finalData.entries()) {
                   Recommended Protocol
                 </p>
                 <div className="flex flex-col gap-3">
-                  {protocols.map((p, i) => (
-                    <div key={i} className={`flex items-start gap-4 rounded-xl p-4 ${p.bg}`}>
-                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 ${p.iconBg}`}>
-                        {p.icon}
-                      </div>
+
+                    <div className="flex items-start gap-4 rounded-xl p-4 bg-[#eef4ee]">
                       <div>
-                        <p
-                          className="font-[font5] text-[#1a3a18] texxt-[17px] mb-1"
-                        >
-                          {p.title}
+                        <p className="font-[font5] text-black text-[17px] mb-1">
+                          {/* {p.treatment} */}
                         </p>
-                        <p className="text-[#5a6b58] text-[15px] leading-relaxed"  >
-                          {p.desc}
+                        <p className="text-[#5a6b58] font-[font3] text-[17px] leading-relaxed">
+                          <ReactMarkdown>
+                            {data?.data?.treatment
+                              .replace(/\s*(\d+)\.\s*/g, "\n$1. ")
+                              .replace(/(\d+\.\s*)([^:]+):/g, "$1**$2:**")
+                              .trim()}
+                          </ReactMarkdown>
                         </p>
                       </div>
                     </div>
-                  ))}
+
                 </div>
               </div>
 
             </>
           )}
 
-          {!diagnosed && (
-            <div className="bg-white rounded-2xl border border-[#dde8d8] p-10 flex flex-col items-center justify-center text-center h-64 shadow-sm">
-              <div className="text-5xl mb-4">🌱</div>
-              <p className="text-[#2d5a27] font-[font5] text-lg">
-                Awaiting Diagnosis
+          {isPending && (
+            <div className="bg-white rounded-2xl border border-[#dde8d8] p-10 flex flex-col items-center justify-center text-center h-90 shadow-sm">
+              {/* Loading Animation */}
+              <div className="relative mb-6">
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#e8f5e8] to-[#d4e8d4] flex items-center justify-center shadow-lg">
+                  <div className="text-4xl animate-bounce">🔬</div>
+                </div>
+                <div className="absolute inset-0 w-20 h-20 rounded-full border-2 border-[#2d5a27] border-t-transparent animate-spin"></div>
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-transparent via-[#2d5a27] to-transparent"></div>
+              </div>
+
+              {/* Loading Messages */}
+              <h3 className="text-[#2d5a27] font-[font3] text-xl mb-3 font-semibold">
+                Analyzing Plant Health
+              </h3>
+
+              <p className="text-[#5a6b58] font-[font3] text-[15px] leading-relaxed max-w-md mb-6">
+                Our AI is examining your plant sample for disease patterns and preparing organic treatment recommendations.
               </p>
-              <p className="text-[#8a9e88] text-sm mt-2"  >
-                Upload a leaf sample and start diagnosis to see results here.
+
+              {/* Progress Steps */}
+              <div className="flex flex-col gap-3 w-full max-w-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-[#2d5a27] animate-pulse"></div>
+                  <p className="text-[#1a3a18] font-[font3] text-sm font-medium">Processing image...</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-[#8a9e88] animate-pulse"></div>
+                  <p className="text-[#5a6b58] font-[font3] text-sm">Analyzing symptoms...</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full bg-[#c4d4c0] animate-pulse"></div>
+                  <p className="text-[#8a9e88] font-[font3] text-sm">Generating treatment plan...</p>
+                </div>
+              </div>
+
+              {/* AI Status */}
+              <div className="mt-6 flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-[#2d5a27] animate-pulse"></div>
+                <p className="text-[#8a9e88] text-xs font-[font3] tracking-wide">
+                  AI PROCESSING • PLEASE WAIT
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!data && !isPending && (
+            <div className="bg-white rounded-2xl border border-[#dde8d8] p-10 flex flex-col items-center justify-center text-center h-120 shadow-sm">
+              {/* Plant Icon with Animation */}
+              <div className="relative mb-6">
+                <div className="w-20 h-20 rounded-full bg-linear-to-br from-[#e8f5e8] to-[#d4e8d4] flex items-center justify-center shadow-lg">
+                  <div className="text-4xl animate-pulse">🌱</div>
+                </div>
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-linear-to-r from-transparent via-[#2d5a27] to-transparent"></div>
+              </div>
+
+              {/* Main Message */}
+              <h3 className="text-[#2d5a27] font-[font3] text-xl mb-3 font-semibold">
+                Ready for Plant Analysis
+              </h3>
+
+              <p className="text-[#5a6b58] font-[font3] text-[15px] leading-relaxed max-w-md mb-6">
+                Our AI-powered disease detection system is ready to analyze your plant health.
+                Upload a clear leaf image and provide detailed symptoms for accurate diagnosis.
               </p>
+
+              {/* Feature Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-lg">
+                <div className="bg-gradient-to-br from-[#f0f7ee] to-[#e8f5e8] p-4 rounded-xl border border-[#d4e8d4] text-center">
+                  <div className="text-2xl mb-2">📷</div>
+                  <p className="text-[#1a3a18] font-[font5] text-[15px] font-semibold">Upload Image</p>
+                  <p className="text-[#5a6b58] font-[font5] text-[13px] mt-1">High-resolution photos</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-[#f0f7ee] to-[#e8f5e8] p-4 rounded-xl border border-[#d4e8d4] text-center">
+                  <div className="text-2xl mb-2">🌾</div>
+                  <p className="text-[#1a3a18] font-[font5] text-[15px] font-semibold">Select Crop</p>
+                  <p className="text-[#5a6b58] font-[font5] text-[13px] mt-1">Choose plant type</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-[#f0f7ee] to-[#e8f5e8] p-4 rounded-xl border border-[#d4e8d4] text-center">
+                  <div className="text-2xl mb-2">📝</div>
+                  <p className="text-[#1a3a18] font-[font5] text-[15px] font-semibold">Describe Issue</p>
+                  <p className="text-[#5a6b58] font-[font5] text-[13px] mt-1">Symptoms & details</p>
+                </div>
+              </div>
+
+              {/* Call to Action */}
+              <div className="mt-6 flex items-center gap-3">
+                <div className="w-2 h-2 rounded-full bg-[#2d5a27] animate-pulse"></div>
+                <p className="text-[#8a9e88] text-xs font-[font3] tracking-wide">
+                  SYSTEM READY • AWAITING INPUT
+                </p>
+              </div>
             </div>
           )}
         </div>

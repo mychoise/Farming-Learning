@@ -5,8 +5,9 @@ import cloudinary from "./cloudinary.config.js";
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-folder: "profile_upload" , // folder name in Cloudinary
-    allowed_formats: ["jpg", "png", "jpeg","avif"],  },
+    folder: "disease_detection", // folder name in Cloudinary
+    allowed_formats: ["jpg", "png", "jpeg", "webp", "avif"],
+  },
 });
 const upload = multer({ storage });
 export default upload;

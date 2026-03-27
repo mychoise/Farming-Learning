@@ -176,6 +176,7 @@ export const getAllCommunication = async (req, res) => {
 };
 
 export const diseaseDetection = async (req, res) => {
+  console.log("req is", "i am called");
   try {
     const { id: userId } = req.user;
     const { descriptionOfDisease, plantName } = req.body;
