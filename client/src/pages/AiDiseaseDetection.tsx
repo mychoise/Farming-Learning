@@ -1,20 +1,9 @@
 import { Microscope } from "lucide-react";
 import { useState, useRef } from "react";
 import { useDetectDisease } from "../hooks/hooks";
-import { useQueryClient } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 
-const protocols = [
-  {
-    bg: "bg-[#eef4ee]",
-    iconBg: "bg-[#d4e8d4]",
-    confidence: 0.92,
-    treatment:
-      "The symptoms of yellowing leaves and dark, circular spots with concentric 'target-like' rings are characteristic of Early Blight (Alternaria solani). In Nepal's warm and humid spring climate, this fungus thrives on lower leaves first and spreads upwards. While the farmer called it 'black spot', in tomato pathology, these symptoms specifically point to Early Blight rather than the rose-specific Black Spot disease.",
-    desc:
-      "1. Pruning: Immediately remove and burn infected lower leaves to prevent spores from splashing onto healthy foliage. 2. Organic Spray: Mix 5ml of Neem oil in 1 liter of water with a few drops of liquid soap and spray every 7-10 days. 3. Bio-fungicide: Apply Trichoderma viride to the soil and foliage. 4. Chemical Control: If the infection is severe, spray Mancozeb (Indofil M-45) at a rate of 2 grams per liter of water. 5. Cultural Practice: Avoid overhead watering; always water at the base of the plant to keep leaves dry. 6. Staking: Use bamboo sticks to keep the fruit and leaves off the ground.",
-  },
-];
+
 
 const sampleImages = [
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='70' viewBox='0 0 80 70'%3E%3Crect width='80' height='70' fill='%23c8d8c8'/%3E%3Cellipse cx='40' cy='35' rx='22' ry='18' fill='%23a0b89a' opacity='0.7'/%3E%3Cellipse cx='40' cy='35' rx='12' ry='10' fill='%23788f72' opacity='0.6'/%3E%3Cellipse cx='40' cy='35' rx='5' ry='4' fill='%23556b52' opacity='0.8'/%3E%3C/svg%3E",
@@ -24,7 +13,7 @@ const sampleImages = [
 
 
 
-function CircleProgress({ value }) {
+function CircleProgress({ value }: { value: number }) {
   const r = 38;
   const circ = 2 * Math.PI * r;
   const offset = circ - (value / 100) * circ;
@@ -59,37 +48,35 @@ export default function AiDiseaseDetection() {
   const [uploaded, setUploaded] = useState<{ url: string; name: string } | false>(false);
   const [context, setContext] = useState("");
   const [selectedCrop, setSelectedCrop] = useState("");
-  const [diagnosed, setDiagnosed] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const {mutate, data , isPending} = useDetectDisease();
 
 
-  function handleDrop(e) {
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
     e.preventDefault();
     setDragging(false);
-    if (e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+    if (e.dataTransfer.files?.length) loadFile(e.dataTransfer.files[0]);
   }
 
-  function handleFile(e) {
-    if (e.target.files.length) loadFile(e.target.files[0]);
+  function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target?.files?.length) loadFile(e.target?.files[0]);
   }
 
-    function loadFile(file) {
+    function loadFile(file: File) {
     if (!file) return;
     const url = URL.createObjectURL(file);
     setUploaded({ url, name: file.name });
   }
 
   function handleSend() {
-    setDiagnosed(true);
     console.log("Sending diagnosis request...");
-    console.log("file is" , fileRef.current?.files[0])
+    console.log("file is" , fileRef?.current?.files?.[0])
     console.log("context is" , context)
 
-const finalData = new FormData();
+const finalData:FormData = new FormData();
 
-const image = (fileRef.current )?.files?.[0];
+const image = (fileRef.current)?.files?.[0];
 if (image) {
   finalData.append("image", image);
 }
@@ -105,7 +92,7 @@ for (const pair of finalData.entries()) {
   }
 
 
-  function removeImage(e)    {
+  function removeImage(e: React.MouseEvent)    {
     e.stopPropagation();
     setUploaded(false);
     if (fileRef.current) fileRef.current.value = "";
@@ -141,7 +128,7 @@ for (const pair of finalData.entries()) {
               Image Input
             </p>
             <div
-              onClick={() => ! uploaded && fileRef.current.click()}
+              onClick={() => ! uploaded && fileRef?.current?.click()}
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
               onDrop={handleDrop}

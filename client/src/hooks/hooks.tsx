@@ -22,6 +22,8 @@ type AnimalWeightEstimationInput = {
     animalName: string;
 }
 
+
+
 export const useOrganicFertilizer = () => {
   const queryClient = useQueryClient();
 
