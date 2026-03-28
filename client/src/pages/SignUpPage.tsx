@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
+import { useAuth } from "../store/useAuth";
+import { useNavigate } from "react-router-dom";
 export default function SignUpPage() {
   const [form, setForm] = useState({
-    fullName: "",
+    name: "",
     email: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
-
+  const { signup , isSucess } = useAuth();
+const navigate  = useNavigate()
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
@@ -18,7 +20,7 @@ export default function SignUpPage() {
   const validate = () => {
     const newErrors = {};
 
-    if (!form.fullName.trim()) newErrors.fullName = "Full name is required";
+    if (!form.name.trim()) newErrors.name = "Full name is required";
     if (!form.email.trim()) newErrors.email = "Email is required";
     if (!form.password.trim()) newErrors.password = "Password is required";
 
@@ -26,9 +28,16 @@ export default function SignUpPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    if (isSucess) {
+      navigate("/");
+    }
+  }, [isSucess]);
+
+  const handleSubmit = async () => {
     if (!validate()) return;
     console.log("Form submitted", form);
+    await signup(form);
   };
 
   return (
@@ -57,15 +66,15 @@ export default function SignUpPage() {
           </label>
           <input
             type="text"
-            name="fullName"
+            name="name"
             required
             placeholder="Arthur Pemberton"
-            value={form.fullName}
+            value={form.name}
             onChange={handleChange}
             className="w-full px-4 py-3 rounded-lg text-[15px] outline-none  font-[font3]  bg-[#e4ebcf] text-[#2c3e22] placeholder-[#9aab88] focus:border-green-700"
           />
-          {errors.fullName && (
-            <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+          {errors.name && (
+            <p className="text-red-500 text-xs mt-1">{errors.name}</p>
           )}
         </div>
 

@@ -1,6 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
 import {create} from "zustand"
-import {  getAllAiChat } from "../api/api"
 
 export const useAI = create((set)=>({
     paramForId:null,

@@ -1,10 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Leaf } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../store/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const {login , isSucess} = useAuth()
+
+  useEffect(() => {
+    if (isSucess) {
+      navigate("/");
+    }
+  }, [isSucess]);
+  const sendData  =  ()=>{
+    console.log("hi, did you clled me");
+    const finalData = {
+        email,
+        password
+    }
+    console.log(finalData)
+    login(finalData)
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#F7F7DF] font-serif">
@@ -57,7 +76,7 @@ export default function LoginPage() {
         </div>
 
         {/* Login Button */}
-        <button className="w-full rounded-xl py-4 text-[16px] font-[font5] tracking-wider text-white bg-[#2d5a27] hover:bg-[#1e3d1a] shadow-[0_4px_16px_rgba(45,90,39,0.25)] hover:shadow-[0_6px_20px_rgba(45,90,39,0.35)] active:scale-[0.98] transition-all duration-200">
+        <button onClick={sendData} className="w-full rounded-xl py-4 text-[16px] font-[font5] tracking-wider text-white bg-[#2d5a27] hover:bg-[#1e3d1a] shadow-[0_4px_16px_rgba(45,90,39,0.25)] hover:shadow-[0_6px_20px_rgba(45,90,39,0.35)] active:scale-[0.98] transition-all duration-200">
           Login
         </button>
 

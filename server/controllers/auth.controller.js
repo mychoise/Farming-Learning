@@ -10,10 +10,16 @@ export const register = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     console.log("errors", errors.array());
-    return res.status(400).json({ success: false, message: errors.array() });
+   return res.status(400).json({
+    success: false,
+    message: errors.array().map((err) => err.msg),
+  });
   }
   try {
-    const { email, password, name, role } = req.body;
+    let { email, password, name, role } = req.body;
+    if(!role) {
+      role = "user";
+    }
     if (!email || !password || !name || !role) {
       return res.status(400).json({
         success: false,
@@ -82,9 +88,13 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ success: false, message: errors.array() });
+    return res.status(400).json({
+      success: false,
+      message: errors.array().map((err) => err.msg),
+    });
   }
   try {
+    console.log("req is i am called");
     const { email, password } = req.body;
     if (!email || !password) {
       return res.status(400).json({

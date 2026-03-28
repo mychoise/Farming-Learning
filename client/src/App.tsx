@@ -16,8 +16,28 @@ import AiDiseaseDetection from "./pages/AiDiseaseDetection";
 import { Toaster } from "react-hot-toast";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-
+import { useEffect } from "react";
+import { refreshToken } from "./api/api";
+import {useAuth} from "./store/useAuth";
 const App = () => {
+
+    const {user} = useAuth();
+
+     useEffect(() => {
+    const init = async () => {
+      try {
+        const res = await refreshToken();
+        useAuth.getState().setToken(res.token);
+        useAuth.getState().setUser(res.user);
+        console.log("Token set successfully", res.token);
+      } catch {
+        // user not logged in
+      }
+    };
+
+    init();
+  }, []);
+
   return (
     <div>
         <Toaster />
@@ -26,15 +46,15 @@ const App = () => {
         <Routes>
           <Route path="/crops" element={<CropList />} />
           <Route path="/crop/:id" element={<CropDetails />} />
-          <Route path="/weather" element={<Weather />} />
-          <Route path="/calculate" element={<CalculationLayout />}>
+          <Route path="/weather" element={user?<Weather />:<LoginPage/>} />
+          <Route path="/calculate" element={user?<CalculationLayout />:<LoginPage/>}>
             <Route path="organic" element={<FertilizerEngine />} />
             <Route path="inorganic" element={<InorganicFertilizer />} />
             <Route path="animal" element={<AnimalWeightEstimator />} />
             <Route path="unit-conversion" element={<UnitConversion />} />
           </Route>
-          <Route path="/crop-calendar" element={<CropCalendar />} />
-          <Route path="/ai" element={<AiLayout />}>
+          <Route path="/crop-calendar" element={user?<CropCalendar />:<LoginPage/>} />
+          <Route path="/ai" element={user?<AiLayout />:<LoginPage/>}>
             <Route index element={<AiNewChat />} />
             <Route path="text/:id" element={<AiChatDescription />} />
             <Route path="disease" element={<AiDiseaseDetection/>} />

@@ -206,3 +206,13 @@ export const login = async(data:{email:string
     return result.data
 }
 
+
+export const signup = async(data:{email:string,password:string,name:string})=>{
+    const result = await axiosInstance.post("/auth/register",data)
+    return result.data
+}
+
+export const refreshToken = async () => {
+  const res = await axiosInstance.get("/auth/refresh");
+  return res.data;
+};

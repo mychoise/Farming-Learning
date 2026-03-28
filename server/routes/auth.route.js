@@ -7,7 +7,6 @@ const registerValidation = [
   body("email").isEmail().normalizeEmail(),
   body("password").isLength({ min: 6 }),
   body("name").isLength({ min: 3 }),
-  body("role").isIn(["user", "admin"]),
 ];
 const loginValidation = [
   body("email").isEmail().normalizeEmail(),
