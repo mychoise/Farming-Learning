@@ -198,3 +198,11 @@ export const detectDisease  = async (data:{image:File , descriptionOfDisease:str
     });
     return result.data
 }
+
+export const login = async(data:{email:string
+    , password:string
+})=>{
+    const result = await axiosInstance.post("/auth/login",data)
+    return result.data
+}
+

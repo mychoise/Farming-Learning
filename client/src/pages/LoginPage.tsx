@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Leaf } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#FAFAF5] font-serif">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 bg-[#F7F7DF] font-serif">
       {/* Header */}
       <div className="text-center mb-10">
         <h1 className="text-6xl font-[medium] mb-3 text-[#1e3d1a] tracking-tight">
@@ -63,12 +64,12 @@ export default function LoginPage() {
         {/* Sign up */}
         <p className="text-center font-[font3] text-sm mt-6 text-[#7a6e4a]">
           Don't have an account?{" "}
-          <a
-            href="#"
+          <Link
+            to="/auth/signup"
             className="font-[font5] text-[#1e3d1a] hover:text-[#2d5a27] transition-colors"
           >
             Request Access
-          </a>
+          </Link>
         </p>
       </div>
 

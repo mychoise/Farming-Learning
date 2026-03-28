@@ -15,6 +15,7 @@ import AiNewChat from "./pages/AiNewChat";
 import AiDiseaseDetection from "./pages/AiDiseaseDetection";
 import { Toaster } from "react-hot-toast";
 import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
 
 const App = () => {
   return (
@@ -40,6 +41,7 @@ const App = () => {
           </Route>
           <Route path="/auth">
             <Route path="login" element={<LoginPage />} />
+            <Route path="signup" element={<SignUpPage/>} />
           </Route>
         </Routes>
       </div>
