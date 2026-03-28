@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { UserCircle, ChevronDown, FlaskConical, Sprout, Scale, PawPrint } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const calcItems = [
   {
@@ -34,6 +34,7 @@ const Navbar = () => {
   const pathname = location.pathname;
   const [calcOpen, setCalcOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -63,7 +64,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="w-full bg-[#F7F7F0] border-b border-gray-200/70 font-[font4] flex items-center justify-between px-8 h-14 relative z-50">
+    <nav className="w-full bg-[#F7F7F0] font-[font4] flex items-center justify-between px-8 h-14 relative z-50">
 
       {/* Logo — text only, no icon, matching screenshot */}
       <Link
@@ -158,7 +159,7 @@ const Navbar = () => {
 
       {/* Right: user avatar icon only — matching screenshot */}
       <div className="flex items-center shrink-0">
-        <button className="flex items-center justify-center text-[#2d6a2d] hover:text-green-700 transition-colors duration-150 cursor-pointer">
+        <button onClick={() => navigate("/auth/login")} className="flex items-center justify-center text-[#2d6a2d] hover:text-green-700 transition-colors duration-150 cursor-pointer">
           <UserCircle size={26} strokeWidth={1.5} />
         </button>
       </div>

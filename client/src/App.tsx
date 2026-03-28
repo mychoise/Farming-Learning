@@ -14,6 +14,7 @@ import AiLayout from "./layout/AiLayout";
 import AiNewChat from "./pages/AiNewChat";
 import AiDiseaseDetection from "./pages/AiDiseaseDetection";
 import { Toaster } from "react-hot-toast";
+import LoginPage from "./pages/LoginPage";
 
 const App = () => {
   return (
@@ -36,6 +37,9 @@ const App = () => {
             <Route index element={<AiNewChat />} />
             <Route path="text/:id" element={<AiChatDescription />} />
             <Route path="disease" element={<AiDiseaseDetection/>} />
+          </Route>
+          <Route path="/auth">
+            <Route path="login" element={<LoginPage />} />
           </Route>
         </Routes>
       </div>
