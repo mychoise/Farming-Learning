@@ -1,6 +1,7 @@
 import { CalendarDaysIcon, Hammer, LayoutDashboard, Mic2Icon, Sun,ArrowUpRight,Scale } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getNotices } from "../api/api";
 
 const notices = [
   {
@@ -76,7 +77,14 @@ const navItems = [
 
 export default function NoticesPage() {
   const [activeTab, setActiveTab] = useState("All Notices");
-  const navigate = useNavigate()
+
+  useEffect(()=>{
+    const fetchNotices = async()=>{
+      const result = await getNotices(1)
+      console.log(result)
+    }
+    fetchNotices()
+  },[])
 
   return (
     <div className="flex bg-stone-50 font-sans">
@@ -138,7 +146,8 @@ export default function NoticesPage() {
 }
 
 function NoticeCard({ notice }: { notice: any }) {
-  const navigate = useNavigate()
+      const navigate = useNavigate()
+
   return (
     <div onClick={()=> navigate(`/notice/${notice.id}`)} className="bg-[#FFFFFF] cursor-pointer rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
       <div

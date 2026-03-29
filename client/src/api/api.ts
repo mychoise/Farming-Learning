@@ -216,3 +216,9 @@ export const refreshToken = async () => {
   const res = await axiosInstance.get("/auth/refresh");
   return res.data;
 };
+
+
+export const getNotices =  async(page:number)=>{
+    const result = await axiosInstance.get(`/notices/allnews?page=${page}`)
+    return result.data
+}

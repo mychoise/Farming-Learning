@@ -14,7 +14,7 @@ export const geAllNotices = async (req, res) => {
       .offset((page - 1) * limit);
     const [{ count }] = await db
       .select({ count: sql`count(*)` })
-      .from(cropTable);
+      .from(noticeTable);
 
     return res.status(200).json({
       success: true,
