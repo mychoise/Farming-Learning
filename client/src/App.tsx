@@ -19,6 +19,7 @@ import SignUpPage from "./pages/SignUpPage";
 import { useEffect } from "react";
 import { refreshToken } from "./api/api";
 import {useAuth} from "./store/useAuth";
+import NoticesPage from "./pages/NoticesPage";
 const App = () => {
 
     const {user} = useAuth();
@@ -63,6 +64,7 @@ const App = () => {
             <Route path="login" element={<LoginPage />} />
             <Route path="signup" element={<SignUpPage/>} />
           </Route>
+          <Route path="/notices" element={<NoticesPage />} />
         </Routes>
       </div>
     </div>
