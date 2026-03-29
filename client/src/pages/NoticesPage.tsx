@@ -1,5 +1,6 @@
 import { CalendarDaysIcon, Hammer, LayoutDashboard, Mic2Icon, Sun,ArrowUpRight,Scale } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const notices = [
   {
@@ -75,7 +76,7 @@ const navItems = [
 
 export default function NoticesPage() {
   const [activeTab, setActiveTab] = useState("All Notices");
-  const [sortBy, setSortBy] = useState("Latest");
+  const navigate = useNavigate()
 
   return (
     <div className="flex bg-stone-50 font-sans">
@@ -137,8 +138,9 @@ export default function NoticesPage() {
 }
 
 function NoticeCard({ notice }: { notice: any }) {
+  const navigate = useNavigate()
   return (
-    <div className="bg-[#FFFFFF] cursor-pointer rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
+    <div onClick={()=> navigate(`/notice/${notice.id}`)} className="bg-[#FFFFFF] cursor-pointer rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
       <div
         className={`relative h-55  ${
           notice.imageBg ? notice.bgColor : ""
