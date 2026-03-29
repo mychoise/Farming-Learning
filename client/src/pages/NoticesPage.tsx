@@ -1,3 +1,4 @@
+import { CalendarDaysIcon } from "lucide-react";
 import { useState } from "react";
 
 const notices = [
@@ -78,7 +79,7 @@ export default function NoticesPage() {
   return (
     <div className="flex min-h-screen bg-stone-50 font-sans">
       {/* Sidebar */}
-      <aside className="w-65 shrink-0 flex flex-col py-6 px-4 bg-[#EEEEE9]">
+      <aside className="w-65 shrink-0 flex flex-col py-6 px-4 bg-[#F9F9F4]">
         <div className="mb-8 px-2">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 bg-green-800 rounded-sm flex items-center justify-center">
@@ -186,55 +187,55 @@ export default function NoticesPage() {
         </div>
       </main>
 
-      {/* Floating Button */}
-      <button className="fixed bottom-7 right-7 w-12 h-12 bg-green-800 text-white text-2xl rounded-full shadow-lg flex items-center justify-center hover:bg-green-900">
-        +
-      </button>
     </div>
   );
 }
 
 function NoticeCard({ notice }: { notice: any }) {
   return (
-    <div className="bg-white rounded-2xl p-5  w-80 overflow-hidden border border-gray-100 shadow-sm hover:shadow-md flex flex-col">
+    <div className="bg-[#FFFFFF] rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
       <div
-        className={`relative h-44 ${
+        className={`relative h-55 ${
           notice.imageBg ? notice.bgColor : ""
         } flex items-center justify-center`}
       >
+        <div className="w-90 rounded-3xl h-full flex overflow-hidden items-center justify-center transition-transform duration-200">
         {notice.image ? (
           <img
             src={notice.image}
             alt={notice.title}
-            className="w-full h-full object-cover"
+            className=" w-[120%] h-[120%] rounded-4xl "
           />
         ) : (
           <span className="text-gray-300 text-4xl">📰</span>
         )}
+        </div>
 
         <span
-          className={`absolute top-3 left-3 text-[10px] font-bold tracking-widest px-2 py-1 rounded-full ${notice.tagBg}`}
+          className={`absolute top-3 left-3 text-[12px] font-[font6] tracking-widest px-2 py-1 rounded-full ${notice.tagBg}`}
         >
           {notice.tag}
         </span>
       </div>
 
-      <div className="p-5 flex flex-col flex-1">
-        <p className="text-xs text-gray-400 mb-2">📅 {notice.date}</p>
+      <div className="p-4 flex flex-col flex-1">
+        <p className="text-[14px]  text-[#707A75] tracking-normal flex items-center gap-2 font-[font3] mb-2">
+          <CalendarDaysIcon width={16} height={16} className="inline mr-1 text-[#707A75] " /> {notice.date}
+        </p>
 
-        <h3 className="text-sm font-bold text-gray-900 mb-2">
+        <h3 className=" font-[font6] tracking-wider font-bold text-[19px] text-gray-900 mb-2">
           {notice.title}
         </h3>
 
-        <p className="text-xs text-gray-500 flex-1">
+        <p className="text-[14px] font-[font5] text-gray-500 flex-1">
           {notice.description}
         </p>
 
         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between">
-          <span className="text-[11px] font-bold tracking-widest text-gray-700">
+          <span className="text-[13px] font-[font4] tracking-widest text-gray-700">
             {notice.cta}
           </span>
-          <span>→</span>
+          <span className="text-[13px] font-[font4] tracking-widest text-gray-700">→</span>
         </div>
       </div>
     </div>

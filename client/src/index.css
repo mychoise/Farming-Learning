@@ -16,6 +16,11 @@
 }
 
 @font-face {
+    font-family: 'font6';
+    src: url('./assets/fonts/font6.woff2');
+}
+
+@font-face {
   font-family: 'bold';
   src: url('./assets/fonts/bold.woff2');
 }
@@ -40,6 +45,11 @@
 @font-face {
     font-family: "font5";
     src: url('./assets/fonts/font5.woff2');
+}
+
+@font-face {
+    font-family: "font7";
+    src: url('./assets/fonts/font7.woff2');
 }
 body{
   overflow-x: hidden;
