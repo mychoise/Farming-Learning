@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {useAI} from "../store/useAI"
 import { toast } from "react-hot-toast";
-import { createNewSession } from "../api/api";
 import { useNewSession } from "../hooks/hooks";
 import { useQueryClient } from "@tanstack/react-query";
 

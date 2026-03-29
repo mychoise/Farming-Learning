@@ -1,4 +1,4 @@
-import { CalendarDaysIcon } from "lucide-react";
+import { CalendarDaysIcon, Hammer, LayoutDashboard, Mic2Icon, Sun,ArrowUpRight,Scale } from "lucide-react";
 import { useState } from "react";
 
 const notices = [
@@ -12,7 +12,7 @@ const notices = [
       "Economic analysts predict a 15% increase in procurement rates due to supply chain adjustments in neighboring provinces.",
     cta: "VIEW DETAILS",
     image:
-      "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=700&q=80",
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuCk6ff5txalF2VP25rXG8lCykGs_ViyLT9Ib4r1sDA5VDYydzkvGTCzxBU6OvNwKTZmKoiwW6-nubhFl_PpDpWAaLynRdyOm7rHDbFVBbmZn0a1pKuIanKOmk6XzrgN7r4UJ2hoeru7NxPVEpYkftTHEUNjA6vmZMB60mZrTrUKDA8RcNU4lCccGkmx6gqsu3rGglEp_bklzKRWk00-zMu26-P0sXcGPi8NS0W9HW5_ec18bbHKEScNgpqcpIYGXdoY0mKR7feovco",
     imageBg: false,
   },
   {
@@ -38,7 +38,7 @@ const notices = [
       "Meteorological department issues high alert for the next 48 hours. Farmers are advised to protect fragile crops.",
     cta: "CHECK FORECAST",
     image:
-      "https://images.unsplash.com/photo-1561553543-e4c7b608b98d?w=700&q=80",
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDeMe_2MqxaeghphXOvxAAfR1UlXL2T1VKjP0K2camAyR4bDJ2b7gsB-gCG_h-_cisYyNHJhTKOU6bOmBvfIshWZJSxEF1-Gcemhc_INE5-hysobRjsbNK7i00e9Q-ddUaPAsE3uhm6T3Ko2bniixVxuzghQZg0b-DUa112Mw7cRFW2Sm_6F7ul1J79LekMA8AcQ2WHzOuayGtj26cRslK0332GHArmmMYWV1LBlKGZHMh1clzVcAzyyhqW7rcwngTj8egwXryXd-0",
     imageBg: false,
   },
   {
@@ -54,6 +54,7 @@ const notices = [
       "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=700&q=80",
     imageBg: false,
   },
+
 ];
 
 const tabs = [
@@ -65,11 +66,11 @@ const tabs = [
 ];
 
 const navItems = [
-  { icon: "⊞", label: "Dashboard" },
-  { icon: "📢", label: "Notices", active: true },
-  { icon: "☀", label: "Weather" },
-  { icon: "↗", label: "Markets" },
-  { icon: "⚖", label: "Policy" },
+  { icon: <LayoutDashboard/>, label: "Dashboard" },
+  { icon: <Mic2Icon/>, label: "Notices", active: true },
+  { icon: <Sun/>, label: "Weather" },
+  { icon: <ArrowUpRight />, label: "Markets" },
+  { icon: <Scale />, label: "Policy" },
 ];
 
 export default function NoticesPage() {
@@ -77,57 +78,29 @@ export default function NoticesPage() {
   const [sortBy, setSortBy] = useState("Latest");
 
   return (
-    <div className="flex min-h-screen bg-stone-50 font-sans">
+    <div className="flex bg-stone-50 font-sans">
       {/* Sidebar */}
-      <aside className="w-65 shrink-0 flex flex-col py-6 px-4 bg-[#F9F9F4]">
-        <div className="mb-8 px-2">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-green-800 rounded-sm flex items-center justify-center">
-              <span className="text-white text-xs">🌿</span>
-            </div>
-            <span className="text-xs font-bold tracking-widest text-gray-500 uppercase">
-              AgriNotice
-            </span>
-          </div>
-        </div>
-
+      <aside className="w-65 h-[98vh] sticky top-0 shrink-0 flex flex-col py-6 px-4 bg-[#EEEEE9]">
         <nav className="flex flex-col gap-1 flex-1">
           {navItems.map((item) => (
             <button
               key={item.label}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-all
+              className={`flex cursor-pointer items-center gap-3 font-[font3] px-3 py-2.5 rounded-lg text-[15px] font-medium text-left transition-all
                 ${
                   item.active
-                    ? "bg-white text-gray-900 w-full "
+                    ? "bg-white text-[#14532D] w-full "
                     : "text-gray-500 hover:bg-white/60 hover:text-gray-800"
                 }`}
             >
-              <span className="w-5 text-center">{item.icon}</span>
+<span>{item.icon}</span>
               {item.label}
             </button>
           ))}
         </nav>
-
-        {/* Premium card */}
-        <div className="mt-4 bg-white rounded-xl p-4 border border-gray-200">
-          <p className="text-[10px] font-bold tracking-widest text-green-700 mb-1">
-            PREMIUM SUPPORT
-          </p>
-          <p className="text-xs text-gray-500 mb-3">
-            Get direct agronomist consultation 24/7.
-          </p>
-          <button className="w-full bg-green-800 text-white text-xs font-semibold py-2 rounded-lg hover:bg-green-900">
-            Upgrade Now
-          </button>
-        </div>
-
-        <button className="mt-4 flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-gray-700">
-          ⚙ Settings
-        </button>
       </aside>
 
       {/* Main */}
-      <main className="flex-1 pt-10 pl-30 pr-8 py-8">
+      <main className="flex-1 bg-[#FAFAF5] pt-10 pl-30 pr-8 py-8">
         {/* Tabs */}
         <div className="flex items-center justify-between mb-7">
           <div className="flex gap-2 flex-wrap">
@@ -147,18 +120,7 @@ export default function NoticesPage() {
             ))}
           </div>
 
-          <div className="text-sm text-gray-500">
-            Sort by:
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="ml-2 bg-transparent font-semibold text-gray-800 outline-none"
-            >
-              <option>Latest</option>
-              <option>Oldest</option>
-              <option>Most Relevant</option>
-            </select>
-          </div>
+
         </div>
 
         {/* Grid */}
@@ -167,23 +129,6 @@ export default function NoticesPage() {
             <NoticeCard key={notice.id} notice={notice} />
           ))}
 
-          {/* SMS Card */}
-          <div className="rounded-2xl flex flex-col items-center justify-center text-center p-8 gap-4 bg-green-800">
-            <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-white/15">
-              ✉
-            </div>
-            <div>
-              <h3 className="text-white font-bold text-lg">
-                Official Updates via SMS
-              </h3>
-              <p className="text-green-200 text-sm">
-                Subscribe to receive critical alerts directly to your phone.
-              </p>
-            </div>
-            <button className="bg-white text-green-800 font-semibold px-5 py-2 rounded-lg">
-              Subscribe Now
-            </button>
-          </div>
         </div>
       </main>
 
@@ -193,9 +138,9 @@ export default function NoticesPage() {
 
 function NoticeCard({ notice }: { notice: any }) {
   return (
-    <div className="bg-[#FFFFFF] rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
+    <div className="bg-[#FFFFFF] cursor-pointer rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
       <div
-        className={`relative h-55 ${
+        className={`relative h-55  ${
           notice.imageBg ? notice.bgColor : ""
         } flex items-center justify-center`}
       >
@@ -207,7 +152,9 @@ function NoticeCard({ notice }: { notice: any }) {
             className=" w-[120%] h-[120%] rounded-4xl "
           />
         ) : (
-          <span className="text-gray-300 text-4xl">📰</span>
+          <span className="text-gray-300 ">
+            <Hammer width={70} height={70} className="" color="#C9B2AA" />
+          </span>
         )}
         </div>
 
