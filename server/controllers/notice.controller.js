@@ -5,9 +5,10 @@ import { db } from "../db.config.js";
 export const geAllNotices = async (req, res) => {
   try {
     let { page } = req.query;
+    console.log("pade are",page)
     page = page ? parseInt(page) : 1;
     const limit = 10;
-    const [notices] = await db
+    const notices = await db
       .select()
       .from(noticeTable)
       .limit(limit)
