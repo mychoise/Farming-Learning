@@ -7,7 +7,7 @@ export const geAllNotices = async (req, res) => {
     let { page } = req.query;
     console.log("pade are",page)
     page = page ? parseInt(page) : 1;
-    const limit = 10;
+    const limit = 9;
     const notices = await db
       .select()
       .from(noticeTable)

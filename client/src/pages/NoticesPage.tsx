@@ -1,63 +1,7 @@
-import { CalendarDaysIcon, Hammer, LayoutDashboard, Mic2Icon, Sun,ArrowUpRight,Scale } from "lucide-react";
-import { useEffect, useState } from "react";
+import { CalendarDaysIcon, Hammer, LayoutDashboard, Mic2Icon, Sun,ArrowUpRight,Scale, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getNotices } from "../api/api";
-
-const notices = [
-  {
-    id: 1,
-    tag: "MARKET",
-    tagBg: "bg-white text-green-800 border border-green-200",
-    date: "MAY 12, 2024",
-    title: "Wheat Prices Projected to Rise in Kathmandu Wholesale Market",
-    description:
-      "Economic analysts predict a 15% increase in procurement rates due to supply chain adjustments in neighboring provinces.",
-    cta: "VIEW DETAILS",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuCk6ff5txalF2VP25rXG8lCykGs_ViyLT9Ib4r1sDA5VDYydzkvGTCzxBU6OvNwKTZmKoiwW6-nubhFl_PpDpWAaLynRdyOm7rHDbFVBbmZn0a1pKuIanKOmk6XzrgN7r4UJ2hoeru7NxPVEpYkftTHEUNjA6vmZMB60mZrTrUKDA8RcNU4lCccGkmx6gqsu3rGglEp_bklzKRWk00-zMu26-P0sXcGPi8NS0W9HW5_ec18bbHKEScNgpqcpIYGXdoY0mKR7feovco",
-    imageBg: false,
-  },
-  {
-    id: 2,
-    tag: "GOVERNMENT",
-    tagBg: "bg-red-100 text-red-700 border border-red-200",
-    date: "MAY 10, 2024",
-    title: "New Tax Incentives for Organic Fertilizer Production Units",
-    description:
-      "Small-scale production units are now eligible for a 3-year tax holiday under the new Agricultural Sustainability Act.",
-    cta: "READ FULL NOTICE",
-    image: null,
-    imageBg: true,
-    bgColor: "bg-red-50",
-  },
-  {
-    id: 3,
-    tag: "WEATHER ALERT",
-    tagBg: "bg-red-500 text-white",
-    date: "MAY 09, 2024",
-    title: "Severe Hailstorm Warning: Pokhara and Surrounding Valleys",
-    description:
-      "Meteorological department issues high alert for the next 48 hours. Farmers are advised to protect fragile crops.",
-    cta: "CHECK FORECAST",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDeMe_2MqxaeghphXOvxAAfR1UlXL2T1VKjP0K2camAyR4bDJ2b7gsB-gCG_h-_cisYyNHJhTKOU6bOmBvfIshWZJSxEF1-Gcemhc_INE5-hysobRjsbNK7i00e9Q-ddUaPAsE3uhm6T3Ko2bniixVxuzghQZg0b-DUa112Mw7cRFW2Sm_6F7ul1J79LekMA8AcQ2WHzOuayGtj26cRslK0332GHArmmMYWV1LBlKGZHMh1clzVcAzyyhqW7rcwngTj8egwXryXd-0",
-    imageBg: false,
-  },
-  {
-    id: 4,
-    tag: "OTHER",
-    tagBg: "bg-white text-gray-700 border border-gray-200",
-    date: "MAY 08, 2024",
-    title: "Community Harvest Festival: Registration Now Open",
-    description:
-      "Annual inter-district harvest festival invites farmers to showcase produce and compete for prizes.",
-    cta: "REGISTER NOW",
-    image:
-      "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=700&q=80",
-    imageBg: false,
-  },
-
-];
+import { useNotices } from "../hooks/hooks";
+import { useState,useEffect } from "react";
 
 const tabs = [
   "All Notices",
@@ -66,6 +10,25 @@ const tabs = [
   "Government Policy",
   "Other",
 ];
+
+const noticesColor = [
+    {
+        tag: "market",
+    tagBg: "bg-white text-green-800 border border-green-200",
+    },
+    {
+        tag: "government",
+    tagBg: "bg-red-100 text-red-700 border border-red-200",
+    },
+    {
+        tag: "weather",
+    tagBg: "bg-red-500 text-white",
+    },
+    {
+        tag: "other",
+    tagBg: "bg-white text-gray-700 border border-gray-200",
+    },
+]
 
 const navItems = [
   { icon: <LayoutDashboard/>, label: "Dashboard" },
@@ -77,14 +40,22 @@ const navItems = [
 
 export default function NoticesPage() {
   const [activeTab, setActiveTab] = useState("All Notices");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(10);
 
-  useEffect(()=>{
-    const fetchNotices = async()=>{
-      const result = await getNotices(1)
-      console.log(result)
-    }
-    fetchNotices()
-  },[])
+const {data,isLoading,isError} = useNotices(page)
+
+console.log("data is",data)
+console.log("loadig is",isLoading)
+console.log("error is",isError)
+
+console.log("total pages is",Math.ceil(data?.pagination?.total / 9))
+
+useEffect(() => {
+  setTotalPages(Math.ceil(data?.pagination?.total / 9))
+}, [data])
+
+
 
   return (
     <div className="flex bg-stone-50 font-sans">
@@ -134,13 +105,48 @@ export default function NoticesPage() {
 
         {/* Grid */}
         <div className="flex gap-10 mt-10 flex-wrap">
-          {notices.map((notice) => (
-            <NoticeCard key={notice.id} notice={notice} />
+          {data?.data?.map((notice) => (
+            <NoticeCard key={notice._id} notice={notice} />
           ))}
+        </div>
 
+        {/* Pagination */}
+        <div className="flex items-center justify-center mt-16 mb-4">
+          <nav className="flex items-center gap-2" aria-label="Pagination">
+            <button
+              disabled
+              className="flex items-center justify-center p-2.5 rounded-full border border-gray-200 text-gray-400 bg-white cursor-not-allowed shadow-sm"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2 bg-white px-2 py-1.5 rounded-full shadow-sm border border-gray-100">
+
+{   Array.from({ length: totalPages }, (_, i) => (
+  <button
+    key={i}
+    onClick={() => setPage(i + 1)}
+    className={`w-9 h-9 flex items-center justify-center rounded-full font-medium text-[15px] font-[font4] transition-all
+      ${page === i + 1
+        ? "bg-[#14532D] text-white"
+        : "bg-transparent text-gray-600 hover:bg-[#EEEEE9] hover:text-[#14532D]"
+      }`}
+  >
+    {i + 1}
+  </button>
+))}
+            </div>
+
+            <button
+              className="flex items-center justify-center p-2.5 rounded-full border border-gray-200 text-gray-600 bg-white hover:bg-[#EEEEE9] hover:text-[#14532D] cursor-pointer transition-all shadow-sm"
+              aria-label="Next page"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </nav>
         </div>
       </main>
-
     </div>
   );
 }
@@ -149,11 +155,9 @@ function NoticeCard({ notice }: { notice: any }) {
       const navigate = useNavigate()
 
   return (
-    <div onClick={()=> navigate(`/notice/${notice.id}`)} className="bg-[#FFFFFF] cursor-pointer rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
+    <div onClick={()=> navigate(`/notice/${notice._id}`)} className="bg-[#FFFFFF] cursor-pointer rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
       <div
-        className={`relative h-55  ${
-          notice.imageBg ? notice.bgColor : ""
-        } flex items-center justify-center`}
+        className={`relative rounded-2xl h-55  bg-red-50 flex items-center justify-center`}
       >
         <div className="w-90 rounded-3xl h-full flex overflow-hidden items-center justify-center transition-transform duration-200">
         {notice.image ? (
@@ -169,16 +173,16 @@ function NoticeCard({ notice }: { notice: any }) {
         )}
         </div>
 
-        <span
-          className={`absolute top-3 left-3 text-[12px] font-[font6] tracking-widest px-2 py-1 rounded-full ${notice.tagBg}`}
+      <span
+          className={`absolute top-3 left-3 ${noticesColor.find((item) => item.tag === notice.category)?.tagBg} uppercase text-[12px] font-[font6] tracking-wider px-2 py-1 rounded-full`}
         >
-          {notice.tag}
+          {notice.category}
         </span>
       </div>
 
       <div className="p-4 flex flex-col flex-1">
         <p className="text-[14px]  text-[#707A75] tracking-normal flex items-center gap-2 font-[font3] mb-2">
-          <CalendarDaysIcon width={16} height={16} className="inline mr-1 text-[#707A75] " /> {notice.date}
+          <CalendarDaysIcon width={16} height={16} className="inline mr-1 text-[#707A75] " /> {notice.createdAt}
         </p>
 
         <h3 className=" font-[font6] tracking-wider font-bold text-[19px] text-gray-900 mb-2">
@@ -186,12 +190,12 @@ function NoticeCard({ notice }: { notice: any }) {
         </h3>
 
         <p className="text-[14px] font-[font5] text-gray-500 flex-1">
-          {notice.description}
+          {notice.content}
         </p>
 
         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between">
           <span className="text-[13px] font-[font4] tracking-widest text-gray-700">
-            {notice.cta}
+            View Details
           </span>
           <span className="text-[13px] font-[font4] tracking-widest text-gray-700">→</span>
         </div>

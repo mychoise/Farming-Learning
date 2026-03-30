@@ -1,5 +1,5 @@
- import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { createNewSession, detectDisease, getAllAiChat, getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation, sendMessageToAI} from "../api/api";
+ import { useQueryClient, useMutation, useQuery , keepPreviousData } from "@tanstack/react-query";
+import { createNewSession, detectDisease, getAllAiChat, getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation, sendMessageToAI,getNotices} from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
 type OrganicFertilizerInput = {
@@ -135,5 +135,16 @@ export const useDetectDisease = () => {
             console.log("Response from server is", data);
             queryClient.setQueryData(["detectDisease"], data);
         }
+    })
+}
+
+
+export const useNotices = (page:number)=>{
+    return useQuery({
+        queryKey: ["notices", page],
+        queryFn: () => getNotices(page),
+        staleTime:60000,
+        placeholderData: keepPreviousData,
+
     })
 }
