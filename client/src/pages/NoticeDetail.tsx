@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState  } from "react";
 import {
   ArrowLeft,
   Clock,
@@ -6,7 +6,10 @@ import {
   Send,
   ChevronRight,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useGetNoticeById } from "../hooks/hooks";
+import {useQueryClient} from "@tanstack/react-query";
+
 
 const recentPolicies = [
   {
@@ -34,8 +37,23 @@ const recentPolicies = [
 
 export default function NoticeDetail() {
   const [email, setEmail] = useState("");
+  const {id} = useParams();
+  console.log("id is",id)
+
+  const {data:notice} = useGetNoticeById(id!)
+
+  console.log("data is",notice)
 
   const navigate = useNavigate()
+  const queryClient = useQueryClient();
+const data = queryClient.getQueryData(["notices",1])
+
+const filteredData  = data?.data?.filter((item:any)=>item.category === notice?.data?.category)
+
+console.log("all data sisisi" , filteredData)
+
+
+
 
   return (
     <div className="min-h-screen bg-stone-100 font-serif">
@@ -54,29 +72,35 @@ export default function NoticeDetail() {
           {/* Tag + Date */}
           <div className="flex items-center gap-3 mb-5">
             <span className="text-xs font-bold tracking-widest px-3 py-1 rounded-full text-emerald-800 bg-[#ACF4A4] font-[font5]">
-              POLICY UPDATE
+              {notice?.data?.category.toUpperCase()} UPDATE
             </span>
 
             <span className="flex items-center gap-1.5 text-[14px] text-[#40493D] font-[font5]">
               <Clock size={13} />
-              Published Oct 24, 2023 • 08:45 AM
+              Published {notice?.data?.createdAt.split("T")[0]} • {notice?.data?.createdAt.split("T")[1]}
             </span>
           </div>
 
           {/* Title */}
           <h1 className="text-5xl font-[medium] leading-tight text-stone-900 mb-8 tracking-tight">
-            New Sustainability Subsidies for Regenerative Soil Practices
+            {notice?.data?.title}
           </h1>
 
           {/* Author */}
 
           {/* Hero Image */}
           <div className="rounded-2xl overflow-hidden mb-3">
+            {notice?.data?.image ? (
             <img
-              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=900&q=80"
+              src={notice?.data?.image}
               alt="Sustainable crop fields"
               className="w-full h-[380px] object-cover"
             />
+            ):
+             <div className="p-4 space-y-4">
+      <div className="w-full h-[380px] skeleton rounded-full"></div>
+    </div>
+            }
           </div>
           {/* Lead paragraph */}
           <p className="text-[20px] mt-7  font-[Inter] font-bold tracking-normal text-[#206223] leading-relaxed mb-6">
@@ -87,15 +111,7 @@ export default function NoticeDetail() {
           </p>
 
           <p className="text-[18px]  text-stone-700 leading-relaxed mb-8 font-[font3]">
-            Starting from the first quarter of the next fiscal year, registered
-            farmers who demonstrate a commitment to low-till or no-till farming
-            methods will be eligible for a tiered subsidy program. This
-            initiative responds to the growing data regarding soil depletion
-            and the urgent need for more resilient agricultural ecosystems in
-            the face of shifting climate patterns.  Applications will open on November 15th through the AgriPulse
-            digital portal. Farmers are encouraged to prepare their 2023 yield
-            reports and soil health assessments ahead of the deadline to ensure
-            expedited processing.
+            {notice?.data?.content}
           </p>
 
           {/* Footer */}
@@ -125,21 +141,21 @@ export default function NoticeDetail() {
           {/* Recent Policies */}
           <div className="bg-[#EEEEE9] rounded-2xl p-5 border border-stone-200">
             <h2 className="text-[25px] font-[medium] text-stone-800 mb-5">
-              Recent in Policy
+              Recent in {notice?.data?.category.slice(0,1).toUpperCase() + notice?.data?.category.slice(1)}
             </h2>
 
             <div className="space-y-5">
-              {recentPolicies.map((item, i) => (
-                <div key={i} className="cursor-pointer group">
+              {filteredData?.map((item, i) => (
+                <div onClick={()=> navigate(`/notice/${item.id}`)} key={i} className="cursor-pointer group">
                   <div className="flex items-center justify-between mb-1">
                     <span
                       className={`text-[12px] font-[font3] tracking-wider text-[#206223]`}
                     >
-                      {item.tag}
+                      {item.category.toUpperCase()}
                     </span>
 
                     <span className="text-[11px] font-[font3] text-stone-400">
-                      {item.time}
+                      {item.createdAt.split("T")[0]}
                     </span>
                   </div>
 
@@ -148,10 +164,10 @@ export default function NoticeDetail() {
                   </p>
 
                   <p className="text-[14px] text-stone-500 font-[font3] leading-relaxed">
-                    {item.desc}
+                    {item.content.slice(0,90)}...
                   </p>
 
-                  {i < recentPolicies.length - 1 && (
+                  {i < filteredData.length - 1 && (
                     <div className="border-b border-stone-200 mt-4" />
                   )}
                 </div>

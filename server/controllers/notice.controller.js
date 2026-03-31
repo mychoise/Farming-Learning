@@ -4,18 +4,26 @@ import { db } from "../db.config.js";
 
 export const geAllNotices = async (req, res) => {
   try {
-    let { page } = req.query;
-    console.log("pade are",page)
+    let { page, category } = req.query;
+    console.log("page and category are", page, category)
     page = page ? parseInt(page) : 1;
     const limit = 9;
-    const notices = await db
+
+    let whereCondition = category ? eq(noticeTable.category, category) : undefined;
+
+    const noticesBuilder = db
       .select()
       .from(noticeTable)
       .limit(limit)
       .offset((page - 1) * limit);
-    const [{ count }] = await db
+
+    const notices = await (whereCondition ? noticesBuilder.where(whereCondition) : noticesBuilder);
+
+    const countBuilder = db
       .select({ count: sql`count(*)` })
       .from(noticeTable);
+
+    const [{ count }] = await (whereCondition ? countBuilder.where(whereCondition) : countBuilder);
 
     return res.status(200).json({
       success: true,

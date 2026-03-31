@@ -1,5 +1,5 @@
  import { useQueryClient, useMutation, useQuery , keepPreviousData } from "@tanstack/react-query";
-import { createNewSession, detectDisease, getAllAiChat, getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation, sendMessageToAI,getNotices} from "../api/api";
+import { createNewSession, detectDisease, getAllAiChat, getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation, sendMessageToAI,getNotices , getNoticeById} from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
 type OrganicFertilizerInput = {
@@ -139,12 +139,20 @@ export const useDetectDisease = () => {
 }
 
 
-export const useNotices = (page:number)=>{
+export const useNotices = (page:number, category?:string)=>{
     return useQuery({
-        queryKey: ["notices", page],
-        queryFn: () => getNotices(page),
+        queryKey: ["notices", page, category],
+        queryFn: () => getNotices(page, category),
         staleTime:60000,
         placeholderData: keepPreviousData,
 
+    })
+}
+
+export const useGetNoticeById = (id:string)=>{
+    return useQuery({
+        queryKey: ["notice", id],
+        queryFn: () => getNoticeById(id),
+        staleTime:60000,
     })
 }

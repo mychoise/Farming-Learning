@@ -41,7 +41,7 @@ export default function AiChatDescription() {
     const {id} = useParams()
   const {questionForAI}: any = useAI()
 
-  const [messages, setMessages] = useState<typeof INITIAL_MESSAGES | null>(null);
+  const [messages, setMessages] = useState<any | null>(null);
   const [input, setInput] = useState(questionForAI || "");
   const [typing] = useState(false);
   const bottomRef = useRef(null);

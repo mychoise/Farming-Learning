@@ -18,6 +18,7 @@ export const noticeTable = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     title: varchar("title", { length: 255 }).notNull(),
     content: text("content").notNull(),
+    lead:text("lead").notNull(),
     image: text("image"),
     category: categoryEnum("category").notNull(),
     createdAt: timestamp("created_at").defaultNow(),

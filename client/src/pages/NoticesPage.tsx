@@ -1,7 +1,7 @@
 import { CalendarDaysIcon, Hammer, LayoutDashboard, Mic2Icon, Sun,ArrowUpRight,Scale, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useNotices } from "../hooks/hooks";
-import { useState,useEffect } from "react";
+import { useState } from "react";
 
 const tabs = [
   "All Notices",
@@ -31,29 +31,35 @@ const noticesColor = [
 ]
 
 const navItems = [
-  { icon: <LayoutDashboard/>, label: "Dashboard" },
-  { icon: <Mic2Icon/>, label: "Notices", active: true },
-  { icon: <Sun/>, label: "Weather" },
-  { icon: <ArrowUpRight />, label: "Markets" },
-  { icon: <Scale />, label: "Policy" },
+  { icon: <LayoutDashboard/>, label: "All Notices", displayName: "All" },
+  { icon: <Sun/>, label: "Weather Alerts", displayName: "Weather" },
+  { icon: <ArrowUpRight />, label: "Market Rates", displayName: "Markets" },
+  { icon: <Scale />, label: "Government Policy", displayName: "Policy" },
+  { icon: <Mic2Icon/>, label: "Other", displayName: "Other" },
 ];
+
+const mapTabToCategory = (tab: string) => {
+  switch (tab) {
+    case "Weather Alerts": return "weather";
+    case "Market Rates": return "market";
+    case "Government Policy": return "government";
+    case "Other": return "other";
+    default: return undefined;
+  }
+};
 
 export default function NoticesPage() {
   const [activeTab, setActiveTab] = useState("All Notices");
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(10);
 
-const {data,isLoading,isError} = useNotices(page)
+  const categoryQuery = mapTabToCategory(activeTab);
+  const {data,isLoading,isError} = useNotices(page, categoryQuery)
 
 console.log("data is",data)
 console.log("loadig is",isLoading)
 console.log("error is",isError)
 
-console.log("total pages is",Math.ceil(data?.pagination?.total / 9))
-
-useEffect(() => {
-  setTotalPages(Math.ceil(data?.pagination?.total / 9))
-}, [data])
+  const totalPages = Math.ceil((data?.pagination?.total || 0) / 9) || 1;
 
 
 
@@ -65,15 +71,19 @@ useEffect(() => {
           {navItems.map((item) => (
             <button
               key={item.label}
+              onClick={() => {
+                setActiveTab(item.label);
+                setPage(1);
+              }}
               className={`flex cursor-pointer items-center gap-3 font-[font3] px-3 py-2.5 rounded-lg text-[15px] font-medium text-left transition-all
                 ${
-                  item.active
+                  activeTab === item.label
                     ? "bg-white text-[#14532D] w-full "
                     : "text-gray-500 hover:bg-white/60 hover:text-gray-800"
                 }`}
             >
 <span>{item.icon}</span>
-              {item.label}
+              {item.displayName}
             </button>
           ))}
         </nav>
@@ -87,7 +97,10 @@ useEffect(() => {
             {tabs.map((tab) => (
               <button
                 key={tab}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => {
+                  setActiveTab(tab);
+                  setPage(1);
+                }}
                 className={`px-6 py-2 rounded-full cursor-pointer text-[15px] font-[font4]
                   ${
                     activeTab === tab
@@ -155,7 +168,7 @@ function NoticeCard({ notice }: { notice: any }) {
       const navigate = useNavigate()
 
   return (
-    <div onClick={()=> navigate(`/notice/${notice._id}`)} className="bg-[#FFFFFF] cursor-pointer rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
+    <div onClick={()=> navigate(`/notice/${notice.id}`)} className="bg-[#FFFFFF] cursor-pointer rounded-3xl pt-5 pl-4 pr-4 w-97 overflow-hidden border border-gray-100 transition-all duration-200 hover:shadow-md flex flex-col">
       <div
         className={`relative rounded-2xl h-55  bg-red-50 flex items-center justify-center`}
       >
@@ -190,7 +203,7 @@ function NoticeCard({ notice }: { notice: any }) {
         </h3>
 
         <p className="text-[14px] font-[font5] text-gray-500 flex-1">
-          {notice.content}
+          {notice.content.slice(0,230)}...
         </p>
 
         <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between">

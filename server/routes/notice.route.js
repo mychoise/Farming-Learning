@@ -12,7 +12,7 @@ import upload from "./../config/Image.config.js";
 const newsRouter = express.Router();
 
 newsRouter.get("/allnews", geAllNotices);
-newsRouter.get("/news/:id", auth, getNoticeById);
+newsRouter.get("/news/:id", getNoticeById);
 newsRouter.post("/create", auth, admin, upload.single("image"), createNotice);
 newsRouter.delete("/delete/:id", auth, admin, deleteNotice);
 

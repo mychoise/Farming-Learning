@@ -218,7 +218,16 @@ export const refreshToken = async () => {
 };
 
 
-export const getNotices =  async(page:number)=>{
-    const result = await axiosInstance.get(`/notices/allnews?page=${page}`)
+export const getNotices =  async(page:number, category?:string)=>{
+    let url = `/notices/allnews?page=${page}`;
+    if (category) {
+        url += `&category=${encodeURIComponent(category)}`;
+    }
+    const result = await axiosInstance.get(url)
+    return result.data
+}
+
+export const getNoticeById = async(id:string)=>{
+    const result = await axiosInstance.get(`/notices/news/${id}`)
     return result.data
 }
