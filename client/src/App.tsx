@@ -21,6 +21,7 @@ import { refreshToken } from "./api/api";
 import {useAuth} from "./store/useAuth";
 import NoticesPage from "./pages/NoticesPage";
 import NoticeDetail from "./pages/NoticeDetail";
+import Post from "./pages/Post";
 const App = () => {
 
     const {user} = useAuth();
@@ -67,6 +68,7 @@ const App = () => {
           </Route>
           <Route path="/notices" element={<NoticesPage />} />
           <Route path="/notice/:id" element={<NoticeDetail />} />
+                  <Route path="/post" element={<Post/>}/>
         </Routes>
       </div>
     </div>
