@@ -51,6 +51,14 @@
     font-family: "font7";
     src: url('./assets/fonts/font7.woff2');
 }
+@font-face {
+    font-family: "font8";
+    src: url('./assets/fonts/font8.woff2');
+}
+@font-face {
+    font-family: "font9";
+    src: url('./assets/fonts/font9.woff2');
+}
 body{
   overflow-x: hidden;
 }
