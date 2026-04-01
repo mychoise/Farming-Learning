@@ -77,11 +77,44 @@ Difficulty: ${c.difficulty ?? "Not specified"}
 `;
 
   // Fetch image from Cloudinary and convert to base64
-  const imageResponse = await fetch(imageUrl);
-  if (!imageResponse.ok)
-    throw new Error(`Failed to fetch image: ${imageResponse.status}`);
-  const imageBuffer = await imageResponse.arrayBuffer();
-  const base64Image = Buffer.from(imageBuffer).toString("base64");
+  const url = new URL(imageUrl);
+
+if (!["http:", "https:"].includes(url.protocol)) {
+  throw new Error("Invalid image protocol");
+}
+
+// DNS check to prevent SSRF
+const { address } = await dns.lookup(url.hostname);
+
+if (
+  address.startsWith("127.") ||
+  address.startsWith("10.") ||
+  address.startsWith("192.168.") ||
+  address.startsWith("172.")
+) {
+  throw new Error("Blocked internal IP");
+}
+
+const imageResponse = await fetch(imageUrl);
+
+if (!imageResponse.ok) {
+  throw new Error("Failed to fetch image");
+}
+
+const contentType = imageResponse.headers.get("content-type");
+if (!contentType || !contentType.startsWith("image/")) {
+  throw new Error("URL is not an image");
+}
+
+// limit size
+const MAX_SIZE = 5 * 1024 * 1024;
+const buffer = Buffer.from(await imageResponse.arrayBuffer());
+
+if (buffer.length > MAX_SIZE) {
+  throw new Error("Image too large");
+}
+
+const base64Image = buffer.toString("base64");
 
   const promptForOllama = `
 You are an expert agricultural plant pathologist specializing in Nepali crops and diseases.
