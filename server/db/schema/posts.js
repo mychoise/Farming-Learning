@@ -1,5 +1,5 @@
 import { pgEnum, pgTable } from "drizzle-orm/pg-core";
-import { uuid, varchar, text, timestamp, numeric, integer } from "drizzle-orm/pg-core";
+import { uuid, varchar, text, timestamp } from "drizzle-orm/pg-core";
 import { index , uniqueIndex } from "drizzle-orm/pg-core";
 import { userTable } from "./user.js";
 

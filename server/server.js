@@ -10,9 +10,12 @@ import calculationRouter from "./routes/calculation.route.js";
 import weatherRouter from "./routes/weather.route.js";
 import postRouter from "./routes/post.route.js";
 import cropCalenderRouter from "./routes/cropcalender.route.js";
+import {createServer, Server} from "http"
 import cors from "cors";
 dotenv.config();
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer)
 app.use(cookieParser());
 app.use(express.json());
 app.use(
@@ -36,6 +39,6 @@ app.use("/api/weather", weatherRouter);
 app.use("/api/post", postRouter);
 app.use("/api/cropcalender", cropCalenderRouter);
 
-app.listen(3000, () => {
+httpServer.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
