@@ -48,6 +48,8 @@ export default function NoticeDetail() {
   const queryClient = useQueryClient();
 const data = queryClient.getQueryData(["notices",1])
 
+console.log("hello my data is", data)
+
 const filteredData  = data?.data?.filter((item:any)=>item.category === notice?.data?.category)
 
 console.log("all data sisisi" , filteredData)

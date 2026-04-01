@@ -59,8 +59,9 @@ const Navbar = () => {
     { label: "Crops Library", href: "/crops" },
     { label: "Weather", href: "/weather" },
     { label: "Crop Calender", href: "/crop-calendar" },
-    { label: "Resources", href: "/resources" },
+    { label: "Notices", href: "/notices" },
     { label: "Assistant", href: "/ai" },
+    {label:"Community", href:"/post"}
   ];
 
   return (

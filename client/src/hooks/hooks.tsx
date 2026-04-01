@@ -141,7 +141,7 @@ export const useDetectDisease = () => {
 
 export const useNotices = (page:number, category?:string)=>{
     return useQuery({
-        queryKey: ["notices", page, category],
+        queryKey: ["notices", page],
         queryFn: () => getNotices(page, category),
         staleTime:60000,
         placeholderData: keepPreviousData,
