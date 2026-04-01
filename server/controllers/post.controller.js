@@ -2,6 +2,7 @@ import { postComment, postTable, postVote } from "../db/schema/posts.js";
 import { db } from "../db.config.js";
 import { eq,and } from "drizzle-orm";
 import { validationResult } from "express-validator";
+import { getIO } from "../config/socket.js";
 
 export const addPost = async (req, res) => {
     const errors = validationResult(req);
@@ -14,44 +15,41 @@ export const addPost = async (req, res) => {
         if(!title || !description){
             return res.status(400).json({ success: false, message: "Title and description are required" });
         }
-        if(req.files.video && req.files.image){
-            const [post] = await db.insert(postTable).values({
+        let post;
+        if(req.files && req.files.video && req.files.image){
+            [post] = await db.insert(postTable).values({
                 createdBy: userId,
                 title,
                 description,
                 video: req.files.video[0].path,
                 image: req.files.image[0].path
             }).returning();
-            
-            return res.status(201).json({ success: true, message: "Post created successfully", post });
-        }
-        if(req.files.video){
-            const [post] = await db.insert(postTable).values({
+        } else if(req.files && req.files.video){
+            [post] = await db.insert(postTable).values({
                 createdBy: userId,
                 title,
                 description,
                 video: req.files.video[0].path
             }).returning();
-            
-            return res.status(201).json({ success: true, message: "Post created successfully", post });
-        }
-        if(req.files.image){
-            const [post] = await db.insert(postTable).values({
+        } else if(req.files && req.files.image){
+            [post] = await db.insert(postTable).values({
                 createdBy: userId,
                 title,
                 description,
                 image: req.files.image[0].path
             }).returning();
-            
-            return res.status(201).json({ success: true, message: "Post created successfully", post });
+        } else {
+            [post] = await db.insert(postTable).values({
+                createdBy: userId,
+                title,
+                description
+            }).returning();
         }
-const [post] = await db.insert(postTable).values({
-    createdBy: userId,
-    title,
-    description
-}).returning();
 
-return res.status(201).json({ success: true, message: "Post created successfully", post });
+        const io = getIO();
+        io.emit("new_post", post);
+
+        return res.status(201).json({ success: true, message: "Post created successfully", post });
     } catch (error) {
         console.log("Error in addPost: ", error.message);
         res.status(500).json({ success: false, message: error.message });
@@ -109,7 +107,7 @@ export const vote = async (req, res) => {
       .update(postTable)
       .set({ vote: vote.id })
       .where(eq(postTable.id, id))
-      .returning(); 
+      .returning();
         res.status(200).json({ success: true, vote, post });
     } catch (error) {
         console.log("Error in vote: ", error);
@@ -136,7 +134,7 @@ export const comment = async (req, res) => {
         .update(postTable)
         .set({ comment: commentData.id })
         .where(eq(postTable.id, id))
-        .returning(); 
+        .returning();
 
         res.status(200).json({ success: true, comment: commentData , post });
     } catch (error) {

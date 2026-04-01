@@ -1,18 +1,20 @@
 import React from 'react';
 import {
-  Home,
-  Sprout,
-  BookOpen,
   Users,
-  Settings,
   Plus,
   Layout,
 
 } from 'lucide-react';
 import PostCard from '../components/post/PostCard';
 import CommunityGuidelines from '../components/post/CommunityGuidelines';
+import { socket } from '../config/socket';
 
 function Post() {
+
+  socket.on("new_post",(post:any)=>{
+    console.log(post);
+  })
+
   return (
     <div className="min-h-screen bg-[#F2F1ED] flex font-sans">
       {/* Sidebar */}

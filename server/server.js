@@ -10,12 +10,20 @@ import calculationRouter from "./routes/calculation.route.js";
 import weatherRouter from "./routes/weather.route.js";
 import postRouter from "./routes/post.route.js";
 import cropCalenderRouter from "./routes/cropcalender.route.js";
-import {createServer, Server} from "http"
+import { createServer } from "http";
+import { Server } from "socket.io";
 import cors from "cors";
+import { initSocket } from "./config/socket.js";
 dotenv.config();
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer)
+const io = new Server(httpServer,{
+    cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+})
+initSocket(io)
 app.use(cookieParser());
 app.use(express.json());
 app.use(
