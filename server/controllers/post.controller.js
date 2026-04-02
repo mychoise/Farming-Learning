@@ -3,6 +3,7 @@ import { db } from "../db.config.js";
 import { eq,and } from "drizzle-orm";
 import { validationResult } from "express-validator";
 import { getIO } from "../config/socket.js";
+import { userTable } from "../db/schema/user.js";
 
 export const addPost = async (req, res) => {
     const errors = validationResult(req);
@@ -46,10 +47,16 @@ export const addPost = async (req, res) => {
             }).returning();
         }
 
-        const io = getIO();
-        io.emit("new_post", post);
+        const [user] = await db.select().from(userTable).where(eq(userTable.id, userId));
 
-        return res.status(201).json({ success: true, message: "Post created successfully", post });
+        const io = getIO();
+        const dataToSend={
+            post,
+            user
+            }
+        io.emit("new_post", dataToSend);
+
+        return res.status(201).json({ success: true, message: "Post created successfully", dataToSend });
     } catch (error) {
         console.log("Error in addPost: ", error.message);
         res.status(500).json({ success: false, message: error.message });
@@ -58,7 +65,7 @@ export const addPost = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
     try {
-        const posts = await db.select().from(postTable).leftJoin(postVote,eq(postTable.vote,postVote.id));
+        const posts = await db.select().from(postTable).leftJoin(postVote,eq(postTable.vote,postVote.id)).leftJoin(userTable,eq(postTable.createdBy,userTable.id));
         res.status(200).json({ success: true, posts });
     } catch (error) {
         console.log("Error in getAllPosts: ", error.message);

@@ -7,14 +7,15 @@ import {
 } from 'lucide-react';
 import PostCard from '../components/post/PostCard';
 import CommunityGuidelines from '../components/post/CommunityGuidelines';
-import { socket } from '../config/socket';
+import { useGetPosts } from '../hooks/hooks';
+import { usePostSocket } from '../hooks/usePostSocket';
 
 function Post() {
 
-  socket.on("new_post",(post:any)=>{
-    console.log(post);
-  })
+  const {data:posts} = useGetPosts();
+  usePostSocket();
 
+  console.log(posts);
   return (
     <div className="min-h-screen bg-[#F2F1ED] flex font-sans">
       {/* Sidebar */}
@@ -53,6 +54,20 @@ function Post() {
               Insights and observations from the global network of regenerative agronomists.
             </p>
           </div>
+
+          {posts?.map((post:any)=>(
+            <PostCard
+            author={post.user.name}
+            location={post.location || "Kathmandu, Nepal"}
+            time={post.posts.createdAt}
+            tag={post.tag ||"GENERAL"}
+            title={post.posts.title}
+            content={post.posts.description}
+            image={post.posts.image}
+            upvotes={post.posts.upvotes}
+            comments={post.posts.comments}
+            />
+          ))}
 
           {/* Elena Moretti Post */}
           <PostCard

@@ -18,37 +18,40 @@ const PostCard = ({
   image?: string;
   upvotes: number;
   comments: number;
-}) => (
+}) => {
+  console.log(author);
+  return(
   <div className="bg-[#F2F1ED] rounded-3xl  hover:bg-[#FBFCFB] transition-all duration-300 hover:shadow-md mb-10 overflow-hidden">
     {/* Author Info */}
     <div className="flex items-center justify-between px-8 pt-8 pb-5">
       <div className="flex items-center gap-4">
         <div className="w-11 h-11 bg-[#C7EBC8] text-[#092722] rounded-[5px] flex items-center justify-center font-bold text-[15px]">
-          {author.charAt(0)}{author.split(" ")[1].charAt(0)}
+         {author.charAt(0).toUpperCase()}
         </div>
         <div>
           <div className="font-[medium] text-[15px] text-emerald-950">{author}</div>
-          <div className="text-sm font-[font3] text-gray-500">{location} • {time}</div>
+          <div className="text-sm font-[font3] text-gray-500"> • {time.slice(0,10)}</div>
         </div>
       </div>
     </div>
 
     {/* Content */}
-    <div className="px-8 pb-6">
+    <div className="px-8 pb-2">
       <h2 className="text-[23px] font-bold font-[font9]  text-[#19371F] mb-5">{title}</h2>
       <p className="text-gray-700 text-[15.5px] leading-relaxed font-[font8]">{content}</p>
     </div>
 
     {/* Image */}
-    <div className="px-8 pb-8">
+
       {image && (
-        <img
+ <div className="px-8 pt-5 pb-8">
+<img
           src={image}
           alt={title}
           className="w-full h-[420px] object-cover rounded-3xl shadow-md"
         />
+        </div>
       )}
-    </div>
 
     {/* Engagement */}
     <div className="border-t border-gray-100 px-8 py-6 flex items-center justify-between text-gray-600">
@@ -72,6 +75,7 @@ const PostCard = ({
     </div>
   </div>
 );
+}
 
 
 export default PostCard;

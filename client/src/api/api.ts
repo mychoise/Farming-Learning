@@ -231,3 +231,9 @@ export const getNoticeById = async(id:string)=>{
     const result = await axiosInstance.get(`/notices/news/${id}`)
     return result.data
 }
+
+
+export const getAllPost = async()=>{
+    const result = await axiosInstance.get("/post/get-posts")
+    return result.data.posts
+}
