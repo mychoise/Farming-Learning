@@ -1,4 +1,5 @@
 import { axiosInstance } from "../lib/axios"
+import {data} from "framer-motion/m";
 
 export type WeatherApiResponse = {
   success: boolean;
@@ -237,3 +238,28 @@ export const getAllPost = async()=>{
     const result = await axiosInstance.get("/post/get-posts")
     return result.data.posts
 }
+
+export const getPostVote = async(postId:string)=>{
+    const result = await axiosInstance.get(`/vote/${postId}`)
+    return result.data
+}
+
+export const votePost = async (data: { postId: string; voteType: "upvote" | "downvote" }) => {
+    const result = await axiosInstance.post(`/post/vote/${data.postId}`, { voteType: data.voteType });
+    return result.data;
+};
+
+export const getComments = async (postId: string) => {
+    const result = await axiosInstance.get(`/post/comment/${postId}`);
+    return result.data.comments;
+};
+
+export const addComment = async (data: { postId: string; comment: string }) => {
+    const result = await axiosInstance.post(`/post/comment/${data.postId}`, { comment: data.comment });
+    return result.data.comment;
+};
+
+export const getPostById = async (postId: string) => {
+    const result = await axiosInstance.get(`/post/get-post/${postId}`);
+    return result.data;
+};

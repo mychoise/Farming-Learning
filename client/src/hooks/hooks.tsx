@@ -1,5 +1,22 @@
  import { useQueryClient, useMutation, useQuery , keepPreviousData } from "@tanstack/react-query";
-import { createNewSession, detectDisease, getAllAiChat, getAnimalWeightEstimation, getOrganicFertilizerCalculation , getUnitConversion, InorganicFertilizerCalculation, sendMessageToAI,getNotices , getNoticeById, getAllPost} from "../api/api";
+import {
+    createNewSession,
+    detectDisease,
+    getAllAiChat,
+    getAnimalWeightEstimation,
+    getOrganicFertilizerCalculation,
+    getUnitConversion,
+    InorganicFertilizerCalculation,
+    sendMessageToAI,
+    getNotices,
+    getNoticeById,
+    getAllPost,
+    getPostVote,
+    votePost,
+    getComments,
+    addComment,
+    getPostById
+} from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
 type OrganicFertilizerInput = {
@@ -164,3 +181,66 @@ export const useGetPosts = ()=>{
     staleTime:60000,
  })
 }
+export const useVote  = (postId: string)=>{
+return useQuery({
+    queryKey: ["postVote", postId],
+    queryFn: ({ queryKey }) => getPostVote(queryKey[1] as string),
+    staleTime:60000,
+})
+}
+
+export const useVotePost = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: votePost,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["posts"] });
+        },
+    });
+};
+
+export const useGetComments = (postId: string) => {
+    return useQuery({
+        queryKey: ["comments", postId],
+        queryFn: () => getComments(postId),
+        enabled: !!postId,
+    });
+};
+
+export const useAddComment = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: addComment,
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ["comments", variables.postId] });
+            queryClient.invalidateQueries({ queryKey: ["posts"] });
+        },
+    });
+};
+
+export const useGetPostById = (postId: string) => {
+    return useQuery({
+        queryKey: ["post", postId],
+        queryFn: () => getPostById(postId),
+        enabled: !!postId,
+    });
+};
+
+export default {
+    useOrganicFertilizer,
+    useInorganicFertilizer,
+    useAnimalWeightEstimation,
+    useUnitConversion,
+    useNewSession,
+    useSendMessageToAI,
+    useAiChatAll,
+    useDetectDisease,
+    useNotices,
+    useGetNoticeById,
+    useGetPosts,
+    useVote,
+    useVotePost,
+    useGetComments,
+    useAddComment,
+    useGetPostById
+};

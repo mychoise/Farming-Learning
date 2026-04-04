@@ -50,6 +50,13 @@
       "when": 1774915412811,
       "tag": "0006_gigantic_war_machine",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1775295314434,
+      "tag": "0007_clear_shatterstar",
+      "breakpoints": true
     }
   ]
 }

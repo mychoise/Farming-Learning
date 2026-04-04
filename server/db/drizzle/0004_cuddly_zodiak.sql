@@ -1,1 +1,0 @@
-ALTER TABLE "crop" ADD COLUMN "icon" text;

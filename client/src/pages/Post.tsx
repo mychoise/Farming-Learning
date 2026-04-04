@@ -3,17 +3,69 @@ import {
   Users,
   Plus,
   Layout,
-
+  Loader2
 } from 'lucide-react';
 import PostCard from '../components/post/PostCard';
 import CommunityGuidelines from '../components/post/CommunityGuidelines';
 import { useGetPosts } from '../hooks/hooks';
 import { usePostSocket } from '../hooks/usePostSocket';
+import PostDetailModal from '../components/post/PostDetailModal';
+
+interface PostItem {
+  post: {
+    id: string;
+    location: string;
+    createdAt: string;
+    tag: string;
+    title: string;
+    description: string;
+    image?: string;
+  };
+  user: {
+    name: string;
+  };
+  upvotes: number;
+  downvotes: number;
+  comments: number;
+}
+
+interface SelectedPost {
+  postId: string;
+  author: string;
+  location: string;
+  time: string;
+  tag: string;
+  title: string;
+  content: string;
+  image?: string;
+  upvotes: number;
+  downvotes: number;
+  commentsCount: number;
+}
 
 function Post() {
 
-  const {data:posts} = useGetPosts();
+  const {data:posts , isLoading} = useGetPosts();
   usePostSocket();
+  const [selectedPost, setSelectedPost] = React.useState<SelectedPost | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
+  const handleOpenModal = (item: PostItem) => {
+    setSelectedPost({
+      postId: item.post.id,
+      author: item.user?.name || "Unknown",
+      location: item.post.location || "Kathmandu, Nepal",
+      time: item.post.createdAt,
+      tag: item.post.tag || "GENERAL",
+      title: item.post.title,
+      content: item.post.description,
+      image: item.post.image,
+      upvotes: item.upvotes,
+      downvotes: item.downvotes,
+      commentsCount: item.comments
+    });
+    setIsModalOpen(true);
+  };
 
   console.log(posts);
   return (
@@ -55,61 +107,39 @@ function Post() {
             </p>
           </div>
 
-          {posts?.map((post:any)=>(
+          {posts?.map((item: PostItem) => (
             <PostCard
-            author={post.user.name}
-            location={post.location || "Kathmandu, Nepal"}
-            time={post.posts.createdAt}
-            tag={post.tag ||"GENERAL"}
-            title={post.posts.title}
-            content={post.posts.description}
-            image={post.posts.image}
-            upvotes={post.posts.upvotes}
-            comments={post.posts.comments}
+              key={item.post.id}
+              postId={item.post.id}
+              author={item.user?.name || "Unknown"}
+              location={item.post.location || "Kathmandu, Nepal"}
+              time={item.post.createdAt}
+              tag={item.post.tag || "GENERAL"}
+              title={item.post.title}
+              content={item.post.description}
+              image={item.post.image}
+              upvotes={item.upvotes}
+              downvotes={item.downvotes}
+              comments={item.comments}
+              onClick={() => handleOpenModal(item)}
             />
           ))}
 
-          {/* Elena Moretti Post */}
-          <PostCard
-            author="Elena Moretti"
-            location="Tuscany, IT"
-            time="4h ago"
-            tag="PERMACULTURE"
-            title="Reclaiming Clay: A Study in Cover Cropping"
-            content="Successfully integrated a mix of crimson clover and winter rye into the south-facing slopes. The visual structure of the soil has already begun to shift toward a more granular consistency despite the heavy rains this season."
-            image="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070"
-            upvotes={128}
-            comments={24}
-          />
-
-          {/* Julian West Post */}
-          <PostCard
-            author="Julian West"
-            location="Oregon, US"
-            time="10h ago"
-            tag="HYDROPONICS"
-            title="Modular System for Urban Nutrient Cycling"
-            content="Prototype 04 is currently operational. Focused on a closed-loop system using kitchen bio-waste transformed into liquid nutrient solutions. The basil yield is exceeding expectations."
-            image="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070"
-            upvotes={85}
-            comments={12}
-          />
-
-             <PostCard
-            author="Julian West"
-            location="Oregon, US"
-            time="10h ago"
-            tag="HYDROPONICS"
-            title="Modular System for Urban Nutrient Cycling"
-            content="Prototype 04 is currently operational. Focused on a closed-loop system using kitchen bio-waste transformed into liquid nutrient solutions. The basil yield is exceeding expectations."
-            upvotes={85}
-            comments={12}
-          />
         </div>
       </div>
 
       {/* Right Sidebar */}
       <div className='sticky top-0'><CommunityGuidelines/></div>
+
+      {/* Post Detail Modal */}
+      {isLoading && <div className="flex items-center justify-center h-screen"><Loader2 className="animate-spin" /></div>}
+      {selectedPost && (
+        <PostDetailModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          post={selectedPost}
+        />
+      )}
     </div>
   );
 }
@@ -127,9 +157,5 @@ const SidebarItem = ({ icon, label, active = false }: { icon: React.ReactNode; l
     <span className={`text-[15px] font-[font9]  ${active ? 'text-[#2B492F]' : 'text-[#77716C]'}`}>{label}</span>
   </div>
 );
-
-
-
-
 
 export default Post;

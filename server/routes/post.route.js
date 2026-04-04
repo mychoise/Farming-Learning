@@ -23,7 +23,7 @@ postRouter.post("/create", auth, postImageandVideo.fields([
 ]),postValidation, addPost)
 postRouter.get("/get-posts", auth, getAllPosts)
 postRouter.get("/get-post/:id", auth, getIndividualPost)
-postRouter.put("/vote/:id", auth, voteValidation, vote)
+postRouter.post("/vote/:id", auth, voteValidation, vote)
 postRouter.post("/comment/:id", auth, commentValidation, comment)
 postRouter.get("/comment/:id", auth, allcomment)
 postRouter.get("/vote/:id", auth, voteCounts)
