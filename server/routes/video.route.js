@@ -22,7 +22,7 @@ videoRouter.post(
   addVideo,
 );
 videoRouter.get("/allVideo", auth, getVideos);
-videoRouter.get("/video/:id", auth, getVideoById);
+videoRouter.get("/get-video/:id", auth, getVideoById);
 videoRouter.delete("/video/:id", auth, admin, deleteVideo);
 
 export default videoRouter;

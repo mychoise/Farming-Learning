@@ -22,6 +22,8 @@ import {useAuth} from "./store/useAuth";
 import NoticesPage from "./pages/NoticesPage";
 import NoticeDetail from "./pages/NoticeDetail";
 import Post from "./pages/Post";
+import Video from "./pages/Video";
+import VideoDetail from "./pages/VideoDetail";
 const App = () => {
 
     const {user} = useAuth();
@@ -69,6 +71,8 @@ const App = () => {
           <Route path="/notices" element={<NoticesPage />} />
           <Route path="/notice/:id" element={<NoticeDetail />} />
                   <Route path="/post" element={<Post/>}/>
+                  <Route path="/video" element={<Video/>} />
+                  <Route path="/video/:id" element={<VideoDetail/>} />
         </Routes>
       </div>
     </div>

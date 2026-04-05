@@ -263,3 +263,18 @@ export const getPostById = async (postId: string) => {
     const result = await axiosInstance.get(`/post/get-post/${postId}`);
     return result.data;
 };
+export const getAllVideo = async()=>{
+    const result = await axiosInstance.get("/video/allVideo");
+    console.log("result is", result)
+    return result.data;
+}
+
+export const getVideoById = async (videoId: string) => {
+    const result = await axiosInstance.get(`/video/get-video/${videoId}`);
+    return result.data;
+}
+
+export const getRecommendedVideos = async (videoId: string) => {
+    const result = await axiosInstance.get(`/video/${videoId}`);
+    return result.data;
+}

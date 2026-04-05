@@ -15,7 +15,10 @@ import {
     votePost,
     getComments,
     addComment,
-    getPostById
+    getPostById,
+    getAllVideo,
+    getVideoById,
+    getRecommendedVideos
 } from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
@@ -226,21 +229,45 @@ export const useGetPostById = (postId: string) => {
     });
 };
 
-export default {
-    useOrganicFertilizer,
-    useInorganicFertilizer,
-    useAnimalWeightEstimation,
-    useUnitConversion,
-    useNewSession,
-    useSendMessageToAI,
-    useAiChatAll,
-    useDetectDisease,
-    useNotices,
-    useGetNoticeById,
-    useGetPosts,
-    useVote,
-    useVotePost,
-    useGetComments,
-    useAddComment,
-    useGetPostById
+export const useGetAllVideo = ()=>{
+    return useQuery({
+        queryKey: ["allVideo"],
+        queryFn:getAllVideo,
+        staleTime:60000,
+    })
+}
+
+export const useGetVideoById = (videoId: string) => {
+    return useQuery({
+        queryKey: ["video", videoId],
+        queryFn: () => getVideoById(videoId),
+        enabled: !!videoId,
+    });
 };
+
+export const useGetRecommendedVideos = (videoId: string) => {
+    return useQuery({
+        queryKey: ["recommendedVideos", videoId],
+        queryFn: () => getRecommendedVideos(videoId),
+        enabled: !!videoId,
+    });
+};
+
+// export default {
+//     useOrganicFertilizer,
+//     useInorganicFertilizer,
+//     useAnimalWeightEstimation,
+//     useUnitConversion,
+//     useNewSession,
+//     useSendMessageToAI,
+//     useAiChatAll,
+//     useDetectDisease,
+//     useNotices,
+//     useGetNoticeById,
+//     useGetPosts,
+//     useVote,
+//     useVotePost,
+//     useGetComments,
+//     useAddComment,
+//     useGetPostById
+// };
