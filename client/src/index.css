@@ -30,6 +30,12 @@
 }
 
 @font-face {
+    font-family: "font10";
+    src:url('./assets/fonts/font10.woff2');
+}
+
+
+@font-face {
     font-family: "font3";
     src: url('./assets/fonts/font3.woff2');
 }

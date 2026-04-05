@@ -1,11 +1,19 @@
+import MainDiv from "../components/Home/MainDiv.tsx";
+import Smart from "../components/Home/Smart.tsx";
+import Services from "../components/Home/Services.tsx";
+import Build from "../components/Home/Build.tsx";
 
 const HomePage = () => {
     return (
         <div>
-            <div>
-                <h1>Hello world</h1>
-                <p>How are you all?</p>
-            </div>
+            {/*Main div*/}
+            <MainDiv/>
+            {/*Smart Board*/}
+            <Smart/>
+            {/*Our Services*/}
+            <Services/>
+            {/*Build*/}
+            <Build/>
         </div>
     )
 }
