@@ -24,6 +24,7 @@ import NoticeDetail from "./pages/NoticeDetail";
 import Post from "./pages/Post";
 import Video from "./pages/Video";
 import VideoDetail from "./pages/VideoDetail";
+import HomePage from "./pages/HomePage.tsx";
 const App = () => {
 
     const {user} = useAuth();
@@ -49,6 +50,7 @@ const App = () => {
       <Navbar />
       <div className="h-[calc(100vh-64px)]">
         <Routes>
+            <Route path="/"  element={<HomePage/>} />
           <Route path="/crops" element={<CropList />} />
           <Route path="/crop/:id" element={<CropDetails />} />
           <Route path="/weather" element={user?<Weather />:<LoginPage/>} />

@@ -19,15 +19,8 @@ const Sidebar = () => {
   console.log(data);
   const navigate = useNavigate();
 
-// const CHAT_LIST = [
-//   { id: 1, title: "Corn rust treatment", date: "Today", preview: "Early-stage rust on lower leaves" },
-//   { id: 2, title: "Wheat irrigation plan", date: "Yesterday", preview: "Optimal schedule for dry season" },
-//   { id: 3, title: "Soil pH adjustment", date: "Mar 20", preview: "Lime application rates for acidic soil" },
-//   { id: 4, title: "Tomato blight check", date: "Mar 18", preview: "Brown lesions on stems identified" },
-//   { id: 5, title: "Fertilizer dosing Q2", date: "Mar 15", preview: "NPK ratios for spring planting" },
-//   { id: 6, title: "Pest scouting report", date: "Mar 12", preview: "Aphid pressure in north field" },
-//   { id: 7, title: "Cover crop selection", date: "Mar 10", preview: "Legume mix for nitrogen fixation" },
-// ];
+
+  
   return (
     <div>
 
