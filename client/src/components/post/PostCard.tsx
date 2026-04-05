@@ -73,30 +73,6 @@ const PostCard = ({
 
       {/* Engagement */}
       <div className="border-t border-gray-100 px-8 py-6 flex items-center gap-7 text-gray-600">
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            handleVote("upvote");
-          }}
-          className="flex items-center gap-1.5 hover:text-emerald-600 cursor-pointer transition"
-        >
-          <div className="hover:bg-[#C6EAC6] p-3 rounded-xl transition-colors">
-            <Leaf size={24} className="text-[#1C3921] group-hover:scale-110 transition-transform" />
-          </div>
-          <span className="font-[font8] text-base">{initialUpvotes}</span>
-        </div>
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            handleVote("downvote");
-          }}
-          className="flex items-center gap-1.5 hover:text-emerald-600 cursor-pointer transition"
-        >
-          <div className="hover:bg-[#FBD9CC] p-3 rounded-xl transition-colors">
-            <Leaf size={24} className="text-[#582006] rotate-180 group-hover:scale-110 transition-transform" />
-          </div>
-          <span className="font-[font8] text-base">{initialDownvotes}</span>
-        </div>
         <div className="flex items-center gap-1.5 hover:text-gray-800 cursor-pointer transition">
           <MessageSquare size={24} className="group-hover:text-emerald-700 transition-colors" />
           <span className="font-[font8] text-base">{comments} Comments</span>

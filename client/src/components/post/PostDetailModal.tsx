@@ -105,22 +105,6 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ isOpen, onClose, post
                 {post.content}
               </p>
             </div>
-
-            {/* Engagement Stats */}
-            <div className="flex items-center gap-8 pt-8 border-t border-gray-100">
-              <div className="flex items-center gap-2 text-emerald-900 font-bold">
-                <Leaf size={24} />
-                <span>{post.upvotes} Upvotes</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 font-bold">
-                <MessageSquare size={24} />
-                <span>{post.commentsCount} Comments</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600 hover:text-emerald-700 cursor-pointer transition-colors">
-                <Share2 size={24} />
-                <span className="font-bold">Share</span>
-              </div>
-            </div>
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import express from "express"
-import { addPost, getAllPosts , getIndividualPost, vote, comment , allcomment ,voteCounts} from "../controllers/post.controller.js"
+import { addPost, getAllPosts , getIndividualPost, comment , allcomment } from "../controllers/post.controller.js"
 
 import { auth } from "../middleware/auth.js"
 import postImageandVideo from "../config/postImageandVideo.config.js"
@@ -23,10 +23,8 @@ postRouter.post("/create", auth, postImageandVideo.fields([
 ]),postValidation, addPost)
 postRouter.get("/get-posts", auth, getAllPosts)
 postRouter.get("/get-post/:id", auth, getIndividualPost)
-postRouter.post("/vote/:id", auth, voteValidation, vote)
 postRouter.post("/comment/:id", auth, commentValidation, comment)
 postRouter.get("/comment/:id", auth, allcomment)
-postRouter.get("/vote/:id", auth, voteCounts)
 
 
 

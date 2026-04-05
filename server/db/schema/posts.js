@@ -4,17 +4,6 @@ import { index , uniqueIndex } from "drizzle-orm/pg-core";
 import { userTable } from "./user.js";
 
 
-export const voteType = pgEnum("vote_type", ["upvote", "downvote"]);
-
-export const postVote = pgTable("postVote",{
-    id:uuid("id").primaryKey().defaultRandom(),
-    userId: uuid("user_id").notNull().references(() => userTable.id, {onDelete:'cascade'}),
-    postId: uuid("post_id").notNull().references(() => postTable.id, {onDelete:'cascade'}),
-    vote: voteType("").notNull(),
-},(table)=>[
-    uniqueIndex("postVote_userId_postId_idx").on(table.userId, table.postId),
-])
-
 export const postComment = pgTable("postComment", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull().references(() => userTable.id, { onDelete: 'cascade' }),

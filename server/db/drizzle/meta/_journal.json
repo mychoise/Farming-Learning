@@ -57,6 +57,13 @@
       "when": 1775295314434,
       "tag": "0007_clear_shatterstar",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1775354836599,
+      "tag": "0008_melted_freak",
+      "breakpoints": true
     }
   ]
 }

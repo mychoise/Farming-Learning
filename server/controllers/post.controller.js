@@ -1,4 +1,4 @@
-import { postComment, postTable, postVote } from "../db/schema/posts.js";
+import { postComment, postTable } from "../db/schema/posts.js";
 import { db } from "../db.config.js";
 import { eq, and, sql , desc } from "drizzle-orm";
 import { validationResult } from "express-validator";
@@ -68,15 +68,13 @@ export const getAllPosts = async (req, res) => {
         const posts = await db.select({
             post: postTable,
             user: userTable,
-            upvotes: sql`count(CASE WHEN ${postVote.vote} = 'upvote' THEN 1 END)`.as("upvotes"),
-            downvotes: sql`count(CASE WHEN ${postVote.vote} = 'downvote' THEN 1 END)`.as("downvotes"),
             comments: sql`count(DISTINCT ${postComment.id})`.as("comments")
         })
         .from(postTable)
         .leftJoin(userTable, eq(postTable.createdBy, userTable.id))
-        .leftJoin(postVote, eq(postTable.id, postVote.postId))
         .leftJoin(postComment, eq(postTable.id, postComment.postId))
-        .groupBy(postTable.id, userTable.id);
+        .groupBy(postTable.id, userTable.id)
+        .orderBy(desc(postTable.createdAt));
 
         res.status(200).json({ success: true, posts });
     } catch (error) {
@@ -90,12 +88,9 @@ export const getIndividualPost = async (req, res) => {
         const { id } = req.params;
         const [postData] = await db.select({
             post: postTable,
-            upvotes: sql`count(CASE WHEN ${postVote.vote} = 'upvote' THEN 1 END)`.as("upvotes"),
-            downvotes: sql`count(CASE WHEN ${postVote.vote} = 'downvote' THEN 1 END)`.as("downvotes"),
-        })
+              })
         .from(postTable)
         .where(eq(postTable.id, id))
-        .leftJoin(postVote, eq(postTable.id, postVote.postId))
         .groupBy(postTable.id);
 
         const comments = await db.select({
@@ -129,52 +124,7 @@ export const getMyPosts  = async(req,res)=>{
     }
 }
 
-export const vote = async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, message: errors.array() });
-    }
-    try {
-        const { id: userId } = req.user;
-        const { id: postId } = req.params;
-        const { voteType: type } = req.body;
 
-        if (!['upvote', 'downvote'].includes(type)) {
-            return res.status(400).json({ success: false, message: "Invalid vote type" });
-        }
-
-        // Check if vote already exists
-        const [existingVote] = await db.select()
-            .from(postVote)
-            .where(and(eq(postVote.userId, userId), eq(postVote.postId, postId)));
-
-        if (existingVote) {
-            if (existingVote.vote === type) {
-                // Toggle off: if clicking the same button, remove the vote
-                await db.delete(postVote).where(eq(postVote.id, existingVote.id));
-                return res.status(200).json({ success: true, message: "Vote removed", action: "removed" });
-            } else {
-                // Switch vote: change from upvote to downvote or vice versa
-                const [updatedVote] = await db.update(postVote)
-                    .set({ vote: type })
-                    .where(eq(postVote.id, existingVote.id))
-                    .returning();
-                return res.status(200).json({ success: true, vote: updatedVote, action: "updated" });
-            }
-        } else {
-            // New vote
-            const [newVote] = await db.insert(postVote).values({
-                userId,
-                postId,
-                vote: type
-            }).returning();
-            return res.status(200).json({ success: true, vote: newVote, action: "added" });
-        }
-    } catch (error) {
-        console.log("Error in vote: ", error);
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
 
 export const allcomment = async (req, res) => {
   try {
@@ -213,20 +163,7 @@ export const allcomment = async (req, res) => {
   }
 };
 
-export const voteCounts = async(req,res)=>{
-    try {
-        const {id:userId} = req.user;
-        const {id} = req.params;
-        const likes= await db.select().from(postVote).where(and(eq(postVote.postId, id), eq(postVote.vote, "upvote")));
-        const [dislikes] = await db.select().from(postVote).where(and(eq(postVote.postId, id), eq(postVote.vote, "downvote")));
-       const likesCount = likes?.length||0
-       const dislikesCount = dislikes?.length||0
-        res.status(200).json({ success: true, likes, dislikes,likesCount,dislikesCount });
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json({success:false,message:error.message})
-    }
-}
+
 
 export const comment = async (req, res) => {
     try {
