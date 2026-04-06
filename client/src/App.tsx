@@ -16,7 +16,7 @@ import AiDiseaseDetection from "./pages/AiDiseaseDetection";
 import { Toaster } from "react-hot-toast";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import { refreshToken } from "./api/api";
 import {useAuth} from "./store/useAuth";
 import NoticesPage from "./pages/NoticesPage";
@@ -25,9 +25,24 @@ import Post from "./pages/Post";
 import Video from "./pages/Video";
 import VideoDetail from "./pages/VideoDetail";
 import HomePage from "./pages/HomePage.tsx";
+import Footer from "./components/Home/Footer.tsx";
+import { useLocation } from "react-router-dom";
 const App = () => {
 
     const {user} = useAuth();
+    const NoFotterPage = ["/login","/signup","/post"]
+    const [showFotter, setShowFotter] = useState<boolean>(true);
+    const location = useLocation();
+
+
+    useEffect(() => {
+        // check path whenever location changes
+        if (NoFotterPage.some((path) => location.pathname.includes(path))) {
+            setShowFotter(false);
+        } else {
+            setShowFotter(true);
+        }
+    }, [location.pathname]);
 
      useEffect(() => {
     const init = async () => {
@@ -76,7 +91,9 @@ const App = () => {
                   <Route path="/video" element={<Video/>} />
                   <Route path="/video/:id" element={<VideoDetail/>} />
         </Routes>
+          <Footer showFotter={showFotter} />
       </div>
+
     </div>
   );
 };
