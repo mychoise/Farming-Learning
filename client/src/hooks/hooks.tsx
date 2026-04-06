@@ -18,7 +18,7 @@ import {
     getPostById,
     getAllVideo,
     getVideoById,
-    getRecommendedVideos
+    getRecommendedVideos, createPost
 } from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
@@ -184,6 +184,22 @@ export const useGetPosts = ()=>{
     staleTime:60000,
  })
 }
+
+export const useCreatePost = (formData) => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn:(formData)=>createPost(formData),
+        onSuccess:(data)=>{
+            console.log("Response from server is", data);
+            queryClient.setQueryData(["posts"], (oldData: any) => {
+                if (!oldData) return [data];
+
+                return [data, ...oldData]; // add new post at top
+            });        }
+    })
+
+}
+
 export const useVote  = (postId: string)=>{
 return useQuery({
     queryKey: ["postVote", postId],
@@ -215,8 +231,9 @@ export const useAddComment = () => {
     return useMutation({
         mutationFn: addComment,
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ["comments", variables.postId] });
+            console.log("hh",variables)
             queryClient.invalidateQueries({ queryKey: ["posts"] });
+
         },
     });
 };
@@ -252,6 +269,8 @@ export const useGetRecommendedVideos = (videoId: string) => {
         enabled: !!videoId,
     });
 };
+
+
 
 // export default {
 //     useOrganicFertilizer,

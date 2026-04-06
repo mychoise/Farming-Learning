@@ -27,6 +27,8 @@ import VideoDetail from "./pages/VideoDetail";
 import HomePage from "./pages/HomePage.tsx";
 import Footer from "./components/Home/Footer.tsx";
 import { useLocation } from "react-router-dom";
+import CreatePost from "./components/post/CreatePost.tsx";
+import PostLayout from "./layout/PostLayout.tsx";
 const App = () => {
 
     const {user} = useAuth();
@@ -87,7 +89,10 @@ const App = () => {
           </Route>
           <Route path="/notices" element={<NoticesPage />} />
           <Route path="/notice/:id" element={<NoticeDetail />} />
-                  <Route path="/post" element={<Post/>}/>
+          <Route path="/post" element={<PostLayout/>} >
+                  <Route index element={<Post/>}/>
+            <Route path="create" element={<CreatePost/>}/>
+          </Route>
                   <Route path="/video" element={<Video/>} />
                   <Route path="/video/:id" element={<VideoDetail/>} />
         </Routes>

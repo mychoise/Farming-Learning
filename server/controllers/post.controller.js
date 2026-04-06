@@ -13,6 +13,7 @@ export const addPost = async (req, res) => {
     try {
         let {id:userId}  = req.user;
         let {title, description } = req.body;
+        console.log(title, description , req.files);
         if(!title || !description){
             return res.status(400).json({ success: false, message: "Title and description are required" });
         }
@@ -185,25 +186,19 @@ export const comment = async (req, res) => {
             id: postComment.id,
             comment: postComment.comment,
             createdAt: postComment.createdAt,
-           userId: userTable.id,
-        userName: userTable.name,
+            userId: userTable.id,
+            userName: userTable.name,
         })
-        .from(postComment)
-        .leftJoin(userTable, eq(postComment.userId, userTable.id))
-        .where(eq(postComment.id, newComment.id));
+            .from(postComment)
+            .leftJoin(userTable, eq(postComment.userId, userTable.id))
+            .where(eq(postComment.id, newComment.id));
 
-        console.log(commentWithUser)
+        console.log("commentWithUser", commentWithUser); // should print object now
 
-    const response =
-      commentWithUser.length > 0 ? commentWithUser : null;
+        const io = getIO()
+        io.to(`post:${postId}`).emit("new_comment", commentWithUser);
+        return res.json({ success: true, comment: commentWithUser });
 
-        const io = getIO();
-        io.to(`post:${postId}`).emit("new_comment", response);
-
-        return res.json({
-            success: true,
-            comment: response
-        });
     } catch (error) {
         console.log("error in comment", error);
         res.status(500).json({ success: false, message: error.message });

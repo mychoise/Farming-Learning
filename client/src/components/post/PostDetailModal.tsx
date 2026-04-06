@@ -26,7 +26,6 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ isOpen, onClose, post
   const { data: comments, isLoading: isLoadingComments } = useGetComments(post.postId);
   const { mutate: addCommentMutation, isPending: isAddingComment } = useAddComment();
 
-  console.log(comments)
 
   // Real-time updates via socket
   usePostSocket(post.postId);
@@ -37,12 +36,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ isOpen, onClose, post
     e.preventDefault();
     if (!newComment.trim()) return;
     addCommentMutation(
-      { postId: post.postId, comment: newComment },
-      {
-        onSuccess: () => {
-          setNewComment("");
-        },
-      }
+      { postId: post.postId, comment: newComment }
     );
   };
 

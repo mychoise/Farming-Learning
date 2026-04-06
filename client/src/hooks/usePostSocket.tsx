@@ -41,9 +41,21 @@ export const usePostSocket = (postId?: string) => {
 
       const commentHandler = (newComment: CommentUpdate) => {
         // Update comments for the specific post
+        console.log("socket new_comment", newComment); // ← paste this
+
+        const shaped = {
+          id: newComment.id,
+          comment: newComment.comment,
+          createdAt: newComment.createdAt,
+          user: {
+            id: newComment.userId,
+            name: newComment.userName,
+          }
+        };
+
         queryClient.setQueryData(["comments", postId], (oldComments: CommentUpdate[] | undefined) => {
-          if (!oldComments) return [newComment]
-          return [...oldComments, newComment]
+          if (!oldComments) return [shaped]
+          return [...oldComments, shaped]
         })
 
         // Update comment count in the posts list

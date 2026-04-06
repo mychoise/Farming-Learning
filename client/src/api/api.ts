@@ -278,3 +278,14 @@ export const getRecommendedVideos = async (videoId: string) => {
     const result = await axiosInstance.get(`/video/${videoId}`);
     return result.data;
 }
+
+export const createPost = async(formData:any) => {
+    const result = await axiosInstance.post(`/post/create`, formData,{
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
+    console.log("result is", result.data)
+    return result.data.data.dataToSend;
+}
+
