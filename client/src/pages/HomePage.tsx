@@ -5,8 +5,34 @@ import Build from "../components/Home/Build.tsx";
 import Contact from "../components/Home/Contact.tsx";
 import BigImage from "../components/Home/BigImage.tsx";
 import Footer from "../components/Home/Footer.tsx";
+import Lenis from "@studio-freight/lenis";
+import {useEffect, useRef} from "react";
 
 const HomePage = () => {
+    const scrollRef = useRef<Lenis | null>(null);
+
+    useEffect(() => {
+        // Initialize Lenis
+        const lenis = new Lenis({
+            duration: 3, // scroll animation duration
+            smooth: true,
+            // enable smooth scrolling
+        });
+
+        scrollRef.current = lenis;
+
+        // Animate scroll frame
+        const raf = (time: number) => {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        };
+        requestAnimationFrame(raf);
+
+        return () => {
+            lenis.destroy();
+        };
+    }, []);
+
     return (
         <div>
             {/*Main div*/}
