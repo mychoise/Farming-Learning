@@ -29,10 +29,14 @@ import Footer from "./components/Home/Footer.tsx";
 import { useLocation } from "react-router-dom";
 import CreatePost from "./components/post/CreatePost.tsx";
 import PostLayout from "./layout/PostLayout.tsx";
+import AdminLayout from "./layout/AdminLayout.tsx";
+import UploadVideo from "./components/admin/UploadVideo.tsx";
+import PublishNotice from "./components/admin/PublishNotice.tsx";
+import AddCrop from "./components/admin/AddCrop.tsx";
 const App = () => {
 
     const {user} = useAuth();
-    const NoFotterPage = ["/login","/signup","/post"]
+    const NoFotterPage = ["/login","/signup","/post","/admin"]
     const [showFotter, setShowFotter] = useState<boolean>(true);
     const location = useLocation();
 
@@ -84,18 +88,25 @@ const App = () => {
             <Route path="disease" element={<AiDiseaseDetection/>} />
           </Route>
           <Route path="/auth">
-            <Route path="login" element={<LoginPage />} />
-            <Route path="signup" element={<SignUpPage/>} />
+            <Route path="login" element={!user?<LoginPage />:<HomePage/>} />
+            <Route path="signup" element={!user?<SignUpPage/>:<HomePage/>} />
           </Route>
           <Route path="/notices" element={<NoticesPage />} />
           <Route path="/notice/:id" element={<NoticeDetail />} />
-          <Route path="/post" element={<PostLayout/>} >
+          <Route path="/post" element={user?<PostLayout/> :<LoginPage/>} >
                   <Route index element={<Post/>}/>
             <Route path="create" element={<CreatePost/>}/>
           </Route>
                   <Route path="/video" element={<Video/>} />
                   <Route path="/video/:id" element={<VideoDetail/>} />
+
+            <Route path="/admin" element={<AdminLayout />}>
+                <Route path={"addVideo"} element={<UploadVideo/>} />
+                <Route path={"addNotice"} element={<PublishNotice/>} />
+                <Route path={"addCrop"} element={<AddCrop/>} />
+            </Route>
         </Routes>
+
           <Footer showFotter={showFotter} />
       </div>
 

@@ -1,10 +1,5 @@
 import { axiosInstance } from "../lib/axios"
-import {data} from "framer-motion/m";
 
-export type WeatherApiResponse = {
-  success: boolean;
-  data: WeatherData;
-};
 
 export type WeatherData = {
   location: Location;
@@ -274,12 +269,9 @@ export const getVideoById = async (videoId: string) => {
     return result.data;
 }
 
-export const getRecommendedVideos = async (videoId: string) => {
-    const result = await axiosInstance.get(`/video/${videoId}`);
-    return result.data;
-}
 
-export const createPost = async(formData:any) => {
+
+export const createPost = async(formData:FormData) => {
     const result = await axiosInstance.post(`/post/create`, formData,{
         headers: {
             "Content-Type": "multipart/form-data",
@@ -289,3 +281,21 @@ export const createPost = async(formData:any) => {
     return result.data.data.dataToSend;
 }
 
+export const createNotice = async(formData) =>{
+    const result  = await axiosInstance.post(`/notices/create`,formData,{
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    })
+    return result.data
+}
+
+export const addVideo = async(formData:FormData)=>{
+    const result = await axiosInstance.post("/video/add",formData,{
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    })
+    console.log("result is", result.data)
+    return result.data
+}

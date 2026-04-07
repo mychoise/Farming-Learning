@@ -1,18 +1,13 @@
-import { Leaf, MessageSquare, Share2 } from "lucide-react";
-import { useVotePost } from "../../hooks/hooks";
+import { MessageSquare } from "lucide-react";
 
 const PostCard = ({
   author,
   location,
   time,
-  tag,
   title,
   content,
   image,
-  upvotes: initialUpvotes,
-  downvotes: initialDownvotes,
   comments,
-  postId,
   onClick
 }: {
   author: string;
@@ -28,11 +23,7 @@ const PostCard = ({
   postId: string;
   onClick: () => void;
 }) => {
-  const { mutate: vote } = useVotePost();
 
-  const handleVote = (type: "upvote" | "downvote") => {
-    vote({ postId, voteType: type });
-  };
 
   return (
     <div

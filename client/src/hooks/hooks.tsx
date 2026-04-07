@@ -11,14 +11,11 @@ import {
     getNotices,
     getNoticeById,
     getAllPost,
-    getPostVote,
-    votePost,
     getComments,
     addComment,
-    getPostById,
     getAllVideo,
     getVideoById,
-    getRecommendedVideos, createPost
+     createPost, createNotice, addVideo
 } from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
@@ -177,6 +174,17 @@ export const useGetNoticeById = (id:string)=>{
     })
 }
 
+export const useCreateNotice = ()=>{
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn:(formData)=>createNotice(formData),
+        onSuccess:(data)=>{
+            console.log("Response from server is", data);
+            queryClient.invalidateQueries({queryKey:["notices"]})
+        }
+    })
+}
+
 export const useGetPosts = ()=>{
  return useQuery({
     queryKey: ["posts"],
@@ -185,13 +193,13 @@ export const useGetPosts = ()=>{
  })
 }
 
-export const useCreatePost = (formData) => {
+export const useCreatePost = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn:(formData)=>createPost(formData),
+        mutationFn:(formData:FormData)=>createPost(formData),
         onSuccess:(data)=>{
             console.log("Response from server is", data);
-            queryClient.setQueryData(["posts"], (oldData: any) => {
+            queryClient.setQueryData(["posts"], (oldData: never) => {
                 if (!oldData) return [data];
 
                 return [data, ...oldData]; // add new post at top
@@ -200,23 +208,7 @@ export const useCreatePost = (formData) => {
 
 }
 
-export const useVote  = (postId: string)=>{
-return useQuery({
-    queryKey: ["postVote", postId],
-    queryFn: ({ queryKey }) => getPostVote(queryKey[1] as string),
-    staleTime:60000,
-})
-}
 
-export const useVotePost = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: votePost,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["posts"] });
-        },
-    });
-};
 
 export const useGetComments = (postId: string) => {
     return useQuery({
@@ -238,13 +230,6 @@ export const useAddComment = () => {
     });
 };
 
-export const useGetPostById = (postId: string) => {
-    return useQuery({
-        queryKey: ["post", postId],
-        queryFn: () => getPostById(postId),
-        enabled: !!postId,
-    });
-};
 
 export const useGetAllVideo = ()=>{
     return useQuery({
@@ -262,13 +247,17 @@ export const useGetVideoById = (videoId: string) => {
     });
 };
 
-export const useGetRecommendedVideos = (videoId: string) => {
-    return useQuery({
-        queryKey: ["recommendedVideos", videoId],
-        queryFn: () => getRecommendedVideos(videoId),
-        enabled: !!videoId,
-    });
-};
+
+export const useUploadVideo = ()=>{
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn:(formData)=>addVideo(formData),
+        onSuccess:(data)=>{
+            console.log("Response from server is", data);
+            queryClient.invalidateQueries({queryKey:["allVideo"]})
+        }
+    })
+}
 
 
 

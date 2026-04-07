@@ -59,19 +59,19 @@ export const getNoticeById = async (req, res) => {
 
 export const createNotice = async (req, res) => {
   try {
-    const { title, content, category } = req.body;
-    if (!title || !content || !category) {
+    const { title, content, category , lead } = req.body;
+    if (!title) {
       return res.status(400).json({
         success: false,
         message: "Title, content and category are required",
       });
     }
-
-    if (!req.file) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Image is required" });
-    }
+    //
+    // if (!req.file) {
+    //   return res
+    //     .status(400)
+    //     .json({ success: false, message: "Image is required" });
+    // }
 
     const [createdNotice] = await db
       .insert(noticeTable)
@@ -79,7 +79,8 @@ export const createNotice = async (req, res) => {
         title,
         content,
         category,
-        image: req.file.path,
+        lead,
+        image:  req.file ? req.file.path : null,
       })
       .returning();
 

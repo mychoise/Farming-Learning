@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X, Send, Leaf, MessageSquare, Share2, MapPin, Clock } from "lucide-react";
+import { X, Send,  MessageSquare, MapPin, Clock } from "lucide-react";
 import { useGetComments, useAddComment } from "../../hooks/hooks";
 import { usePostSocket } from "../../hooks/usePostSocket";
 

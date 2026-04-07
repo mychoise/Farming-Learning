@@ -11,13 +11,13 @@ interface PostUpdate {
 }
 
 interface CommentUpdate {
+  userId: any;
   id: string;
   comment: string;
   createdAt: string;
   user: {
     id: string;
     name: string;
-    image?: string;
   };
 }
 

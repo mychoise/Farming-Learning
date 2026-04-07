@@ -15,7 +15,6 @@ function CategoryBadge({ label }) {
 
 
 export default function Video() {
-  const [showPlayer, setShowPlayer] = useState(false);
 console.log("hello");
 const { data:videos } = useGetAllVideo();
 console.log("data is", videos);

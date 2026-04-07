@@ -22,7 +22,7 @@ export default function CreatePost() {
             formData.append("image", images[0].file);
         }
 
-        console.log("formData is",formData);
+        console.log("formData is",formData!);
 
          mutate(formData)
 
