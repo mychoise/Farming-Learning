@@ -204,14 +204,10 @@ Crops with Nepali months (Baisakh to Chaitra) for seed store, nursery & transpla
 
 ## Design Inspiration
 
-Landing page inspired by: https://didasko.framer.website/
 Modern, clean, mobile-first design with Nepali-friendly typography and colors (green, earth tones).
 Animations powered by GSAP.
 
-## Available Languages
 
-- Nepali (Primary)
-- English
 
 ## Scripts
 
