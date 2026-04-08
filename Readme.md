@@ -236,7 +236,6 @@ Animations powered by GSAP.
 
 ## Future Enhancements
 
-- Full AI image-based disease detection
 - Marketplace payment integration (eSewa, Khalti)
 - Offline support (PWA)
 - Voice input in Nepali
