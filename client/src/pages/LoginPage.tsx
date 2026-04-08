@@ -8,13 +8,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const {login , isSucess} = useAuth()
+  const {login , isSuccess} = useAuth()
 
   useEffect(() => {
-    if (isSucess) {
+    if (isSuccess) {
       navigate("/");
     }
-  }, [isSucess]);
+  }, [isSuccess, navigate]);
   const sendData  =  ()=>{
     console.log("hi, did you clled me");
     const finalData = {

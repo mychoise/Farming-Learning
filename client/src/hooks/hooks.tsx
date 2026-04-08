@@ -177,7 +177,7 @@ export const useGetNoticeById = (id:string)=>{
 export const useCreateNotice = ()=>{
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn:(formData)=>createNotice(formData),
+        mutationFn:(formData: FormData)=>createNotice(formData),
         onSuccess:(data)=>{
             console.log("Response from server is", data);
             queryClient.invalidateQueries({queryKey:["notices"]})

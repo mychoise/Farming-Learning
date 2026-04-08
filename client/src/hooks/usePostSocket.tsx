@@ -48,8 +48,8 @@ export const usePostSocket = (postId?: string) => {
           comment: newComment.comment,
           createdAt: newComment.createdAt,
           user: {
-            id: newComment.userId,
-            name: newComment.userName,
+            id: newComment.user?.id ?? String(newComment.userId),
+            name: newComment.user?.name ?? "Unknown",
           }
         };
 

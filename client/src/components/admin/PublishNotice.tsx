@@ -87,7 +87,7 @@ const PublishNotice = () => {
                         <label className="block text-xs font-[medium] text-gray-500 uppercase tracking-wider mb-2">Short Description</label>
                         <textarea
                             onChange={(e)=>setLead(e.target.value)}
-                            rows="3"
+                            rows={3}
                             value={lead}
                             placeholder="A brief summary that appears on the notification preview..."
                             className="w-full p-3 border font-[font5] border-gray-200 rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all resize-none"
@@ -100,7 +100,7 @@ const PublishNotice = () => {
                             <label className="block text-xs font-[medium] text-gray-500 uppercase tracking-wider mb-4">Full Content</label>
                             <textarea
                                 onChange={(e)=>setContent(e.target.value)}
-                                rows="12"
+                                rows={12}
                                 value={content}
                                 placeholder="Write the full body of your notice here. Provide detailed instructions, data, or news updates..."
                                 className="w-full font-[font5] p-2 focus:outline-none text-gray-700 resize-none"

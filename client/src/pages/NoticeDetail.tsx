@@ -10,6 +10,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useGetNoticeById } from "../hooks/hooks";
 import {useQueryClient} from "@tanstack/react-query";
 
+type NoticeItem = {
+  id: string;
+  category: string;
+  createdAt: string;
+  title: string;
+  content: string;
+};
+
+type NoticesCache = {
+  data: NoticeItem[];
+};
+
 
 const recentPolicies = [
   {
@@ -46,11 +58,11 @@ export default function NoticeDetail() {
 
   const navigate = useNavigate()
   const queryClient = useQueryClient();
-const data = queryClient.getQueryData(["notices",1])
+const data = queryClient.getQueryData<NoticesCache>(["notices",1])
 
 console.log("hello my data is", data)
 
-const filteredData  = data?.data?.filter((item:any)=>item.category === notice?.data?.category)
+const filteredData  = data?.data?.filter((item)=>item.category === notice?.data?.category)
 
 console.log("all data sisisi" , filteredData)
 

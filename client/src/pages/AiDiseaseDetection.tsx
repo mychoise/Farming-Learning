@@ -74,19 +74,15 @@ export default function AiDiseaseDetection() {
     console.log("file is" , fileRef?.current?.files?.[0])
     console.log("context is" , context)
 
-const finalData:FormData = new FormData();
-
 const image = (fileRef.current)?.files?.[0];
-if (image) {
-  finalData.append("image", image);
-}
+if (!image) return;
 
-finalData.append("descriptionOfDisease", context);
-finalData.append("plantName", selectedCrop)
+const finalData = {
+  image,
+  descriptionOfDisease: context,
+  plantName: selectedCrop,
+};
 
-for (const pair of finalData.entries()) {
-  console.log(pair[0], pair[1]);
-}
     mutate(finalData);
     console.log('your fucking data is', data)
   }

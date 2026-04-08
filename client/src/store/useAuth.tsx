@@ -15,6 +15,7 @@ type AuthState = {
     isSuccess: boolean;
     setToken: (token: string) => void;
     setUser: (user: User) => void;
+    logout: () => void;
     login: (data: { email: string; password: string }) => Promise<void>;
     signup: (data: { email: string; password: string; name: string }) => Promise<void>;
 };
@@ -26,6 +27,7 @@ export const useAuth = create<AuthState>((set) => ({
 
     setToken: (token) => set({ token }),
     setUser: (user) => set({ user }),
+    logout: () => set({ user: null, token: null, isSuccess: false }),
 
     login: async (data) => {
         try {

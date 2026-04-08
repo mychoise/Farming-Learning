@@ -2,23 +2,32 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../store/useAuth";
 import { useNavigate } from "react-router-dom";
+
+type SignUpForm = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+type SignUpErrors = Partial<Record<keyof SignUpForm, string>>;
+
 export default function SignUpPage() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<SignUpForm>({
     name: "",
     email: "",
     password: "",
   });
 
-  const [errors, setErrors] = useState({});
-  const { signup , isSucess } = useAuth();
+  const [errors, setErrors] = useState<SignUpErrors>({});
+  const { signup , isSuccess } = useAuth();
 const navigate  = useNavigate()
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
   const validate = () => {
-    const newErrors = {};
+    const newErrors: SignUpErrors = {};
 
     if (!form.name.trim()) newErrors.name = "Full name is required";
     if (!form.email.trim()) newErrors.email = "Email is required";
@@ -29,10 +38,10 @@ const navigate  = useNavigate()
   };
 
   useEffect(() => {
-    if (isSucess) {
+    if (isSuccess) {
       navigate("/");
     }
-  }, [isSucess]);
+  }, [isSuccess, navigate]);
 
   const handleSubmit = async () => {
     if (!validate()) return;

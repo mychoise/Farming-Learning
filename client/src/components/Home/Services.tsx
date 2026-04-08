@@ -24,7 +24,7 @@ const Services = () => {
                 scrollTrigger: {
                     trigger: imageRef.current,
                     start: "top 80%", // start when container top hits 80% viewport
-                    scrub: "top 70%",      // smooth scroll tie
+                    scrub: true,      // smooth scroll tie
                 },
             }
         );

@@ -281,7 +281,7 @@ export const createPost = async(formData:FormData) => {
     return result.data.data.dataToSend;
 }
 
-export const createNotice = async(formData) =>{
+export const createNotice = async(formData: FormData) =>{
     const result  = await axiosInstance.post(`/notices/create`,formData,{
         headers: {
             "Content-Type": "multipart/form-data",

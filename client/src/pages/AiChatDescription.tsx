@@ -4,31 +4,16 @@ import { useAI } from "../store/useAI";
 import { useSendMessageToAI, useAiChatAll } from "../hooks/hooks";
 import ReactMarkdown from "react-markdown";
 import { useQueryClient } from "@tanstack/react-query";
-const INITIAL_MESSAGES = [
-  {
-    "id": "95ab829e-6526-434b-9b5c-dec6012609d1",
-    "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
-    "question": "hi",
-    "response": "Namaste! I am your agricultural consultant...",
-    "createdAt": "2026-03-25T21:15:14.298Z"
-  },
-  {
-    "id": "87b76ad4-fd6a-40c3-b2d3-9d656e4cad82",
-    "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
-    "question": "namaste",
-    "response": "Namaste! As an agricultural consultant...",
-    "createdAt": "2026-03-26T15:24:48.289Z"
-  },
-  {
-    "id": "a191d400-9314-415e-9c07-08ae68ce02b2",
-    "communicationId": "1905930f-42dc-4fed-8c03-5473341e9312",
-    "question": "what is compost manure",
-    "response": "Namaste! As an agricultural consultant working in the diverse landscapes of Nepal...",
-    "createdAt": "2026-03-26T15:25:39.150Z"
-  }
-]
 
-function LeafIcon({ size = 15 }) {
+type AiChatMessage = {
+  id: string;
+  communicationId: string;
+  question: string;
+  response?: string;
+  createdAt: string;
+};
+
+function LeafIcon({ size = 15 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M11 20A7 7 0 0 1 4 13c0-5 6-11 8-11s8 6 8 11a7 7 0 0 1-7 7z" />
@@ -38,13 +23,13 @@ function LeafIcon({ size = 15 }) {
 }
 
 export default function AiChatDescription() {
-    const {id} = useParams()
-  const {questionForAI}: any = useAI()
+    const {id} = useParams<{ id: string }>()
+  const {questionForAI} = useAI()
 
-  const [messages, setMessages] = useState<any | null>(null);
+  const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
+  const [localErrorMessage, setLocalErrorMessage] = useState<AiChatMessage | null>(null);
   const [input, setInput] = useState(questionForAI || "");
-  const [typing] = useState(false);
-  const bottomRef = useRef(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const{data:chatAll} = useAiChatAll(id || "")
 
@@ -55,70 +40,59 @@ export default function AiChatDescription() {
 // ))
 
 
-  useEffect(() => {
-    if (chatAll?.data) {
-        setMessages(chatAll.data);
-    }
-}, [chatAll])
-
     const queryClient = useQueryClient()
 
+  const serverMessages: AiChatMessage[] = Array.isArray(chatAll?.data)
+    ? (chatAll.data as AiChatMessage[])
+    : [];
+
+  const pendingMessage: AiChatMessage[] = pendingQuestion && id
+    ? [{
+        id: "pending-local",
+        communicationId: id,
+        question: pendingQuestion,
+        createdAt: new Date().toISOString(),
+      }]
+    : [];
+
+  const messages = [...serverMessages, ...pendingMessage, ...(localErrorMessage ? [localErrorMessage] : [])];
 
 
+
+
+  const {mutate , isPending} = useSendMessageToAI()
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typing]);
-
-  const {mutate , isPending} = useSendMessageToAI()
+  }, [messages, isPending]);
 
 
 
 
 
 const send = () => {
-    if (!input.trim()) return;
+    const question = input.trim();
+    if (!question || !id) return;
 
-    const finalData = { id, question: input };
-
-    // add user message with proper structure
-    const tempMessage = {
-        id: Date.now().toString(),
-        communicationId: id || "",
-        question: input,
-        createdAt: new Date().toISOString()
-    };
-
-    setMessages((m) => [...m, tempMessage]);
+    setLocalErrorMessage(null);
+    setPendingQuestion(question);
     setInput("");
-    mutate(finalData, {
-        onSuccess: (data) => {
-            setMessages((m) => [
-                ...(m || []).slice(0, -1), // Remove the temporary message
-                {
-                    id: data?.data?.id || Date.now().toString(),
-                    communicationId: data?.data?.communicationId || id || "",
-                    question: input,
-                    response: data?.data?.response || "No response",
-                    createdAt: data?.data?.createdAt || new Date().toISOString()
-                },
-
-            ]);
+    mutate({ id, question }, {
+        onSuccess: () => {
+            setPendingQuestion(null);
             queryClient.invalidateQueries({
-                queryKey: ["ai-chats"],
+                queryKey: ["getAllAiChat", id],
             });
         },
         onError: () => {
-            setMessages((m) => [
-                ...(m || []).slice(0, -1), // Remove the temporary message
-                {
-                    id: (Date.now() + 1).toString(),
-                    communicationId: id || "",
-                    question: input,
-                    response: "Something went wrong.",
-                    createdAt: new Date().toISOString()
-                },
-            ]);
+            setPendingQuestion(null);
+            setLocalErrorMessage({
+              id: `local-error-${Date.now()}`,
+              communicationId: id,
+              question,
+              response: "Something went wrong.",
+              createdAt: new Date().toISOString()
+            });
         }
     });
 
@@ -140,7 +114,7 @@ const send = () => {
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto py-8 px-10 space-y-8">
-{messages?.map((msg) => (
+{messages.map((msg) => (
   <div key={msg.id}>
     {/* User message */}
     <div className="flex flex-row-reverse items-start gap-4 ml-auto" style={{ maxWidth: "580px" }}>
