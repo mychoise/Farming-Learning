@@ -103,12 +103,28 @@ export const InorganicFertilizerCalculator = async (req, res) => {
   try {
     const { cropName, SystemOfLandCalculation, length, wide } = req.body;
 
-    if (!cropName || !SystemOfLandCalculation || !length || !wide) {
+    if (
+      cropName == null ||
+      SystemOfLandCalculation == null ||
+      length == null ||
+      wide == null
+    ) {
       return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    if (
+      typeof cropName !== "string" ||
+      typeof SystemOfLandCalculation !== "string"
+    ) {
+      return res.status(400).json({ message: "Invalid field types" });
     }
 
     const lengthNum = Number(length);
     const wideNum = Number(wide);
+
+    if (!Number.isFinite(lengthNum) || !Number.isFinite(wideNum)) {
+      return res.status(400).json({ message: "Invalid numeric values" });
+    }
 
     const [crop] = await db
       .select({
