@@ -15,6 +15,8 @@ const HomePage = () => {
         // Initialize Lenis
         const lenis = new Lenis({
             duration: 3, // scroll animation duration
+            smooth: true,
+            direction: "vertical",
         });
 
         scrollRef.current = lenis;
