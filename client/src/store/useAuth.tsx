@@ -1,66 +1,53 @@
-import {create} from "zustand"
-import { login, signup } from "../api/api.js"
-import {toast} from "react-hot-toast"
+import { create } from "zustand";
+import { login, signup } from "../api/api.js";
+import { toast } from "react-hot-toast";
+
+type User = {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+};
 
 type AuthState = {
-    user:unknown;
+    user: User | null;
     token: string | null;
+    isSuccess: boolean;
     setToken: (token: string) => void;
+    setUser: (user: User) => void;
     login: (data: { email: string; password: string }) => Promise<void>;
     signup: (data: { email: string; password: string; name: string }) => Promise<void>;
-    isSucess:boolean;
-    setUser:(user:{user:unknown}) => Promise<void>
-}
+};
 
 export const useAuth = create<AuthState>((set) => ({
     user: null,
     token: null,
-    setToken: (token: string) => {
-        set({token})
-    },
-    setUser: (user: unknown) => {
-        set({user})
-    },
-    login:async(data:{email:string, password:string})=>{
+    isSuccess: false,
+
+    setToken: (token) => set({ token }),
+    setUser: (user) => set({ user }),
+
+    login: async (data) => {
         try {
-            const result = await login(data)
-console.log("login result is ",result.user)
-console.log("token is", result.token)
-set({user:result.user, token:result.token})
-set({isSucess:true})
-toast.success("Login in success")
+            const result = await login(data);
+            set({ user: result.user, token: result.token, isSuccess: true });
+            toast.success("Login successful");
+        } catch (error: any) {
+            set({ isSuccess: false });
+            const msg = error?.response?.data?.message;
+            toast.error(Array.isArray(msg) ? msg[0] : msg || "Login failed");
         }
-        catch (error: any) {
-  set({ isSucess: false });
-
-  const msg = error?.response?.data?.message;
-
-  if (Array.isArray(msg)) {
-    toast.error(msg[0]); // show first validation error
-  } else {
-    toast.error(msg || "Login failed");
-  }
-}
     },
-    signup:async(data:{email:string, password:string, name:string})=>{
+
+    signup: async (data) => {
         try {
-  const result = await signup(data)
-        console.log("sign up result is ",result)
-        set({user:result.data, token:result.token})
-        set({isSucess:true})
-        toast.success("Sign up successful")
+            const result = await signup(data);
+            set({ user: result.data, token: result.token, isSuccess: true });
+            toast.success("Sign up successful");
+        } catch (error: any) {
+            set({ isSuccess: false });
+            const msg = error?.response?.data?.message;
+            toast.error(Array.isArray(msg) ? msg[0] : msg || "Sign up failed");
         }
-        catch (error: any) {
-  set({ isSucess: false });
-
-  const msg = error?.response?.data?.message;
-
-  if (Array.isArray(msg)) {
-    toast.error(msg[0]); // show first validation error
-  } else {
-    toast.error(msg || "Login failed");
-  }
-}
-
-    }
-}))
+    },
+}));

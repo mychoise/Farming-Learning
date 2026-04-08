@@ -48,7 +48,7 @@ const HomePage = () => {
             {/*IMage*/}
             <BigImage/>
             {/*Footer*/}
-            <Footer/>
+            {/*<Footer/>*/}
         </div>
     )
 }

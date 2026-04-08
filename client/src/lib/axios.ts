@@ -72,6 +72,7 @@ axiosInstance.interceptors.response.use(
 
         useAuth.getState().setToken(newToken);
 
+
         processQueue(null, newToken);
 
         originalRequest.headers.Authorization = `Bearer ${newToken}`;

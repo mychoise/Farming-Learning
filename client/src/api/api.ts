@@ -299,3 +299,13 @@ export const addVideo = async(formData:FormData)=>{
     console.log("result is", result.data)
     return result.data
 }
+
+export const addCrop = async(formData:FormData)=>{
+    const result = await axiosInstance.post("/crop/add",formData,{
+        headers: {
+            "Content-Type": "multipart/form-data",
+        }
+    })
+    console.log("result is", result.data)
+    return result.data
+}

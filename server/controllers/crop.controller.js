@@ -102,7 +102,7 @@ export const getSpecificCrop = async (req, res) => {
 
 export const addCrop = async (req, res) => {
   try {
-    const {
+    let {
       name,
       nepaliName,
       description,
@@ -120,6 +120,7 @@ export const addCrop = async (req, res) => {
       difficulty,
       profitMin,
       profitMax,
+      scientificName
     } = req.body;
 
     // Required fields
@@ -185,6 +186,17 @@ export const addCrop = async (req, res) => {
     }
 
     // growingGuide validation (jsonb array)
+    if (typeof growingGuide === "string") {
+      try {
+        growingGuide = JSON.parse(growingGuide);
+      } catch (err) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid JSON format for growingGuide",
+        });
+      }
+    }
+
     if (growingGuide !== undefined && growingGuide !== null) {
       if (!Array.isArray(growingGuide)) {
         return res.status(400).json({
@@ -249,9 +261,10 @@ export const addCrop = async (req, res) => {
         wateringSchedule: parseList(wateringSchedule),
         harvestingTips: parseList(harvestingTips),
         difficulty: difficulty || null,
-        profitMin: profitMin ? String(profitMin) : null,
-        profitMax: profitMax ? String(profitMax) : null,
+        profitMin: profitMin ? Number(profitMin) : null,
+        profitMax: profitMax ? Number(profitMax) : null,
         imageUrl,
+        scientificName
       })
       .returning();
 

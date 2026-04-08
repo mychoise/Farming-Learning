@@ -2,7 +2,7 @@ import CropList from "./pages/CropList";
 import Navbar from "./components/Navbar";
 import CropDetails from "./pages/CropDetails";
 import Weather from "./pages/Weather";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route,Navigate } from "react-router-dom";
 import FertilizerEngine from "./pages/FertilizerEngine";
 import InorganicFertilizer from "./pages/InorganicFertilizer";
 import CalculationLayout from "./layout/CalculationLayout";
@@ -36,7 +36,7 @@ import AddCrop from "./components/admin/AddCrop.tsx";
 const App = () => {
 
     const {user} = useAuth();
-    const NoFotterPage = ["/login","/signup","/post","/admin"]
+    const NoFotterPage = ["/login","/signup","/post","/admin","/crop"]
     const [showFotter, setShowFotter] = useState<boolean>(true);
     const location = useLocation();
 
@@ -88,8 +88,19 @@ const App = () => {
             <Route path="disease" element={<AiDiseaseDetection/>} />
           </Route>
           <Route path="/auth">
-            <Route path="login" element={!user?<LoginPage />:<HomePage/>} />
-            <Route path="signup" element={!user?<SignUpPage/>:<HomePage/>} />
+              <Route
+                  path="login"
+                  element={
+                      !user ? (
+                          <LoginPage />
+                      ) : user.role === "admin" ? (
+                          <Navigate to="/admin/addCrop" />
+                      ) : (
+                          <Navigate to="/" />
+                      )
+                  }
+              />
+              <Route path="signup" element={!user?<SignUpPage/>:<HomePage/>} />
           </Route>
           <Route path="/notices" element={<NoticesPage />} />
           <Route path="/notice/:id" element={<NoticeDetail />} />
@@ -101,7 +112,7 @@ const App = () => {
                   <Route path="/video/:id" element={<VideoDetail/>} />
 
             <Route path="/admin" element={<AdminLayout />}>
-                <Route path={"addVideo"} element={<UploadVideo/>} />
+                <Route index path={"addVideo"} element={<UploadVideo/>} />
                 <Route path={"addNotice"} element={<PublishNotice/>} />
                 <Route path={"addCrop"} element={<AddCrop/>} />
             </Route>

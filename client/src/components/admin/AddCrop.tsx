@@ -1,9 +1,11 @@
 import { useState } from "react";
 import {Amphora, CircleDollarSign, Image, ImagePlus, Leaf, PlusCircle, Tractor} from "lucide-react";
+import {toast} from "react-hot-toast";
+import {useAddCrop} from "../../hooks/hooks.tsx";
 
-const SEASONS = ["Spring (Basanta)", "Summer (Grishma)", "Autumn (Sharad)", "Winter (Hemanta)", "Pre-monsoon (Chaitra)", "Monsoon (Barkha)"];
+const SEASONS = ["spring", "winter", "monsoon", "all"];
 const CATEGORIES = ["Vegetable", "Fruit", "Grain", "Herb", "Flower", "Spice", "Legume", "Root Crop"];
-const DIFFICULTIES = ["Beginner Friendly", "Intermediate", "Advanced", "Expert"];
+const DIFFICULTIES = ["beginner", "intermediate", "advanced"];
 
 function SectionHeader({ icon, title, color = "bg-green-100 text-green-700" }) {
     return (
@@ -30,15 +32,18 @@ export default function AddCrop() {
     const [steps, setSteps] = useState([{ id: 1, title: "", description: "" }]);
     const [dragOver, setDragOver] = useState(false);
     const [imagePreview, setImagePreview] = useState(null);
+    const [image,setImage] = useState(null);
     const [form, setForm] = useState({
         commonName: "", nepaliName: "", botanicalName: "",
-        category: "Vegetable", difficulty: "Beginner Friendly",
+        category: "Vegetable", difficulty: "beginner",
         description: "",
         nitrogen: 0, phosphorus: 0, potassium: 0,
-        soilType: "", idealClimate: "", season: "Spring (Basanta)",
+        soilType: "", idealClimate: "", season: "spring",
         wateringSchedule: "", harvestingTips: "",
         minProfit: "50,000", maxProfit: "120,000",
+        icon:""
     });
+    const {mutate}= useAddCrop();
 
     function handleChange(field, value) {
         setForm(f => ({ ...f, [field]: value }));
@@ -48,6 +53,7 @@ export default function AddCrop() {
         e.preventDefault();
         setDragOver(false);
         const file = e.dataTransfer?.files?.[0] || e.target?.files?.[0];
+        setImage(file);
         if (file && (file.type === "image/png" || file.type === "image/jpeg")) {
             const reader = new FileReader();
             reader.onload = ev => setImagePreview(ev.target.result);
@@ -65,6 +71,67 @@ export default function AddCrop() {
 
     function removeStep(id) {
         if (steps.length > 1) setSteps(s => s.filter(st => st.id !== id));
+    }
+
+    function handleSubmit() {
+        console.log("hi, i have been clicked")
+        console.log("form information is",form)
+        console.log("growing suide is ",steps)
+        if(!form.commonName || !form.botanicalName || !form.description || !form.category || !form.difficulty){
+            toast.error("Please fill in all required fields (Common Name, Botanical Name, Description).");
+            return;
+        }
+
+        const formatedGuide = JSON.stringify(steps.map(s => ({ title: s.title, description: s.description })));
+    console.log("formated guide is ",formatedGuide)
+        console.log("image is", image)
+        const formData = new FormData();
+        formData.append("name", form.commonName);
+        formData.append("nepaliName", form.nepaliName);
+        formData.append("scientificName", form.botanicalName);
+        formData.append("description", form.description);
+        formData.append("categoryName", form.category);
+        formData.append("difficulty", form.difficulty);
+        if (form.icon) {
+            formData.append("icon", form.icon);
+        }
+
+        formData.append("nitrogen", String(form.nitrogen));
+        formData.append("phosphorus", String(form.phosphorus));
+        formData.append("potassium", String(form.potassium));
+
+        // Growing Conditions
+        formData.append("soilType", form.soilType);
+        formData.append("climate", form.idealClimate);
+        formData.append("season", form.season);
+
+        // Care Info
+        formData.append("wateringSchedule", form.wateringSchedule);
+        formData.append("harvestingTips", form.harvestingTips);
+
+        // Growing Guide (stringified JSON)
+        const formattedGuide = JSON.stringify(
+            steps.map(s => ({ title: s.title, description: s.description }))
+        );
+        formData.append("growingGuide", formattedGuide);
+
+        // Profit
+        formData.append("profitMin", form.minProfit);
+        formData.append("profitMax", form.maxProfit);
+        if(image){
+            formData.append("image", image);
+        }
+
+        console.log("final form data is ", formData)
+        mutate(formData,{
+            onSuccess:()=>{
+                toast.success("Crop added successfully.");
+            },
+            onError:()=>{
+                toast.error("Error in adding Crop!");
+            }
+        })
+
     }
 
     return (
@@ -140,6 +207,16 @@ export default function AddCrop() {
                                 placeholder="e.g. गेंदा"
                                 value={form.nepaliName}
                                 onChange={e => handleChange("nepaliName", e.target.value)}
+                            />
+                        </div>
+
+                        <div>
+                            <Label>Icon</Label>
+                            <input
+                                className={`${inputBase} font-[font5]`}
+                                placeholder="e.g. 🥦"
+                                value={form.icon}
+                                onChange={e => handleChange("icon", e.target.value)}
                             />
                         </div>
                     </div>
@@ -337,7 +414,9 @@ export default function AddCrop() {
                     <button className="px-7 py-3 rounded-2xl border-2 border-gray-300 text-gray-600 text-sm  hover:border-red-300 hover:text-red-500 transition-all duration-200 font-[font5] cursor-pointer">
                         Discard Draft
                     </button>
-                    <button className="px-8 py-3 rounded-2xl bg-green-900 text-white text-sm font-[font5] hover:-translate-y-0.5 hover:shadow-xl transition-all cursor-pointer duration-200 ">
+                    <button
+                        onClick={handleSubmit}
+                        className="px-8 py-3 rounded-2xl bg-green-900 text-white text-sm font-[font5] hover:-translate-y-0.5 hover:shadow-xl transition-all cursor-pointer duration-200 ">
                         Publish to Catalog
                     </button>
                 </div>

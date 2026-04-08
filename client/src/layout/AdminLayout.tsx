@@ -1,10 +1,19 @@
-import Sidebar from "../components/ai/Sidebar";
-import { Outlet } from "react-router-dom";
+import {Navigate, Outlet} from "react-router-dom";
+import AdminSidebar from "../components/admin/AdminSidebar.tsx";
+import {useAuth} from "../store/useAuth.tsx";
 
 const AiLayout = () => {
+    const {user} = useAuth();
+    console.log("user is",user)
+    if(!user){
+        return <Navigate to={"/login"}/>
+    }
+    if (user?.role !== "admin") {
+        return <Navigate to="/" />;
+    }
     return (
         <div className="flex h-full overflow-hidden ">
-            <Sidebar />
+            <AdminSidebar />
             <main className="flex-1 overflow-y-auto ">
                 <Outlet />
             </main>

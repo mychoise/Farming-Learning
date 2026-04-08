@@ -14,8 +14,7 @@ const MainDiv = () => {
                             [WE ARE AGRILEARN,]
                             <br/>
                             <h1 className="font-[font3] mt-2 text-[22px]">
-                                We turn your farm's data into clear, simple actions that boost efficiency, increase yield, and improve your bottom line
-                            </h1>
+                                We transform your farm’s information into simple, actionable steps that increase efficiency, improve yield, and grow profits.                            </h1>
                         </h1>
                     </div>
 

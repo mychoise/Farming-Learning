@@ -35,8 +35,7 @@ const Services = () => {
             <div className="w-[37%]">
                 <h1 className="font-[font10] text-2xl">OUR SERVICES</h1>
                 <p className="font-[font3] mt-3 text-4xl">
-                    We’ve built a suite of powerful, easy-to-use services that work together to make your entire operation smarter. From soil to sale, we’ve got you covered.
-                </p>
+                    We offer a suite of simple, powerful tools that work together to make your whole farm smarter. From soil to harvest, we’ve got you covered                </p>
             </div>
 
             <div>

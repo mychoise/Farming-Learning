@@ -15,7 +15,7 @@ import {
     addComment,
     getAllVideo,
     getVideoById,
-     createPost, createNotice, addVideo
+    createPost, createNotice, addVideo, addCrop
 } from "../api/api";
 import type { OrganicFertilizerCalculation ,InOrganicFertilizerCalculation , animalWeightEstimationResponse} from "../api/api";
 
@@ -251,10 +251,20 @@ export const useGetVideoById = (videoId: string) => {
 export const useUploadVideo = ()=>{
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn:(formData)=>addVideo(formData),
+        mutationFn:(formData:FormData)=>addVideo(formData),
         onSuccess:(data)=>{
             console.log("Response from server is", data);
             queryClient.invalidateQueries({queryKey:["allVideo"]})
+        }
+    })
+}
+
+export const useAddCrop = ()=>{
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn:(formData:FormData)=>addCrop(formData),
+        onSuccess:(data)=>{
+            queryClient.invalidateQueries({queryKey:["allCrop"]})
         }
     })
 }
