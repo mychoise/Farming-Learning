@@ -12,7 +12,9 @@ import postRouter from "./routes/post.route.js";
 import cropCalenderRouter from "./routes/cropcalender.route.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import helmet from "helmet";
 import cors from "cors";
+import {rateLimit} from "express-rate-limit";
 import { initSocket } from "./config/socket.js";
 dotenv.config();
 const app = express();
@@ -23,7 +25,40 @@ const io = new Server(httpServer,{
     credentials: true,
   },
 })
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 8, // Limit each IP to 8 requests per `window` (here, per 15 minutes).
+    standardHeaders: 'draft-8', // draft-6: `RateLimit-*` headers; draft-7 & draft-8: combined `RateLimit` header
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+    ipv6Subnet: 56, // Set to 60 or 64 to be less aggressive, or 52 or 48 to be more aggressive
+    // store: ... , // Redis, Memcached, etc. See below.
+})
+
+const aiLimiter = rateLimit({
+    windowMs: 60 * 1000,        // 1 minute
+    limit: 8,                   // Max 8 AI requests per minute (protects Ollama + Gemini cost)
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        success: false,
+        error: "AI usage limit reached. Please wait a moment before trying again.",
+    },
+});
+
 initSocket(io)
+
+app.use(
+    helmet({
+        contentSecurityPolicy: false,           // Safe for API
+        crossOriginEmbedderPolicy: false,       // Important when frontend & backend are on different domains
+        crossOriginOpenerPolicy: { policy: "same-origin" },
+        hidePoweredBy: true,
+        xssFilter: true,
+        noSniff: true,
+        referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+        originAgentCluster: true,
+    })
+);
 app.use(cookieParser());
 app.use(express.json());
 app.use(
@@ -32,14 +67,17 @@ app.use(
     credentials: true,
   }),
 );
+app.use(limiter);
+
 
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
 
+
 app.use("/api/auth", authRouter);
 app.use("/api/crop", cropRouter);
-app.use("/api/ai", aiRouter);
+app.use("/api/ai", aiLimiter,aiRouter);
 app.use("/api/notices", newsRouter);
 app.use("/api/video", videoRouter);
 app.use("/api/calculate", calculationRouter);
